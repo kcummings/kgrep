@@ -137,38 +137,12 @@ namespace kgrep
                 return;
 
              try {
-
-                 // First occurance replaces are on a line basis.
+                 KgrepEngine engine = new KgrepEngine();
                  string line;
-                 StringBuilder sb = new StringBuilder();
                  while ((line = sr.ReadLine()) != null) {
-                    foreach (Replacement rep in repList) {
-                        if (rep.criteria.Length > 0) {
-                            if (!Regex.IsMatch(line, rep.criteria))
-                                continue;
-                        }                        
-                        if (!rep.multiple) {
-                        //    if (Regex.IsMatch(line, rep.pattern)) {
-                                //line = Regex.Replace(line, rep.fromPattern, rep.topattern);
-                                line = rep.fromPattern.Replace(line, rep.topattern);
-                        //        break;
-                         //   }
-                        }
-                     }
-                     sb.Append(line);
-                     sb.Append('\n');
-                    //Console.WriteLine(line);
+                     Console.WriteLine(engine.ApplyReplacements(line, repList));
                  }
 
-                 // Multiple occurance replacements are on a one string file basis.
-                 string fileAsOneString = sb.ToString();
-                 foreach (Replacement rep in repList) {
-                     if (rep.multiple) {
-                         //fileAsOneString = Regex.Replace(fileAsOneString, rep.pattern, markToCharacters(rep.topattern), RegexOptions.Multiline);
-                         fileAsOneString = rep.fromPattern.Replace(fileAsOneString, markToCharacters(rep.topattern));
-                     }
-                 }
-                 Console.Write(fileAsOneString.Replace("\n", Environment.NewLine));
             }
             catch (Exception e) {
                 Console.WriteLine("{0}", e.Message);

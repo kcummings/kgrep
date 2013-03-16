@@ -1,4 +1,8 @@
 /src/bin
 /src/obj
+/Tests/bin
+/Tests/obj
+/Tests/TestResult.xml
 kgrep.suo
 *.user
+
