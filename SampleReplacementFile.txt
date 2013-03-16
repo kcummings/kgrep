@@ -1,0 +1,30 @@
+# Syntax of a kgrep replacement line:
+
+# (delim=?) + (anchor) + pattern + new value
+# if the line starts with "delim=" the given delimitor is used to seperate the pattern from new value.
+# if anchor is given, the replacement only applies to lines that match the anchor. Anchor is a regular expression.
+
+# Everything after a '#' is considered a comment.
+
+# leading and trailing spaces and are ignored. If a space is required use '\s'
+# It is case sensitive.
+
+# Input line is: "Let's go to the git store." becomes output line: "Let's go to the gitmore store."
+git ~ gitmore
+
+# Input line is: "Let's go to the git store." becomes output line: "Let's go to the store."
+# i.e. the string 'git' is removed from the line.
+git ~ 
+
+# Given "Hello git" becomes "git Hello".
+(Hello)\s+(git)     ~  \2 \1
+
+# Given "<chapter id="12"> becomes "chap id is 12".
+<chapter id="(.*?)"> ~ chap id is \1
+
+# removes all the tags attributes.
+<chapter\s+(.*?)>  ~ <chapter>
+
+
+START MULTIPLE REPLACEMENTS
+
