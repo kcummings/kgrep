@@ -28,5 +28,26 @@ namespace kgrep {
             }
             return true;
         }
+
+        public string ScanForTokens(string line, string tokenpattern, string delim) {
+            StringBuilder sb = new StringBuilder();
+            Regex re = new Regex(tokenpattern);
+            Match m = re.Match(line);
+
+            // Only return submatches if found, otherwise return any matches.
+            while (m.Success) {
+                int[] gnums = re.GetGroupNumbers();
+                if (gnums.Length > 1) {   // Group[0] is always original string
+                    for (int i = 1; i < gnums.Length; i++) {
+                        sb.Append((m.Groups[gnums[i]]));
+                    }
+                } else
+                    // Only print the substring that was matched.
+                    sb.Append((m.Value));
+                sb.Append(delim);
+                m = m.NextMatch();
+            }
+            return sb.ToString();
+        }
     }
 }

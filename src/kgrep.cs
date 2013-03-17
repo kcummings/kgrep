@@ -82,22 +82,10 @@ namespace kgrep
             HandleInput sr = new HandleInput(filename);
 
             try {
+                KgrepEngine engine = new KgrepEngine();
                 r = new Regex(matchpattern);
                 while ((line = sr.ReadLine()) != null) {
-                    Match m = Regex.Match(line,matchpattern);
-                    while (m.Success) {
-                        int[] gnums = r.GetGroupNumbers();
-                        if (gnums.Length > 1) {
-                            for (int i = 1; i < gnums.Length; i++) {
-                                Console.Write(m.Groups[gnums[i]]);
-                            }
-                            Console.Write("\n");
-                        }
-                        else
-                            // Only print the substring that was matched.
-                            Console.WriteLine(m.Value);
-                        m = m.NextMatch();
-                    }
+                    engine.ScanForTokens(line, matchpattern, "\n");
                 }
             }
             catch (Exception e) {
