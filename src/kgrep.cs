@@ -40,10 +40,6 @@ namespace kgrep
                         matchpattern = args[0];
                         if (File.Exists(filename))
                             grep(filename, matchpattern);  // kgrep matchpattern filename 
-                        else {
-                            topattern = args[1];
-                            grep(READ_STDIN, matchpattern, topattern);  // cat filename|kgrep matchpattern topattern
-                        }
                         break;
                 }
             }
@@ -62,8 +58,6 @@ namespace kgrep
                     if (File.Exists(args[i])) {
                         if (topattern == null)
                             grep(args[i], matchpattern);  // kgrep matchpattern filename1 ... filenameN
-                        else
-                            grep(args[i], matchpattern, topattern);  // kgrep matchpattern topattern filename1 ... filenameN
                     }
                 }
             } 
@@ -94,28 +88,6 @@ namespace kgrep
             finally {
                 sr.Close();
             }
-        }
-
-        static void grep(string filename, string matchpattern, string topattern) {
-            string fileAsOneString;
-            HandleInput sr = new HandleInput(filename);
-
-            try {
-                fileAsOneString = Regex.Replace(sr.ReadToEnd(), matchpattern, markToCharacters(topattern), RegexOptions.Multiline);
-                Console.Write(fileAsOneString.Replace("\\n","\n"));
-            }
-            catch (Exception e) {
-                Console.WriteLine("{0}", e.Message);
-            }
-            finally {
-                sr.Close();
-            }
-        }
-
-        static string markToCharacters(string tostring) {
-            tostring = tostring.Replace(@"\s", " ");
-            tostring = tostring.Replace(@"\n", "\n");
-            return tostring.Replace(@"\t", "\t");
         }
 
         // Use replacements from a collection rather than the command line.
