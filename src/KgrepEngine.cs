@@ -13,6 +13,7 @@ namespace kgrep {
             foreach (Replacement rep in repList) {
                 if (isCandidateForReplacement(line, rep)) {
                     if (rep.multiple) break;
+                  //  Console.WriteLine("{0} {1} {2}", rep.criteria, rep.fromPattern, rep.topattern);
                     line = rep.fromPattern.Replace(line, rep.topattern);
                 }
             }
@@ -37,14 +38,16 @@ namespace kgrep {
             // Only return submatches if found, otherwise return any matches.
             while (m.Success) {
                 int[] gnums = re.GetGroupNumbers();
-                if (gnums.Length > 1) {   // Group[0] is always original string
+                if (gnums.Length > 1) {  
                     for (int i = 1; i < gnums.Length; i++) {
                         sb.Append((m.Groups[gnums[i]]));
+                        sb.Append(delim);
                     }
-                } else
+                } else {
                     // Only print the substring that was matched.
                     sb.Append((m.Value));
-                sb.Append(delim);
+                    sb.Append(delim);
+                }
                 m = m.NextMatch();
             }
             return sb.ToString();

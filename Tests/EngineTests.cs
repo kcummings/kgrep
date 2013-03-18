@@ -16,6 +16,15 @@ namespace kgrep.Tests {
         }
 
         [Test]
+        public void TestSimpleReplacementToRemoveToken() {
+            KgrepEngine engine = new KgrepEngine();
+            List<Replacement> reps = new List<Replacement>();
+            Replacement rep = new Replacement(false, "", "token", "");
+            reps.Add(rep);
+            Assert.AreEqual("abc", engine.ApplyReplacements("abctoken", reps));
+        }
+
+        [Test]
         public void TestSimpleReplacementNoMatch() {
             KgrepEngine engine = new KgrepEngine();
             List<Replacement> reps = new List<Replacement>();
@@ -34,15 +43,6 @@ namespace kgrep.Tests {
         }
 
         [Test]
-        public void TestMultipleOccurances() {
-            KgrepEngine engine = new KgrepEngine();
-            List<Replacement> reps = new List<Replacement>();
-            Replacement rep = new Replacement(false, "", "ab", "de");
-            reps.Add(rep);
-            Assert.AreEqual("dele dee lincoln",engine.ApplyReplacements("able abe lincoln", reps));
-        }
-
-        [Test]
         public void TestEndPointReplacements() {
             KgrepEngine engine = new KgrepEngine();
             List<Replacement> reps = new List<Replacement>();
@@ -58,6 +58,12 @@ namespace kgrep.Tests {
         public void TestScannerForSingleToken() {
             KgrepEngine engine = new KgrepEngine();
             Assert.AreEqual("b",engine.ScanForTokens("abc", "a(b)c",""));
+        }
+
+        [Test]
+        public void TestScannerForMultipleGroups() {
+            KgrepEngine engine = new KgrepEngine();
+            Assert.AreEqual("ell|o|", engine.ScanForTokens("hello world", "h(...)(.)", "|"));
         }
 
         [Test]
