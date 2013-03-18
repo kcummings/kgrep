@@ -20,12 +20,14 @@ namespace kgrep
             const string READ_STDIN = "stdin";  // can be any literal as long as it's not a valid file name
             List<Replacement> repList = new List<Replacement>();
 
-            //Console.WriteLine(args.Length.ToString());
-            if (args.Length == 1) {  // cat filename|kgrep matchpattern
+            // cat filename|kgrep matchpattern
+            if (args.Length == 1) {  
                 matchpattern = args[0];
-                grep(READ_STDIN, matchpattern);  // read from stdin
+                ScanAndPrintTokens(READ_STDIN, matchpattern);  // read from stdin
             }
-            else if (args.Length == 2) {// kgrep matchpattern filename OR cat filename|kgrep matchpattern topattern
+            
+            // kgrep matchpattern filename OR cat filename|kgrep matchpattern topattern
+            else if (args.Length == 2) {
                 filename = args[1];
                 switch (args[0])
 	            {
@@ -36,21 +38,21 @@ namespace kgrep
                     default:
                         matchpattern = args[0];
                         if (File.Exists(filename))
-                            grep(filename, matchpattern);  // kgrep matchpattern filename 
-                        else {
+                            ScanAndPrintTokens(filename, matchpattern);  // kgrep matchpattern filename 
+                        else 
                             SingleFindAndReplace(matchpattern, topattern);
-                        }
                         break;
                 }
             }
+
+            // kgrep matchpattern filename1 .... filenameN
             else if (args.Length > 2) {
-                // kgrep matchpattern filename1 .... filenameN
                 matchpattern = args[0];
                 topattern = args[1];
                 if (File.Exists(topattern)) { // no pattern given, it's a file instead
                     for (int i = 1; i < args.Length; i = i + 1) {
                         if (File.Exists(args[i])) {
-                            grep(args[i], matchpattern);  // kgrep matchpattern filename1 ... filenameN
+                            ScanAndPrintTokens(args[i], matchpattern);  // kgrep matchpattern filename1 ... filenameN
                         }
                     }
                 }
@@ -76,7 +78,7 @@ namespace kgrep
         }
 
         // kgrep being used as a scanner/grep.
-        static void grep(string filename, string matchpattern) {
+        static void ScanAndPrintTokens(string filename, string matchpattern) {
             string line;
             Regex r = null;
             HandleInput sr = new HandleInput(filename);
