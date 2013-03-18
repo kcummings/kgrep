@@ -33,7 +33,7 @@ namespace kgrep
 	            {
                     case "-f":  // kgrep -f replacementFile
                         repList = (new ReadReplacementFile(filename)).GetReplacements();
-                        grep(READ_STDIN, repList);
+                        SearchAndReplaceTokens(READ_STDIN, repList);
                         break;
                     default:
                         matchpattern = args[0];
@@ -74,7 +74,7 @@ namespace kgrep
             List<Replacement> repList = new List<Replacement>();
             Replacement rep = new Replacement(false, "", fromPattern, toPattern);
             repList.Add(rep);
-            grep("stdin", repList);
+            SearchAndReplaceTokens("stdin", repList);
         }
 
         // kgrep being used as a scanner/grep.
@@ -100,7 +100,7 @@ namespace kgrep
         }
 
         // Kgrep being used as sed.
-        static void grep(string filename, List<Replacement> repList) {
+        static void SearchAndReplaceTokens(string filename, List<Replacement> repList) {
             HandleInput sr = new HandleInput(filename);
             if (repList.Count == 0)
                 return;
