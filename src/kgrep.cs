@@ -8,7 +8,6 @@ using System.Diagnostics;
 
 namespace kgrep
 {
-    // Usage: kgrep matchpattern [topattern] filename
     // Finds ALL occurances of matchpattern in filename.
     // All output is written to stdout (console).
     class kgrep
@@ -18,29 +17,28 @@ namespace kgrep
             string matchpattern;
             string topattern = null;
             const string READ_STDIN = "stdin";  // can be any literal as long as it's not a valid file name
-            List<Replacement> repList = new List<Replacement>();
 
             // cat filename|kgrep matchpattern
             if (args.Length == 1) {  
                 matchpattern = args[0];
-                ScanAndPrintTokens(READ_STDIN, matchpattern);  // read from stdin
+                ScanAndPrintTokens(READ_STDIN, matchpattern);  
             }
             
-            // kgrep matchpattern filename OR cat filename|kgrep matchpattern topattern
             else if (args.Length == 2) {
                 filename = args[1];
                 switch (args[0])
 	            {
-                    case "-f":  // kgrep -f replacementFile
+                    case "-f":  // cat filename|kgrep -f replacementFile
+                        List<Replacement> repList = new List<Replacement>();
                         repList = (new ReadReplacementFile(filename)).GetReplacements();
-                        SearchAndReplaceTokens(READ_STDIN, repList);
+                        SearchAndReplaceTokens(repList, READ_STDIN);
                         break;
                     default:
                         matchpattern = args[0];
                         if (File.Exists(filename))
-                            ScanAndPrintTokens(filename, matchpattern);  // kgrep matchpattern filename 
+                            ScanAndPrintTokens(matchpattern, filename);  // kgrep matchpattern filename 
                         else 
-                            SingleFindAndReplace(matchpattern, topattern);
+                            SingleFindAndReplaceStdin(matchpattern, topattern); // cat filename|kgrep matchpattern topattern
                         break;
                 }
             }
@@ -49,43 +47,47 @@ namespace kgrep
             else if (args.Length > 2) {
                 matchpattern = args[0];
                 topattern = args[1];
-                if (File.Exists(topattern)) { // no pattern given, it's a file instead
-                    for (int i = 1; i < args.Length; i = i + 1) {
-                        if (File.Exists(args[i])) {
-                            ScanAndPrintTokens(args[i], matchpattern);  // kgrep matchpattern filename1 ... filenameN
-                        }
-                    }
-                }
-                else {  // kgrep matchpattern topattern
-                    SingleFindAndReplace(matchpattern, topattern);
-                }
+                if (File.Exists(topattern))
+                    ScanAndPrintFromMultipleFiles(matchpattern, args);
+                else  
+                    SingleFindAndReplaceStdin(matchpattern, topattern);
             } 
             else {
-                Console.WriteLine("kgrep (Kevin's grep) v0.03");
-                Console.WriteLine("Usage: kgrep matchpattern [topattern] filename1 ... filenameN");
-                Console.WriteLine("       kgrep -f patternfile filename1 ... filenameN");
-                Console.WriteLine("       cat filename|kgrep matchpattern [topattern]");
+                Usage();
             }
-            //Console.ReadLine();
+        }
+
+        private static void Usage() {
+            Console.WriteLine("kgrep (Kevin's grep) v0.04");
+            Console.WriteLine("Usage: kgrep matchpattern [topattern] filename1 ... filenameN");
+            Console.WriteLine("       kgrep -f patternfile filename1 ... filenameN");
+            Console.WriteLine("       cat filename|kgrep matchpattern [topattern]");
+        }
+
+        // kgrep matchpattern filename1 ... filenameN
+        private static void ScanAndPrintFromMultipleFiles(string matchpattern, string[] filelist) {
+            for (int i = 1; i < filelist.Length; i = i + 1) {
+                if (File.Exists(filelist[i])) {
+                    ScanAndPrintTokens(filelist[i], matchpattern);  
+                }
+            }
         }
 
         // kgrep matchpattern topattern
-        static void SingleFindAndReplace(string fromPattern, string toPattern) {
+        static void SingleFindAndReplaceStdin(string fromPattern, string toPattern) {
             List<Replacement> repList = new List<Replacement>();
             Replacement rep = new Replacement(false, "", fromPattern, toPattern);
             repList.Add(rep);
-            SearchAndReplaceTokens("stdin", repList);
+            SearchAndReplaceTokens(repList, "stdin");
         }
 
         // kgrep being used as a scanner/grep.
-        static void ScanAndPrintTokens(string filename, string matchpattern) {
-            string line;
-            Regex r = null;
+        static void ScanAndPrintTokens(string matchpattern, string filename) {
             HandleInput sr = new HandleInput(filename);
 
             try {
                 KgrepEngine engine = new KgrepEngine();
-                r = new Regex(matchpattern);
+                string line;
                 while ((line = sr.ReadLine()) != null) {
                     string alteredLine = engine.ScanForTokens(line, matchpattern, "\n");
                     if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
@@ -100,7 +102,7 @@ namespace kgrep
         }
 
         // Kgrep being used as sed.
-        static void SearchAndReplaceTokens(string filename, List<Replacement> repList) {
+        static void SearchAndReplaceTokens(List<Replacement> repList, string filename) {
             HandleInput sr = new HandleInput(filename);
             if (repList.Count == 0)
                 return;
