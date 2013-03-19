@@ -12,8 +12,8 @@ namespace kgrep
         private String inputFile;
         private bool _replaceAll = false;
         public bool replaceAll { get { return _replaceAll; } }
-        String COMMENT = "#";
-        String DELIM = "~";
+        private String COMMENT = "#";
+        private String DELIM = "~";
 
         public ReplacementFile(String filename) {
             inputFile = filename;

@@ -16,7 +16,7 @@ namespace kgrep
             string filename;
             string matchpattern;
             string topattern = null;
-            const string READ_STDIN = "stdin";  // can be any literal as long as it's not a valid file name
+            const string READ_STDIN = "stdin?";  // can be any literal as long as it's not a valid file name
 
             // cat filename|kgrep matchpattern
             if (args.Length == 1) {  

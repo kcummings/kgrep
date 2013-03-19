@@ -18,21 +18,6 @@ namespace kgrep
             }
         }
 
-        /// <summary>
-        /// Read entire input stream into a string with newlines
-        /// so can later regex on multi-lines.
-        /// </summary>
-        /// <returns></returns>
-        public string ReadToEnd() {
-            StringBuilder sb = new StringBuilder();
-            string line;
-            while ((line = ReadLine()) != null) {
-                sb.Append(line);
-                sb.Append('\n');
-            }
-            return sb.ToString();
-        }
-
         // Read in a line from the appropiate stream.
         public string ReadLine() {
             if (sr == null)
