@@ -104,10 +104,10 @@ namespace kgrep
         static void SearchAndReplaceTokens(ReplacementFile rf, string filename) {
             List<Replacement> repList = new List<Replacement>();
             repList = rf.GetReplacements();
-            SearchAndReplaceTokens(repList, filename, rf.replaceAll);
+            SearchAndReplaceTokens(repList, filename, rf.isReplaceAll);
         }
 
-        static void SearchAndReplaceTokens(List<Replacement> repList, string filename, bool replaceAll) {
+        static void SearchAndReplaceTokens(List<Replacement> repList, string filename, bool isReplaceAll) {
             HandleInput sr = new HandleInput(filename);
             if (repList.Count == 0)
                 return;
@@ -117,7 +117,7 @@ namespace kgrep
                  string line;
                  string alteredLine;
                  while ((line = sr.ReadLine()) != null) {
-                     if (replaceAll) 
+                     if (isReplaceAll) 
                          alteredLine = engine.ApplyReplacementsAll(line, repList);
                      else 
                          alteredLine = engine.ApplyReplacementsFirst(line, repList);

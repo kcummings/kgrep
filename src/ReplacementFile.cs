@@ -10,8 +10,8 @@ namespace kgrep
     {
         private List<Replacement> replacementList = new List<Replacement>();
         private String inputFile;
-        private bool _replaceAll = false;
-        public bool replaceAll { get { return _replaceAll; } }
+        private bool _isReplaceAll = false;
+        public bool isReplaceAll { get { return _isReplaceAll; } }
         private String COMMENT = "#";
         private String DELIM = "~";
 
@@ -44,7 +44,7 @@ namespace kgrep
 
                     // Once true, it's true for the remaining replacements.
                     if (line.StartsWith("ReplacementMode=All",true,ci))   // case insensitive 
-                        _replaceAll = true;
+                        _isReplaceAll = true;
 
                     // Remove any trailing comments.
                     int i = line.IndexOf(COMMENT);
