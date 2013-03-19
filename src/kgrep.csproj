@@ -43,7 +43,7 @@
     <Compile Include="kgrep.cs" />
     <Compile Include="KgrepEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReadReplacementFile.cs" />
+    <Compile Include="ReplacementFile.cs" />
     <Compile Include="Replacement.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -8,22 +8,30 @@ namespace kgrep {
 
         private bool stopReplacements = false;
 
-        public string ApplyReplacements(string line, List<Replacement> repList) {
+        public string ApplyReplacementsFirst(string line, List<Replacement> repList) {
+            if (stopReplacements) return line;
             if (repList.Count == 0)
                 return line;
 
             foreach (Replacement rep in repList) {
                 if (isCandidateForReplacement(line, rep)) {
-                    if (rep.multiple) {
-                       line = rep.fromPattern.Replace(line, rep.topattern);
-                    } else {
-                        if (!stopReplacements) {
-                            if (rep.fromPattern.IsMatch(line)) {
-                                stopReplacements = true;
-                            }
-                            line = rep.fromPattern.Replace(line, rep.topattern);
-                        }
+                    if (rep.fromPattern.IsMatch(line)) {
+                        stopReplacements = true;
+                        line = rep.fromPattern.Replace(line, rep.topattern);
+                        break;
                     }
+                }
+            }
+            return line;
+        }
+
+        public string ApplyReplacementsAll(string line, List<Replacement> repList) {
+            if (repList.Count == 0)
+                return line;
+
+            foreach (Replacement rep in repList) {
+                if (isCandidateForReplacement(line, rep)) {
+                   line = rep.fromPattern.Replace(line, rep.topattern);
                 }
             }
             return line;

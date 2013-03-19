@@ -6,19 +6,22 @@ using System.IO;
 
 namespace kgrep
 {
-    class ReadReplacementFile
+    class ReplacementFile
     {
         private List<Replacement> replacementList = new List<Replacement>();
         private String inputFile;
+        private bool _replaceAll = false;
+        public bool replaceAll { get { return _replaceAll; } }
         String COMMENT = "#";
+        String DELIM = "~";
 
-        public ReadReplacementFile(String filename) {
+        public ReplacementFile(String filename) {
             inputFile = filename;
         }
         // using List = List<Replacement> ;
         public List<Replacement> GetReplacements() {
             StreamReader sr;
-            Boolean multiple = false;
+            System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("en-US");
 
             if (File.Exists(inputFile)) {
                 String line;
@@ -33,27 +36,30 @@ namespace kgrep
                         continue;
                     }
 
-                    if (line.StartsWith("comment="))
+                    if (line.StartsWith("comment=",true,ci))
                         COMMENT = line.Substring("comment=".Length,1);
 
+                    if (line.StartsWith("delim=", true, ci))
+                        DELIM = line.Substring("delim=".Length, 1);
+
                     // Once true, it's true for the remaining replacements.
-                    if (line.StartsWith("START MULTIPLE REPLACMENTS"))
-                        multiple = true;
+                    if (line.StartsWith("ReplacementMode=All",true,ci))   // case insensitive 
+                        _replaceAll = true;
 
                     // Remove any trailing comments.
                     int i = line.IndexOf(COMMENT);
                     if (i >= 0)
                         line = line.Remove(i);
 
-                    String[] parts = line.Split("~".ToCharArray(),4);
+                    String[] parts = line.Split(DELIM.ToCharArray(),4);
                     if (parts.Length == 2) {
-                        // input pattern: from ~ to
+                        // input pattern: from ~ to         # assuming ~ is delim char.
                         //Console.WriteLine("Adding {0} to {1} with {2}", parts[0], parts[1], multiple.ToString());
-                        replacementList.Add( new Replacement( multiple, "", parts[0].Trim(), parts[1].Trim()));
+                        replacementList.Add( new Replacement("", parts[0].Trim(), parts[1].Trim()));
                     }
                     if (parts.Length == 3) {
                         // input pattern: anchor ~ from ~ to
-                        replacementList.Add(new Replacement(multiple, parts[0].Trim(), parts[1].Trim(), parts[2].Trim()));
+                        replacementList.Add(new Replacement(parts[0].Trim(), parts[1].Trim(), parts[2].Trim()));
                     }
                 }
                 sr.Close();

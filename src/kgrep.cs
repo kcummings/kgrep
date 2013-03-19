@@ -29,9 +29,8 @@ namespace kgrep
                 switch (args[0])
 	            {
                     case "-f":  // cat filename|kgrep -f replacementFile
-                        List<Replacement> repList = new List<Replacement>();
-                        repList = (new ReadReplacementFile(filename)).GetReplacements();
-                        SearchAndReplaceTokens(repList, READ_STDIN);
+                        ReplacementFile rf = new ReplacementFile(filename);
+                        SearchAndReplaceTokens(rf, READ_STDIN);
                         break;
                     default:
                         matchpattern = args[0];
@@ -58,7 +57,7 @@ namespace kgrep
         }
 
         private static void Usage() {
-            Console.WriteLine("kgrep (Kevin's grep) v0.04");
+            Console.WriteLine("kgrep (Kevin's grep) v0.05");
             Console.WriteLine("Usage: kgrep matchpattern [topattern] filename1 ... filenameN");
             Console.WriteLine("       kgrep -f patternfile filename1 ... filenameN");
             Console.WriteLine("       cat filename|kgrep matchpattern [topattern]");
@@ -76,9 +75,9 @@ namespace kgrep
         // kgrep matchpattern topattern
         static void SingleFindAndReplaceStdin(string fromPattern, string toPattern) {
             List<Replacement> repList = new List<Replacement>();
-            Replacement rep = new Replacement(false, "", fromPattern, toPattern);
+            Replacement rep = new Replacement("", fromPattern, toPattern);
             repList.Add(rep);
-            SearchAndReplaceTokens(repList, "stdin");
+            SearchAndReplaceTokens(repList, "stdin", true);
         }
 
         // kgrep being used as a scanner/grep.
@@ -102,7 +101,13 @@ namespace kgrep
         }
 
         // Kgrep being used as sed.
-        static void SearchAndReplaceTokens(List<Replacement> repList, string filename) {
+        static void SearchAndReplaceTokens(ReplacementFile rf, string filename) {
+            List<Replacement> repList = new List<Replacement>();
+            repList = rf.GetReplacements();
+            SearchAndReplaceTokens(repList, filename, rf.replaceAll);
+        }
+
+        static void SearchAndReplaceTokens(List<Replacement> repList, string filename, bool replaceAll) {
             HandleInput sr = new HandleInput(filename);
             if (repList.Count == 0)
                 return;
@@ -110,8 +115,12 @@ namespace kgrep
              try {
                  KgrepEngine engine = new KgrepEngine();
                  string line;
+                 string alteredLine;
                  while ((line = sr.ReadLine()) != null) {
-                     string alteredLine = engine.ApplyReplacements(line, repList);
+                     if (replaceAll) 
+                         alteredLine = engine.ApplyReplacementsAll(line, repList);
+                     else 
+                         alteredLine = engine.ApplyReplacementsFirst(line, repList);
                      if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
                  }
             }
