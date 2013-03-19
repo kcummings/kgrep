@@ -16,7 +16,7 @@ namespace kgrep.Tests {
             }
 
             [Test]
-            public void TestScannerForMultipleGroups() {
+            public void TestScannerForMultipleGroupsOnOneLine() {
                 KgrepEngine engine = new KgrepEngine();
                 Assert.AreEqual("ell|o|", engine.ScanForTokens("hello world", "h(...)(.)", "|"));
             }

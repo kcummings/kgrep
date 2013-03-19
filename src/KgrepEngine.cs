@@ -6,15 +6,24 @@ using System.Text.RegularExpressions;
 namespace kgrep {
     public class KgrepEngine {
 
+        private bool stopReplacements = false;
+
         public string ApplyReplacements(string line, List<Replacement> repList) {
             if (repList.Count == 0)
                 return line;
 
             foreach (Replacement rep in repList) {
                 if (isCandidateForReplacement(line, rep)) {
-                    if (rep.multiple) break;
-                  //  Console.WriteLine("{0} {1} {2}", rep.criteria, rep.fromPattern, rep.topattern);
-                    line = rep.fromPattern.Replace(line, rep.topattern);
+                    if (rep.multiple) {
+                       line = rep.fromPattern.Replace(line, rep.topattern);
+                    } else {
+                        if (!stopReplacements) {
+                            if (rep.fromPattern.IsMatch(line)) {
+                                stopReplacements = true;
+                            }
+                            line = rep.fromPattern.Replace(line, rep.topattern);
+                        }
+                    }
                 }
             }
             return line;
