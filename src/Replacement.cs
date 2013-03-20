@@ -8,18 +8,18 @@ namespace kgrep
 {
     public class Replacement
     {
-        [XmlIgnore] public String criteria = null;
+        [XmlIgnore] public String Criteria = null;
       //  public String pattern = null;
         public String topattern = null;
-        public Regex fromPattern;
+        public Regex frompattern;
 
         public Replacement() {}
 
-        public Replacement(string pcriteria, string pfromPattern, string ptoPattern) {
-            criteria = pcriteria;
+        public Replacement(string pCriteria, string pFromPattern, string pToPattern) {
+            Criteria = pCriteria;
             //pattern = ppattern.Trim();
-            fromPattern = new Regex(pfromPattern.Trim(), RegexOptions.Compiled);
-            topattern = ptoPattern.Trim();
+            frompattern = new Regex(pFromPattern.Trim(), RegexOptions.Compiled);
+            topattern = pToPattern.Trim();
         }
     }
 }

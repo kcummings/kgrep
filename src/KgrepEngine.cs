@@ -6,18 +6,19 @@ using System.Text.RegularExpressions;
 namespace kgrep {
     public class KgrepEngine {
 
-        private bool stopReplacements = false;
+        private bool _stopReplacements = false;
 
+        // "ReplacementMode=First" in effect.
         public string ApplyReplacementsFirst(string line, List<Replacement> repList) {
-            if (stopReplacements) return line;
+            if (_stopReplacements) return line;
             if (repList.Count == 0)
                 return line;
 
             foreach (Replacement rep in repList) {
                 if (isCandidateForReplacement(line, rep)) {
-                    if (rep.fromPattern.IsMatch(line)) {
-                        stopReplacements = true;
-                        line = rep.fromPattern.Replace(line, rep.topattern);
+                    if (rep.frompattern.IsMatch(line)) {
+                        _stopReplacements = true;
+                        line = rep.frompattern.Replace(line, rep.topattern);
                         break;
                     }
                 }
@@ -25,13 +26,14 @@ namespace kgrep {
             return line;
         }
 
+        // "ReplacementMode=All" in effect.
         public string ApplyReplacementsAll(string line, List<Replacement> repList) {
             if (repList.Count == 0)
                 return line;
 
             foreach (Replacement rep in repList) {
                 if (isCandidateForReplacement(line, rep)) {
-                   line = rep.fromPattern.Replace(line, rep.topattern);
+                    line = rep.frompattern.Replace(line, rep.topattern);
                 }
             }
             return line;
@@ -39,8 +41,8 @@ namespace kgrep {
 
         private bool isCandidateForReplacement(string line, Replacement rep) {
             // Has a matching anchor?
-            if (rep.criteria.Length > 0) {
-                if (Regex.IsMatch(line, rep.criteria))
+            if (rep.Criteria.Length > 0) {
+                if (Regex.IsMatch(line, rep.Criteria))
                     return true;
                 return false;
             }

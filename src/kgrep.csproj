@@ -42,6 +42,7 @@
     <Compile Include="HandleInput.cs" />
     <Compile Include="kgrep.cs" />
     <Compile Include="KgrepEngine.cs" />
+    <Compile Include="ParseCommandLine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReplacementFile.cs" />
     <Compile Include="Replacement.cs" />

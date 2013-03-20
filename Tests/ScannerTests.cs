@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using kgrep;
+﻿using kgrep;
 using NUnit.Framework;
 
-namespace kgrep.Tests {
+namespace Tests {
  
         [TestFixture]
         public class ScannerTests {

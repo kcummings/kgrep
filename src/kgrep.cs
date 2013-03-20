@@ -13,102 +13,67 @@ namespace kgrep
     class kgrep
     {
         static void Main(string[] args) {
-            string filename;
-            string matchpattern;
-            string topattern = null;
-            const string READ_STDIN = "stdin?";  // can be any literal as long as it's not a valid file name
 
-            // cat filename|kgrep matchpattern
-            if (args.Length == 1) {  
-                matchpattern = args[0];
-                ScanAndPrintTokens(READ_STDIN, matchpattern);  
-            }
-            
-            else if (args.Length == 2) {
-                filename = args[1];
-                switch (args[0])
-	            {
-                    case "-f":  // cat filename|kgrep -f replacementFile
-                        ReplacementFile rf = new ReplacementFile(filename);
-                        SearchAndReplaceTokens(rf, READ_STDIN);
-                        break;
-                    default:
-                        matchpattern = args[0];
-                        if (File.Exists(filename))
-                            ScanAndPrintTokens(matchpattern, filename);  // kgrep matchpattern filename 
-                        else 
-                            SingleFindAndReplaceStdin(matchpattern, topattern); // cat filename|kgrep matchpattern topattern
-                        break;
-                }
+            ParseCommandLine cmdarg = new ParseCommandLine(args);
+            if (cmdarg.InputSourceNames.Count == 0) {
+                Console.WriteLine("No input sources given.");
+                Usage();
             }
 
-            // kgrep matchpattern filename1 .... filenameN
-            else if (args.Length > 2) {
-                matchpattern = args[0];
-                topattern = args[1];
-                if (File.Exists(topattern))
-                    ScanAndPrintFromMultipleFiles(matchpattern, args);
-                else  
-                    SingleFindAndReplaceStdin(matchpattern, topattern);
-            } 
+            // kgrep matchpattern topattern filename1 ... filenameN     #A
+            // cat filename|kgrep matchpattern topattern                #A
+            // kgrep matchpattern filename1 ... filenameN               #B
+            // cat filename|kgrep matchpattern                          #B   
+            // kgrep -f patternfile filename1 ... filenameN             #C
+            // kgrep -f patternfile filename1                           #C          
+            // cat filename|kgrep -f patternfile                        #C
+            if (cmdarg.ReplacementFileName != null) {  // #C
+                ReplacementFile rf = new ReplacementFile(cmdarg.ReplacementFileName);
+                SearchAndReplaceTokens(rf, cmdarg.InputSourceNames);
+            } else if (cmdarg.ReplacementPattern != null && cmdarg.SearchPattern != null)  // #A
+                SearchAndReplaceTokens(cmdarg.SearchPattern, cmdarg.ReplacementPattern, cmdarg.InputSourceNames);
+            else if (cmdarg.SearchPattern != null && cmdarg.ReplacementPattern == null)
+                ScanAndPrintTokens(cmdarg.SearchPattern, cmdarg.InputSourceNames);  // #B
             else {
+                Console.WriteLine("unknown command line argument pattern");
                 Usage();
             }
         }
 
-        private static void Usage() {
-            Console.WriteLine("kgrep (Kevin's grep) v0.05");
-            Console.WriteLine("Usage: kgrep matchpattern [topattern] filename1 ... filenameN");
-            Console.WriteLine("       kgrep -f patternfile filename1 ... filenameN");
-            Console.WriteLine("       cat filename|kgrep matchpattern [topattern]");
-        }
-
-        // kgrep matchpattern filename1 ... filenameN
-        private static void ScanAndPrintFromMultipleFiles(string matchpattern, string[] filelist) {
-            for (int i = 1; i < filelist.Length; i = i + 1) {
-                if (File.Exists(filelist[i])) {
-                    ScanAndPrintTokens(filelist[i], matchpattern);  
-                }
-            }
-        }
-
-        // kgrep matchpattern topattern
-        static void SingleFindAndReplaceStdin(string fromPattern, string toPattern) {
-            List<Replacement> repList = new List<Replacement>();
-            Replacement rep = new Replacement("", fromPattern, toPattern);
-            repList.Add(rep);
-            SearchAndReplaceTokens(repList, "stdin", true);
-        }
-
         // kgrep being used as a scanner/grep.
-        static void ScanAndPrintTokens(string matchpattern, string filename) {
-            HandleInput sr = new HandleInput(filename);
-
+        static void ScanAndPrintTokens(string matchpattern, List<string> filenames) {
             try {
                 KgrepEngine engine = new KgrepEngine();
-                string line;
-                while ((line = sr.ReadLine()) != null) {
-                    string alteredLine = engine.ScanForTokens(line, matchpattern, "\n");
-                    if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
+                foreach (string filename in filenames) {
+                    HandleInput sr = new HandleInput(filename);
+                    string line;
+                    while ((line = sr.ReadLine()) != null) {
+                        string alteredLine = engine.ScanForTokens(line, matchpattern, "\n");
+                        if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
+                    }
+                    sr.Close();
                 }
             }
             catch (Exception e) {
                 Console.WriteLine("{0}", e.Message);
             }
-            finally {
-                sr.Close();
-            }
         }
 
         // Kgrep being used as sed.
-        static void SearchAndReplaceTokens(ReplacementFile rf, string filename) {
-            List<Replacement> repList = new List<Replacement>();
-            repList = rf.GetReplacements();
-            SearchAndReplaceTokens(repList, filename, rf.isReplaceAll);
+        static void SearchAndReplaceTokens(string searchPattern, string toPattern, List<String> filenames) {
+            List<Replacement> reps = new List<Replacement>();
+            Replacement rep = new Replacement("", searchPattern, toPattern);
+            reps.Add(rep);
+            SearchAndReplaceTokens(reps, filenames, true);
         }
 
-        static void SearchAndReplaceTokens(List<Replacement> repList, string filename, bool isReplaceAll) {
-            HandleInput sr = new HandleInput(filename);
+        static void SearchAndReplaceTokens(ReplacementFile rf, List<string> filenames) {
+            List<Replacement> repList = new List<Replacement>();
+            repList = rf.GetReplacements();
+            SearchAndReplaceTokens(repList, filenames, rf.isReplaceAll);
+        }
+
+        static void SearchAndReplaceTokens(List<Replacement> repList, List<string> filenames, bool isReplaceAll) {
             if (repList.Count == 0)
                 return;
 
@@ -116,20 +81,29 @@ namespace kgrep
                  KgrepEngine engine = new KgrepEngine();
                  string line;
                  string alteredLine;
-                 while ((line = sr.ReadLine()) != null) {
-                     if (isReplaceAll) 
-                         alteredLine = engine.ApplyReplacementsAll(line, repList);
-                     else 
-                         alteredLine = engine.ApplyReplacementsFirst(line, repList);
-                     if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
+                 foreach (string filename in filenames) {
+                     HandleInput sr = new HandleInput(filename);
+                     while ((line = sr.ReadLine()) != null) {
+                         if (isReplaceAll)
+                             alteredLine = engine.ApplyReplacementsAll(line, repList);
+                         else
+                             alteredLine = engine.ApplyReplacementsFirst(line, repList);
+                         if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
+                     }
+                     sr.Close();
                  }
             }
             catch (Exception e) {
                 Console.WriteLine("{0}", e.Message);
             }
-            finally {
-                sr.Close();
-            }
+        }
+
+        private static void Usage() {
+            Console.WriteLine("kgrep (Kevin's grep) v0.2");
+            Console.WriteLine("Usage: kgrep matchpattern [topattern] filename1 ... filenameN");
+            Console.WriteLine("       kgrep -f patternfile filename1 ... filenameN");
+            Console.WriteLine("       cat filename|kgrep matchpattern [topattern]");
+            Environment.Exit(1);
         }
     }
 }

@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Collections;
 using System.IO;
 
 namespace kgrep
@@ -10,7 +8,7 @@ namespace kgrep
     {
         private List<Replacement> replacementList = new List<Replacement>();
         private String inputFile;
-        private bool _isReplaceAll = false;
+        private bool _isReplaceAll = true;
         public bool isReplaceAll { get { return _isReplaceAll; } }
         private String COMMENT = "#";
         private String DELIM = "~";
