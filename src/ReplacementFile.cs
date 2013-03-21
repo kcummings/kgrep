@@ -4,7 +4,7 @@ using System.IO;
 
 namespace kgrep
 {
-    class ReplacementFile
+    public class ReplacementFile
     {
         private List<Replacement> replacementList = new List<Replacement>();
         private String inputFile;

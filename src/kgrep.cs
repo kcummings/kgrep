@@ -1,16 +1,28 @@
 using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml.Serialization;
-using System.Diagnostics;
+/*
+##The MIT License (MIT)
+####*Copyright (c) 2013, Kevin Cummings <kevin.cummings@gmx.com>*
+
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, 
+ * and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE 
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 namespace kgrep
 {
-    // Finds ALL occurances of matchpattern in filename.
+    // kgrep can scan an input source for all occurances of a pattern 
+    // or scan and replace based on regular expressions.
     // All output is written to stdout (console).
-    class kgrep
+    class Kgrep
     {
         static void Main(string[] args) {
 
@@ -27,74 +39,18 @@ namespace kgrep
             // kgrep -f patternfile filename1 ... filenameN             #C
             // kgrep -f patternfile filename1                           #C          
             // cat filename|kgrep -f patternfile                        #C
+
+            KgrepEngine engine = new KgrepEngine();
             if (cmdarg.ReplacementFileName != null) {  // #C
                 ReplacementFile rf = new ReplacementFile(cmdarg.ReplacementFileName);
-                SearchAndReplaceTokens(rf, cmdarg.InputSourceNames);
+                engine.SearchAndReplaceTokens(rf, cmdarg.InputSourceNames);
             } else if (cmdarg.ReplacementPattern != null && cmdarg.SearchPattern != null)  // #A
-                SearchAndReplaceTokens(cmdarg.SearchPattern, cmdarg.ReplacementPattern, cmdarg.InputSourceNames);
-            else if (cmdarg.SearchPattern != null && cmdarg.ReplacementPattern == null)
-                ScanAndPrintTokens(cmdarg.SearchPattern, cmdarg.InputSourceNames);  // #B
+                engine.SearchAndReplaceTokens(cmdarg.SearchPattern, cmdarg.ReplacementPattern, cmdarg.InputSourceNames);
+            else if (cmdarg.ReplacementPattern == null && cmdarg.SearchPattern != null)
+                engine.ScanAndPrintTokens(cmdarg.SearchPattern, cmdarg.InputSourceNames);  // #B
             else {
                 Console.WriteLine("unknown command line argument pattern");
                 Usage();
-            }
-        }
-
-        // kgrep being used as a scanner/grep.
-        static void ScanAndPrintTokens(string matchpattern, List<string> filenames) {
-            try {
-                KgrepEngine engine = new KgrepEngine();
-                foreach (string filename in filenames) {
-                    HandleInput sr = new HandleInput(filename);
-                    string line;
-                    while ((line = sr.ReadLine()) != null) {
-                        string alteredLine = engine.ScanForTokens(line, matchpattern, "\n");
-                        if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
-                    }
-                    sr.Close();
-                }
-            }
-            catch (Exception e) {
-                Console.WriteLine("{0}", e.Message);
-            }
-        }
-
-        // Kgrep being used as sed.
-        static void SearchAndReplaceTokens(string searchPattern, string toPattern, List<String> filenames) {
-            List<Replacement> reps = new List<Replacement>();
-            Replacement rep = new Replacement("", searchPattern, toPattern);
-            reps.Add(rep);
-            SearchAndReplaceTokens(reps, filenames, true);
-        }
-
-        static void SearchAndReplaceTokens(ReplacementFile rf, List<string> filenames) {
-            List<Replacement> repList = new List<Replacement>();
-            repList = rf.GetReplacements();
-            SearchAndReplaceTokens(repList, filenames, rf.isReplaceAll);
-        }
-
-        static void SearchAndReplaceTokens(List<Replacement> repList, List<string> filenames, bool isReplaceAll) {
-            if (repList.Count == 0)
-                return;
-
-             try {
-                 KgrepEngine engine = new KgrepEngine();
-                 string line;
-                 string alteredLine;
-                 foreach (string filename in filenames) {
-                     HandleInput sr = new HandleInput(filename);
-                     while ((line = sr.ReadLine()) != null) {
-                         if (isReplaceAll)
-                             alteredLine = engine.ApplyReplacementsAll(line, repList);
-                         else
-                             alteredLine = engine.ApplyReplacementsFirst(line, repList);
-                         if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
-                     }
-                     sr.Close();
-                 }
-            }
-            catch (Exception e) {
-                Console.WriteLine("{0}", e.Message);
             }
         }
 

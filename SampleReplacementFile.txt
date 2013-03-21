@@ -28,3 +28,6 @@ git ~
 # removes all the tags attributes.
 <chapter\s+(.*?)>  ~ <chapter>
 
+# Replace "abc" with "def" only if the line contains "changeme". changeme can be a regular expression
+changeme ~ abc ~ def
+

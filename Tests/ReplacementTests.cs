@@ -102,6 +102,22 @@ namespace Tests {
         }
 
         [Test]
+        public void TestSuccessWithAnchorAsRegex() {
+            KgrepEngine engine = new KgrepEngine();
+            List<Replacement> reps = new List<Replacement>();
+            reps.Add(new Replacement("t...y", "you", "to"));
+            Assert.AreEqual("from me to to today", engine.ApplyReplacementsFirst("from me to you today", reps));
+        }
+
+        [Test]
+        public void TestFailureWithAnchorAsRegex() {
+            KgrepEngine engine = new KgrepEngine();
+            List<Replacement> reps = new List<Replacement>();
+            reps.Add(new Replacement("ty", "you", "to"));
+            Assert.AreEqual("from me to you today", engine.ApplyReplacementsFirst("from me to you today", reps));
+        }
+
+        [Test]
         public void TestWithAnchorMismatch() {
             KgrepEngine engine = new KgrepEngine();
             List<Replacement> reps = new List<Replacement>();
