@@ -50,7 +50,8 @@
   <ItemGroup>
     <Compile Include="ParseCommandLineTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReplacementTests.cs" />
+    <Compile Include="ReplacementArgumentTests.cs" />
+    <Compile Include="ReplacementFileTests.cs" />
     <Compile Include="ScannerTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,23 @@ using NUnit.Framework;
 namespace Tests {
     [TestFixture]
     public class ReplacementTests {
+
+        [Test]
+        public void TestRegexReplacement() {
+            KgrepEngine engine = new KgrepEngine();
+            List<Replacement> reps = new List<Replacement>();
+            reps.Add(new Replacement("", "e(..)o-(...)", "$1 $2"));
+            Assert.AreEqual("hll bye", engine.ApplyReplacementsAll("hello-bye", reps));
+        }
+
+        [Test]
+        public void TestRegexExtractReplacement() {
+            KgrepEngine engine = new KgrepEngine();
+            List<Replacement> reps = new List<Replacement>();
+            reps.Add(new Replacement("", "<tag attr='(.+?)'>", "attr=$1"));
+            Assert.AreEqual("attr=hi", engine.ApplyReplacementsAll("<tag attr='hi'>", reps));
+        }
+
         [Test]
         public void TestEmptyReplacementSet() {
             KgrepEngine engine = new KgrepEngine();

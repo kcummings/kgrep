@@ -8,6 +8,46 @@ namespace kgrep {
 
         private bool _stopReplacements = false;
 
+        // kgrep being used as a scanner/grep.
+        public void ScanAndPrintTokens(string matchpattern, List<string> filenames) {
+            try {
+                foreach (string filename in filenames) {
+                    IHandleInput sr = (new ReadFileFactory()).GetSource(filename);
+                    string line;
+                    while ((line = sr.ReadLine()) != null) {
+                        string alteredLine = ScanForTokens(line, matchpattern, "\n");
+                        if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
+                    }
+                    sr.Close();
+                }
+            } catch (Exception e) {
+                Console.WriteLine("{0}", e.Message);
+            }
+        }
+
+        public void SearchAndReplaceTokens(string replacementFileName, List<string> filenames) {
+            try {
+                ReplacementFile rf = new ReplacementFile(replacementFileName);
+                string line;
+                string alteredLine;
+                List<Replacement> repList = rf.GetReplacements();
+
+                foreach (string filename in filenames) {
+                    IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
+                    while ((line = sr.ReadLine()) != null) {
+                        if (rf.isReplaceAll)
+                            alteredLine = ApplyReplacementsAll(line, repList);
+                        else
+                            alteredLine = ApplyReplacementsFirst(line, repList);
+                        if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
+                    }
+                    sr.Close();
+                }
+            } catch (Exception e) {
+                Console.WriteLine("{0}", e.Message);
+            }
+        }
+
         // "ReplacementMode=First" in effect.
         public string ApplyReplacementsFirst(string line, List<Replacement> repList) {
             if (_stopReplacements) return line;
@@ -70,62 +110,6 @@ namespace kgrep {
                 m = m.NextMatch();
             }
             return sb.ToString();
-        }
-
-        // kgrep being used as a scanner/grep.
-        public void ScanAndPrintTokens(string matchpattern, List<string> filenames) {
-            try {
-                KgrepEngine engine = new KgrepEngine();
-                foreach (string filename in filenames) {
-                    HandleInput sr = new HandleInput(filename);
-                    string line;
-                    while ((line = sr.ReadLine()) != null) {
-                        string alteredLine = engine.ScanForTokens(line, matchpattern, "\n");
-                        if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
-                    }
-                    sr.Close();
-                }
-            } catch (Exception e) {
-                Console.WriteLine("{0}", e.Message);
-            }
-        }
-
-        // Kgrep being used as sed.
-        public void SearchAndReplaceTokens(string searchPattern, string toPattern, List<String> filenames) {
-            List<Replacement> reps = new List<Replacement>();
-            Replacement rep = new Replacement("", searchPattern, toPattern);
-            reps.Add(rep);
-            SearchAndReplaceTokens(reps, filenames, true);
-        }
-
-        public void SearchAndReplaceTokens(ReplacementFile rf, List<string> filenames) {
-            List<Replacement> repList = new List<Replacement>();
-            repList = rf.GetReplacements();
-            SearchAndReplaceTokens(repList, filenames, rf.isReplaceAll);
-        }
-
-        public void SearchAndReplaceTokens(List<Replacement> repList, List<string> filenames, bool isReplaceAll) {
-            if (repList.Count == 0)
-                return;
-
-            try {
-                KgrepEngine engine = new KgrepEngine();
-                string line;
-                string alteredLine;
-                foreach (string filename in filenames) {
-                    HandleInput sr = new HandleInput(filename);
-                    while ((line = sr.ReadLine()) != null) {
-                        if (isReplaceAll)
-                            alteredLine = engine.ApplyReplacementsAll(line, repList);
-                        else
-                            alteredLine = engine.ApplyReplacementsFirst(line, repList);
-                        if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
-                    }
-                    sr.Close();
-                }
-            } catch (Exception e) {
-                Console.WriteLine("{0}", e.Message);
-            }
         }
     }
 }

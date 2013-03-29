@@ -22,43 +22,38 @@ namespace kgrep
     // kgrep can scan an input source for all occurances of a pattern 
     // or scan and replace based on regular expressions.
     // All output is written to stdout (console).
+
+    // kgrep matchpattern filename1 ... filenameN     
+    // cat filename|kgrep matchpattern               
+
+    // If matchpattern is a file, it contains a ReplacementPatterns.
+    // If matchpattern contains a "~" it is treated as a ReplacementPattern, else a ScanToPrintPattern.
+
     class Kgrep
     {
         static void Main(string[] args) {
 
             ParseCommandLine cmdarg = new ParseCommandLine(args);
             if (cmdarg.InputSourceNames.Count == 0) {
-                Console.WriteLine("No input sources given.");
-                Usage();
+                Usage("No input sources given/recognized.");
             }
 
-            // kgrep matchpattern topattern filename1 ... filenameN     #A
-            // cat filename|kgrep matchpattern topattern                #A
-            // kgrep matchpattern filename1 ... filenameN               #B
-            // cat filename|kgrep matchpattern                          #B   
-            // kgrep -f patternfile filename1 ... filenameN             #C
-            // kgrep -f patternfile filename1                           #C          
-            // cat filename|kgrep -f patternfile                        #C
-
             KgrepEngine engine = new KgrepEngine();
-            if (cmdarg.ReplacementFileName != null) {  // #C
-                ReplacementFile rf = new ReplacementFile(cmdarg.ReplacementFileName);
-                engine.SearchAndReplaceTokens(rf, cmdarg.InputSourceNames);
-            } else if (cmdarg.ReplacementPattern != null && cmdarg.SearchPattern != null)  // #A
-                engine.SearchAndReplaceTokens(cmdarg.SearchPattern, cmdarg.ReplacementPattern, cmdarg.InputSourceNames);
-            else if (cmdarg.ReplacementPattern == null && cmdarg.SearchPattern != null)
-                engine.ScanAndPrintTokens(cmdarg.SearchPattern, cmdarg.InputSourceNames);  // #B
+            if (cmdarg.ReplacementFileName != null) 
+                engine.SearchAndReplaceTokens(cmdarg.ReplacementFileName, cmdarg.InputSourceNames);
+            else if (cmdarg.SearchPattern != null)  
+                engine.ScanAndPrintTokens(cmdarg.SearchPattern, cmdarg.InputSourceNames);  
             else {
-                Console.WriteLine("unknown command line argument pattern");
-                Usage();
+                Usage("unknown command line argument pattern");
             }
         }
 
-        private static void Usage() {
-            Console.WriteLine("kgrep (Kevin's grep) v0.2");
-            Console.WriteLine("Usage: kgrep matchpattern [topattern] filename1 ... filenameN");
-            Console.WriteLine("       kgrep -f patternfile filename1 ... filenameN");
-            Console.WriteLine("       cat filename|kgrep matchpattern [topattern]");
+        private static void Usage(string message) {
+            if (!string.IsNullOrEmpty(message)) Console.WriteLine(message);
+            Console.WriteLine("kgrep (Kevin's grep) v0.6");
+            Console.WriteLine("Usage: kgrep matchpattern filename1 ... filenameN");
+            Console.WriteLine("       cat filename|kgrep matchpattern");
+            Console.WriteLine(" matchpattern can be either a regex string to scan or a replacement commands");
             Environment.Exit(1);
         }
     }
