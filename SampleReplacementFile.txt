@@ -7,9 +7,11 @@
 # Replacements are case sensitive.
 
 # Options:
-# replace all occurance on all input lines. Uncomment to set.
-# ReplacementMode=All   # ReplacementMode=First # is default mode
-# delim=~	# field seperator
+# =First then apply replacments to all lines regardless of the number of matches per line.
+# =All then only apply the first matching replacement per line
+ReplacementMode=First   # value is First or All
+
+delim=~			# field seperator
 # comment=#     # everthing after the comment char is ignored
 
 # Input line is: "Let's go to the git store." becomes output line: "Let's go to the gitmore store."
@@ -20,10 +22,10 @@ git ~ gitmore
 git ~ 
 
 # Given "Hello git" becomes "git Hello".
-(Hello)\s+(git)     ~  \2 \1
+(Hello)\s+(git)     ~  $2 $1
 
 # Given "<chapter id="12"> becomes "chap id is 12".
-<chapter id="(.*?)"> ~ chap id is \1
+<chapter id="(.*?)"> ~ chap id is $1
 
 # removes all the tags attributes.
 <chapter\s+(.*?)>  ~ <chapter>
