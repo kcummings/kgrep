@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using kgrep;
@@ -75,6 +76,20 @@ namespace Tests {
             KgrepEngine engine = new KgrepEngine();
             string result = engine.ApplyReplacementsAll("a b ca", reps);
             Assert.AreEqual(result, " b c");
+        }
+
+        [Test]
+        [ExpectedException(typeof(System.Exception))]
+        public void TestInvalidRegex() {
+            ReplacementFile rf = new ReplacementFile("a[.~b");
+            List<Replacement> reps = rf.GetReplacements();
+        }
+
+        [Test]
+        [ExpectedException(typeof(System.Exception))]
+        public void TestInvalidRegex() {
+            ReplacementFile rf = new ReplacementFile("a~b[.");
+            List<Replacement> reps = rf.GetReplacements();
         }
     }
 }
