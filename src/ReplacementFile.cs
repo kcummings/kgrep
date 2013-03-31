@@ -7,8 +7,8 @@ namespace kgrep
     public class ReplacementFile
     {
         private List<Replacement> replacementList = new List<Replacement>();
-        private bool _isReplaceAll = true;
-        public bool isReplaceAll { get { return _isReplaceAll; } }
+        private bool _ScopeAll = true;
+        public bool ScopeAll { get { return _ScopeAll; } }
         private String COMMENT = "#";
         private String DELIM = "~";
         private IHandleInput sr;
@@ -29,15 +29,21 @@ namespace kgrep
                     continue;
                 }
 
-                if (line.ToLower().StartsWith("comment="))
-                    COMMENT = line.Substring("comment=".Length,1);
+                if (line.ToLower().StartsWith("comment=")) {
+                    COMMENT = line.Substring("comment=".Length, 1);
+                    continue;
+                }
 
-                if (line.ToLower().StartsWith("delim="))
+                if (line.ToLower().StartsWith("delim=")) {
                     DELIM = line.Substring("delim=".Length, 1);
-
+                    continue;
+                }
+                
                 // Once true, it's true for the remaining replacements.
-                if (line.ToLower().StartsWith("ReplacementMode=All"))   
-                    _isReplaceAll = true;
+                if (line.ToLower().StartsWith("scope=first")) {
+                    _ScopeAll = false;
+                    continue;
+                }
 
                 // Remove any trailing comments.
                 int i = line.IndexOf(COMMENT);
@@ -45,13 +51,10 @@ namespace kgrep
                     line = line.Remove(i);
 
                 String[] parts = line.Split(DELIM.ToCharArray(),4);
-                if (parts.Length == 2) {
-                    // input pattern: from ~ to         # assuming ~ is delim char.
-                    //Console.WriteLine("Adding {0} to {1} with {2}", parts[0], parts[1], multiple.ToString());
+                if (parts.Length == 2) {  // just a~b pattern
                     replacementList.Add( new Replacement("", parts[0].Trim(), parts[1].Trim()));
                 }
-                if (parts.Length == 3) {
-                    // input pattern: anchor ~ from ~ to
+                if (parts.Length == 3) {    // anchored a~b pattern
                     replacementList.Add(new Replacement(parts[0].Trim(), parts[1].Trim(), parts[2].Trim()));
                 }
             }

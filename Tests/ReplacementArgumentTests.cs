@@ -33,9 +33,34 @@ namespace Tests {
             Assert.AreEqual(reps[2].topattern, "fourth");
         }
 
+        [Test]
+        public void TestEmbeddedDelim() {
+            ReplacementFile rf = new ReplacementFile("delim=,; a,bc;   hello,world  ;  third , fourth ");
+            List<Replacement> reps = rf.GetReplacements();
+            Assert.AreEqual(reps[2].frompattern.ToString(), (new Regex("third".Trim(), RegexOptions.Compiled)).ToString());
+            Assert.AreEqual(reps[2].topattern, "fourth");
+        }
 
         [Test]
-        public void TestCommentArgument() {
+        public void TestEmbeddedDelimAndScopeFirst() {
+            ReplacementFile rf = new ReplacementFile("scope=first;delim=,; a,b; b,c");
+            List<Replacement> reps = rf.GetReplacements();
+            Assert.IsTrue(reps.Count == 2);
+            Assert.AreEqual(reps[0].frompattern.ToString(), (new Regex("a".Trim(), RegexOptions.Compiled)).ToString());
+            Assert.AreEqual(reps[0].topattern, "b");
+        }
+
+        [Test]
+        public void TestEmbeddedDelimAndScopeAll() {
+            ReplacementFile rf = new ReplacementFile("scope=all;delim=,; a,b; b,c");
+            List<Replacement> reps = rf.GetReplacements();
+            Assert.IsTrue(reps.Count == 2);
+            Assert.AreEqual(reps[1].frompattern.ToString(), (new Regex("b".Trim(), RegexOptions.Compiled)).ToString());
+            Assert.AreEqual(reps[1].topattern, "c");
+        }
+
+        [Test]
+        public void TestEmbeddedComment() {
             ReplacementFile rf = new ReplacementFile("#comment; a~bc");
             List<Replacement> reps = rf.GetReplacements();
             Assert.AreEqual(reps[0].frompattern.ToString(), (new Regex("a".Trim(), RegexOptions.Compiled)).ToString());

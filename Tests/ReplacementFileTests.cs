@@ -33,8 +33,7 @@ namespace Tests {
         public void TestSimpleReplacementToRemoveToken() {
             KgrepEngine engine = new KgrepEngine();
             List<Replacement> reps = new List<Replacement>();
-            Replacement rep = new Replacement("", "token", "");
-            reps.Add(rep);
+            reps.Add(new Replacement("", "token", ""));
             Assert.AreEqual("abc", engine.ApplyReplacementsFirst("abctoken", reps));
         }
 
@@ -42,8 +41,7 @@ namespace Tests {
         public void TestSimpleReplacementNoMatch() {
             KgrepEngine engine = new KgrepEngine();
             List<Replacement> reps = new List<Replacement>();
-            Replacement rep = new Replacement("", "k", "def");
-            reps.Add(rep);
+            reps.Add(new Replacement("", "k", "def"));
             Assert.AreNotEqual("", engine.ApplyReplacementsFirst("abc", reps));
         }
 
@@ -51,8 +49,7 @@ namespace Tests {
         public void TestSimpleReplacement() {
             KgrepEngine engine = new KgrepEngine();
             List<Replacement> reps = new List<Replacement>();
-            Replacement rep = new Replacement("", "abc", "def");
-            reps.Add(rep);
+            reps.Add(new Replacement("", "abc", "def"));
             Assert.AreEqual("def",engine.ApplyReplacementsFirst("abc", reps));
         }
 
@@ -60,8 +57,7 @@ namespace Tests {
         public void TestEndPointReplacements() {
             KgrepEngine engine = new KgrepEngine();
             List<Replacement> reps = new List<Replacement>();
-            Replacement rep = new Replacement("", "ab", "de");
-            reps.Add(rep);
+            reps.Add(new Replacement("", "ab", "de"));
             Assert.AreEqual("dele dee lincode",engine.ApplyReplacementsFirst("able abe lincoab", reps));
         }
 

@@ -35,7 +35,7 @@ namespace kgrep {
                 foreach (string filename in filenames) {
                     IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
                     while ((line = sr.ReadLine()) != null) {
-                        if (rf.isReplaceAll)
+                        if (rf.ScopeAll)
                             alteredLine = ApplyReplacementsAll(line, repList);
                         else
                             alteredLine = ApplyReplacementsFirst(line, repList);
@@ -48,7 +48,7 @@ namespace kgrep {
             }
         }
 
-        // "ReplacementMode=First" in effect.
+        // "scope=First" in effect.
         public string ApplyReplacementsFirst(string line, List<Replacement> repList) {
             if (_stopReplacements) return line;
             if (repList.Count == 0)
@@ -66,7 +66,7 @@ namespace kgrep {
             return line;
         }
 
-        // "ReplacementMode=All" in effect.
+        // "scope=All" in effect.
         public string ApplyReplacementsAll(string line, List<Replacement> repList) {
             if (repList.Count == 0)
                 return line;

@@ -21,7 +21,7 @@ namespace kgrep
 
             if (args.Length == 1) {   // cat filename|kgrep matchpattern
                 string firstArgument = args[0];
-                if (File.Exists(firstArgument) || firstArgument.Contains("~"))
+                if (isReplacementString(firstArgument))
                     ReplacementFileName = firstArgument;
                 else
                     SearchPattern = firstArgument;
@@ -31,7 +31,7 @@ namespace kgrep
             // kgrep matchpattern filename1 .... filenameN
             if (args.Length > 1) {
                 string firstArgument = args[0];
-                if (File.Exists(firstArgument) || firstArgument.Contains("~"))
+                if (isReplacementString(firstArgument))
                     ReplacementFileName = firstArgument;
                 else
                     SearchPattern = firstArgument;
@@ -40,6 +40,12 @@ namespace kgrep
                         InputSourceNames.Add(args[i]);
                 }
             }
+        }
+
+        private bool isReplacementString(string arg) {
+            if (File.Exists(arg) || arg.Contains("~") || arg.Contains("delim="))
+                return true;
+            return false;
         }
     }
 }

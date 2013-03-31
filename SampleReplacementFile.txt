@@ -7,9 +7,9 @@
 # Replacements are case sensitive.
 
 # Options:
-# =First then apply replacments to all lines regardless of the number of matches per line.
-# =All then only apply the first matching replacement per line
-ReplacementMode=First   # value is First or All
+# =first then apply replacments to all lines regardless of the number of matches per line.
+# =all then only apply the first matching replacement per line
+scope=first   # value is First or All
 
 delim=~			# field seperator
 # comment=#     # everthing after the comment char is ignored

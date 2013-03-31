@@ -11,7 +11,7 @@ namespace kgrep {
         public ReadFileFactory() {}
 
         public IHandleInput GetSource(string inputSource) {
-            if (inputSource.Contains("~"))  // assume one ~ implies command line argument given as a Replacement command
+            if (inputSource.Contains("~") || inputSource.Contains("delim="))  // assume one ~ implies command line argument given as a Replacement command
                 return new ReadCommandLineArgumentAsFile(inputSource);
             else if (File.Exists(inputSource))
                 return new ReadFile(inputSource);
