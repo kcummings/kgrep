@@ -16,7 +16,7 @@ namespace kgrep {
                     string line;
                     while ((line = sr.ReadLine()) != null) {
                         string alteredLine = ScanForTokens(line, matchpattern, "\n");
-                        if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
+                        if (!String.IsNullOrEmpty(alteredLine)) Console.Write(alteredLine);
                     }
                     sr.Close();
                 }
@@ -97,13 +97,13 @@ namespace kgrep {
             // Only return submatches if found, otherwise return any matches.
             while (m.Success) {
                 int[] gnums = re.GetGroupNumbers();
-                if (gnums.Length > 1) {  
+                if (gnums.Length > 1) {
                     for (int i = 1; i < gnums.Length; i++) {
                         sb.Append((m.Groups[gnums[i]]));
                         sb.Append(delim);
                     }
                 } else {
-                    // Only print the substring that was matched.
+                    // Only include the substring that was matched.
                     sb.Append((m.Value));
                     sb.Append(delim);
                 }
