@@ -129,6 +129,36 @@ namespace Tests {
         }
 
         [Test]
+        public void TestTrailingSpaceAfterField() {
+            ReplacementFile rf = new ReplacementFile(@" \sa  ~ b\s ");
+            List<Replacement> reps = rf.GetReplacements();
+
+            KgrepEngine engine = new KgrepEngine();
+            string result = engine.ApplyReplacementsAll("3 ab ca", reps);
+            Assert.AreEqual("3b b ca", result);
+        }
+
+        [Test]
+        public void TestTrailingSpacesAfterField() {
+            ReplacementFile rf = new ReplacementFile(@" a  ~ b\s\s ");
+            List<Replacement> reps = rf.GetReplacements();
+
+            KgrepEngine engine = new KgrepEngine();
+            string result = engine.ApplyReplacementsAll("3 ab ca", reps);
+            Assert.AreEqual("3 b  b cb  ", result);
+        }
+
+        [Test]
+        public void TestLeadingSpacesAfterField() {
+            ReplacementFile rf = new ReplacementFile(@" a  ~ \sb ");
+            List<Replacement> reps = rf.GetReplacements();
+
+            KgrepEngine engine = new KgrepEngine();
+            string result = engine.ApplyReplacementsAll("3ab ca", reps);
+            Assert.AreEqual("3 bb c b", result);
+        }
+
+        [Test]
         public void TestLeadingAndTrailingSpaces() {
             ReplacementFile rf = new ReplacementFile(@" \s\sa\s  ~ b ");
             List<Replacement> reps = rf.GetReplacements();

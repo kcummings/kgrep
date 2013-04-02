@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <VisualState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ShowCheckBoxes="false">
   <TopNode>[0-1000]C:\work\kgrep\Tests\kgrep.nunit</TopNode>
-  <SelectedNode>[0-1012]Tests.ReplacementArgumentTests.TestInvalidRegexWithAnchor</SelectedNode>
+  <SelectedNode>[0-1015]Tests.ReplacementArgumentTests.TestLeadingAndTrailingSpaces</SelectedNode>
   <ExcludeCategories>false</ExcludeCategories>
   <Nodes>
     <Node UniqueName="[0-1000]C:\work\kgrep\Tests\kgrep.nunit" Expanded="true" />
-    <Node UniqueName="[0-1043]C:\work\kgrep\Tests\bin\Debug\Tests.dll" Expanded="true" />
-    <Node UniqueName="[0-1044]Tests" Expanded="true" />
+    <Node UniqueName="[0-1049]C:\work\kgrep\Tests\bin\Debug\Tests.dll" Expanded="true" />
+    <Node UniqueName="[0-1050]Tests" Expanded="true" />
     <Node UniqueName="[0-1001]Tests.ReplacementArgumentTests" Expanded="true" />
   </Nodes>
 </VisualState>

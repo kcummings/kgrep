@@ -18,7 +18,7 @@ namespace kgrep
                 Criteria = pCriteria;
                 //pattern = ppattern.Trim();
                 frompattern = new Regex(pFromPattern.Trim(), RegexOptions.Compiled);
-                topattern = pToPattern.Trim();
+                topattern = pToPattern.Trim().Replace(@"\s"," ");  // allow \s to represent a space in to pattern
 
                 // Just validation here
                 Regex topat = new Regex(pToPattern.Trim());
