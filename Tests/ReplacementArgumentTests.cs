@@ -79,6 +79,66 @@ namespace Tests {
         }
 
         [Test]
+        public void TestTrailingSpace() {
+            ReplacementFile rf = new ReplacementFile(@" a\s ~ b ");
+            List<Replacement> reps = rf.GetReplacements();
+
+            KgrepEngine engine = new KgrepEngine();
+            string result = engine.ApplyReplacementsAll("a b ca", reps);
+            Assert.AreEqual("bb ca", result);
+        }
+
+        [Test]
+        public void TestTrailingSpaces() {
+            ReplacementFile rf = new ReplacementFile(@" a\s\s ~ b ");
+            List<Replacement> reps = rf.GetReplacements();
+
+            KgrepEngine engine = new KgrepEngine();
+            string result = engine.ApplyReplacementsAll("a   b ca", reps);
+            Assert.AreEqual("b b ca", result);
+        }
+
+        [Test]
+        public void TestLeadingSpaceWillFail() {
+            ReplacementFile rf = new ReplacementFile(@" \sa ~ b ");
+            List<Replacement> reps = rf.GetReplacements();
+
+            KgrepEngine engine = new KgrepEngine();
+            string result = engine.ApplyReplacementsAll(" da b ca", reps);
+            Assert.AreEqual(" da b ca", result);
+        }
+
+        [Test]
+        public void TestLeadingSpace() {
+            ReplacementFile rf = new ReplacementFile(@" \sa ~ b ");
+            List<Replacement> reps = rf.GetReplacements();
+
+            KgrepEngine engine = new KgrepEngine();
+            string result = engine.ApplyReplacementsAll(" a b ca", reps);
+            Assert.AreEqual("b b ca", result);
+        }
+
+        [Test]
+        public void TestLeadingSpaces() {
+            ReplacementFile rf = new ReplacementFile(@" \s\sa  ~ b ");
+            List<Replacement> reps = rf.GetReplacements();
+
+            KgrepEngine engine = new KgrepEngine();
+            string result = engine.ApplyReplacementsAll("  a  b ca", reps);
+            Assert.AreEqual("b  b ca", result);
+        }
+
+        [Test]
+        public void TestLeadingAndTrailingSpaces() {
+            ReplacementFile rf = new ReplacementFile(@" \s\sa\s  ~ b ");
+            List<Replacement> reps = rf.GetReplacements();
+
+            KgrepEngine engine = new KgrepEngine();
+            string result = engine.ApplyReplacementsAll("  a b ca", reps);
+            Assert.AreEqual("bb ca", result);
+        }
+
+        [Test]
         [ExpectedException(typeof(System.Exception))]
         public void TestInvalidRegexFromPattern() {
             ReplacementFile rf = new ReplacementFile("a[.~b");

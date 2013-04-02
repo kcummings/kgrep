@@ -25,7 +25,9 @@ Usage
         ScanToken =  a regex string that when found in input will print one match per line
 
 
-A SearchToken string is a regex used to scan and print matching tokens each on a new line. Example: 
+A SearchToken string is a regex used to scan and print matching tokens each on a new line. Leading and trailing spaces are removed from before, after and anchor fields. If you want to include a leading or trailing space in those fields use '\s', e.g. " \sA ~ B ". 
+
+Example: 
 
     echo "hello dolly bob"|kgrep "[ld]o" 
    will print (writes matching strings on seperate lines)
