@@ -69,6 +69,17 @@ namespace Tests {
         }
 
         [Test]
+        public void TestEmbeddedControlsNoAction() {
+            ReplacementFile rf = new ReplacementFile("comment=:; :ignored;");
+            List<Replacement> reps = rf.GetReplacements();
+
+            KgrepEngine engine = new KgrepEngine();
+            string result = engine.ApplyReplacementsAll("a b ca", reps);
+            Assert.AreEqual("a b ca", result);
+            Assert.IsTrue(reps.Count == 0);
+        }
+
+        [Test]
         public void TestRemoveOneArgument() {
             ReplacementFile rf = new ReplacementFile("# remove a from arg; a~");
             List<Replacement> reps = rf.GetReplacements();

@@ -1,18 +1,19 @@
-# Syntax of a kgrep replacement line:
-# (delim=?) + (anchor) + pattern + new value
-# if the line starts with "delim=" the given delimitor is used to seperate the pattern from new value.
-# if anchor is given, the replacement only applies to lines that match the anchor. Anchor is a regular expression.
+# Refer to the README.md file for help with the syntax of a kgrep replacement line.
+# [anchor ~] beforePattern ~ toPattern
+
 # Everything after a '#' is considered a comment. The comment char can be changed.
-# leading and trailing spaces and are ignored. If a space is required use '\s'
 # Replacements are case sensitive.
 
-# Options:
+
+### Control Options (these can be anywhere in the file)
 # =first then apply replacments to all lines regardless of the number of matches per line.
 # =all then only apply the first matching replacement per line
 scope=first   # value is First or All
 
 delim=~			# field seperator
-# comment=#     # everthing after the comment char is ignored
+#comment=#     # uncomment to change to a different comment character
+### end of control options
+
 
 # Input line is: "Let's go to the git store." becomes output line: "Let's go to the gitmore store."
 git ~ gitmore
