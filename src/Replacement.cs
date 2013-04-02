@@ -26,7 +26,6 @@ namespace kgrep
             }
             catch (Exception e) {
                 Console.WriteLine("Regex error Replacement, from '{0}'  to '{1}'  anchor '{2}'",pFromPattern,pToPattern,pCriteria);
-                Console.WriteLine( e.GetType());
                 throw new Exception(e.Message);
             }
         }

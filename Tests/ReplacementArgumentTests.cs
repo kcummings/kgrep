@@ -80,15 +80,22 @@ namespace Tests {
 
         [Test]
         [ExpectedException(typeof(System.Exception))]
-        public void TestInvalidRegex() {
+        public void TestInvalidRegexFromPattern() {
             ReplacementFile rf = new ReplacementFile("a[.~b");
             List<Replacement> reps = rf.GetReplacements();
         }
 
         [Test]
         [ExpectedException(typeof(System.Exception))]
-        public void TestInvalidRegex() {
+        public void TestInvalidRegexToPattern() {
             ReplacementFile rf = new ReplacementFile("a~b[.");
+            List<Replacement> reps = rf.GetReplacements();
+        }
+
+        [Test]
+        [ExpectedException(typeof(System.Exception))]
+        public void TestInvalidRegexWithAnchor() {
+            ReplacementFile rf = new ReplacementFile("[.a~c~b");
             List<Replacement> reps = rf.GetReplacements();
         }
     }

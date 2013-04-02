@@ -1,4 +1,6 @@
 using System;
+using System.Reflection;
+
 /*
 ##The MIT License (MIT)
 ####*Copyright (c) 2013, Kevin Cummings <kevin.cummings@gmx.com>*
@@ -21,7 +23,7 @@ namespace kgrep
 {
     // kgrep can scan an input source for all occurances of a pattern 
     // or scan and replace based on regular expressions.
-    // All output is written to stdout (console).
+    // All output is written to stdout.
 
     // kgrep matchpattern filename1 ... filenameN     
     // cat filename|kgrep matchpattern               
@@ -49,8 +51,9 @@ namespace kgrep
         }
 
         private static void Usage(string message) {
+            string versionNumber = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             if (!string.IsNullOrEmpty(message)) Console.WriteLine(message);
-            Console.WriteLine("kgrep (Kevin's grep) v0.6");
+            Console.WriteLine("kgrep (Kevin's grep) v{0}",versionNumber);
             Console.WriteLine("Usage: kgrep matchpattern filename1 ... filenameN");
             Console.WriteLine("       cat filename|kgrep matchpattern");
             Console.WriteLine(" matchpattern can be either a regex string to scan or a replacement commands");
