@@ -13,33 +13,33 @@ namespace Tests {
         public void TestSimpleArgument() {
             ReplacementFile rf = new ReplacementFile("a~bc");
             List<Replacement> reps = rf.GetReplacements();
-            Assert.AreEqual(reps[0].frompattern.ToString(), (new Regex("a".Trim(), RegexOptions.Compiled)).ToString());
-            Assert.AreEqual(reps[0].topattern, "bc");
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].frompattern.ToString());
+            Assert.AreEqual( "bc", reps[0].topattern);
         }
 
         [Test]
         public void TestTwoArguments() {
             ReplacementFile rf = new ReplacementFile("a~bc; g~jk");
             List<Replacement> reps = rf.GetReplacements();
-            Assert.AreEqual(reps[0].topattern, "bc");
-            Assert.AreEqual(reps[1].frompattern.ToString(), (new Regex("g".Trim(), RegexOptions.Compiled)).ToString());
-            Assert.AreEqual(reps[1].topattern, "jk");
+            Assert.AreEqual("bc",reps[0].topattern);
+            Assert.AreEqual((new Regex("g".Trim(), RegexOptions.Compiled)).ToString(), reps[1].frompattern.ToString());
+            Assert.AreEqual("jk",  reps[1].topattern);
         }
 
         [Test]
         public void TestThreeArgument() {
             ReplacementFile rf = new ReplacementFile("a~bc;   hello~world  ;  third ~ fourth ");
             List<Replacement> reps = rf.GetReplacements();
-            Assert.AreEqual(reps[2].frompattern.ToString(), (new Regex("third".Trim(), RegexOptions.Compiled)).ToString());
-            Assert.AreEqual(reps[2].topattern, "fourth");
+            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].frompattern.ToString());
+            Assert.AreEqual( "fourth", reps[2].topattern);
         }
 
         [Test]
         public void TestEmbeddedDelim() {
             ReplacementFile rf = new ReplacementFile("delim=,; a,bc;   hello,world  ;  third , fourth ");
             List<Replacement> reps = rf.GetReplacements();
-            Assert.AreEqual(reps[2].frompattern.ToString(), (new Regex("third".Trim(), RegexOptions.Compiled)).ToString());
-            Assert.AreEqual(reps[2].topattern, "fourth");
+            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].frompattern.ToString());
+            Assert.AreEqual("fourth", reps[2].topattern);
         }
 
         [Test]
@@ -47,8 +47,8 @@ namespace Tests {
             ReplacementFile rf = new ReplacementFile("scope=first;delim=,; a,b; b,c");
             List<Replacement> reps = rf.GetReplacements();
             Assert.IsTrue(reps.Count == 2);
-            Assert.AreEqual(reps[0].frompattern.ToString(), (new Regex("a".Trim(), RegexOptions.Compiled)).ToString());
-            Assert.AreEqual(reps[0].topattern, "b");
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].frompattern.ToString());
+            Assert.AreEqual("b", reps[0].topattern);
         }
 
         [Test]
@@ -56,16 +56,16 @@ namespace Tests {
             ReplacementFile rf = new ReplacementFile("scope=all;delim=,; a,b; b,c");
             List<Replacement> reps = rf.GetReplacements();
             Assert.IsTrue(reps.Count == 2);
-            Assert.AreEqual(reps[1].frompattern.ToString(), (new Regex("b".Trim(), RegexOptions.Compiled)).ToString());
-            Assert.AreEqual(reps[1].topattern, "c");
+            Assert.AreEqual((new Regex("b".Trim(), RegexOptions.Compiled)).ToString(), reps[1].frompattern.ToString());
+            Assert.AreEqual( "c", reps[1].topattern);
         }
 
         [Test]
         public void TestEmbeddedComment() {
             ReplacementFile rf = new ReplacementFile("#comment; a~bc");
             List<Replacement> reps = rf.GetReplacements();
-            Assert.AreEqual(reps[0].frompattern.ToString(), (new Regex("a".Trim(), RegexOptions.Compiled)).ToString());
-            Assert.AreEqual(reps[0].topattern, "bc");
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].frompattern.ToString());
+            Assert.AreEqual( "bc", reps[0].topattern);
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace Tests {
 
             KgrepEngine engine = new KgrepEngine();
             string result = engine.ApplyReplacementsAll("a b ca", reps);
-            Assert.AreEqual(result, " b c");
+            Assert.AreEqual(" b c", result);
         }
 
         [Test]
