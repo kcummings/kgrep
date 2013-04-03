@@ -6,60 +6,59 @@ using System.Text.RegularExpressions;
 namespace kgrep {
     public class KgrepEngine {
 
-        private bool _stopReplacements = false;
+        public IHandleOutput sw = new WriteStdout();
 
         // kgrep being used as a scanner/grep.
-        public void ScanAndPrintTokens(string matchpattern, List<string> filenames) {
+        public string ScanAndPrintTokens(string matchpattern, List<string> filenames) {
             try {
                 foreach (string filename in filenames) {
                     IHandleInput sr = (new ReadFileFactory()).GetSource(filename);
                     string line;
                     while ((line = sr.ReadLine()) != null) {
-                        string alteredLine = ScanForTokens(line, matchpattern, "\n");
-                        if (!String.IsNullOrEmpty(alteredLine)) Console.Write(alteredLine);
+                        string alteredLine = ScanForTokens(line, matchpattern);
+                        if (!String.IsNullOrEmpty(alteredLine)) sw.Write(alteredLine);
                     }
                     sr.Close();
                 }
             } catch (Exception e) {
                 Console.WriteLine("{0}", e.Message);
             }
+            return sw.Close();
         }
 
-        public void SearchAndReplaceTokens(string replacementFileName, List<string> filenames) {
+        public string SearchAndReplaceTokens(string replacementFileName, List<string> inputFilenames) {
             try {
                 ReplacementFile rf = new ReplacementFile(replacementFileName);
                 string line;
                 string alteredLine;
                 List<Replacement> repList = rf.GetReplacements();
 
-                foreach (string filename in filenames) {
+                foreach (string filename in inputFilenames) {
                     IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
                     while ((line = sr.ReadLine()) != null) {
                         if (rf.ScopeAll)
                             alteredLine = ApplyReplacementsAll(line, repList);
                         else
                             alteredLine = ApplyReplacementsFirst(line, repList);
-                        if (!String.IsNullOrEmpty(alteredLine)) Console.WriteLine(alteredLine);
+                        if (!String.IsNullOrEmpty(alteredLine)) sw.Write(alteredLine);
                     }
                     sr.Close();
                 }
             } catch (Exception e) {
                 Console.WriteLine("{0}", e.Message);
             }
+            return sw.Close();
         }
 
         // "scope=First" in effect.
         public string ApplyReplacementsFirst(string line, List<Replacement> repList) {
-            if (_stopReplacements) return line;
             if (repList.Count == 0)
                 return line;
 
             foreach (Replacement rep in repList) {
                 if (isCandidateForReplacement(line, rep)) {
                     if (rep.frompattern.IsMatch(line)) {
-                        _stopReplacements = true;
-                        line = rep.frompattern.Replace(line, rep.topattern);
-                        break;
+                        return rep.frompattern.Replace(line, rep.topattern);
                     }
                 }
             }
@@ -89,7 +88,7 @@ namespace kgrep {
             return true;
         }
 
-        public string ScanForTokens(string line, string tokenpattern, string delim) {
+        public string ScanForTokens(string line, string tokenpattern) {
             StringBuilder sb = new StringBuilder();
             Regex re = new Regex(tokenpattern);
             Match m = re.Match(line);
@@ -100,12 +99,10 @@ namespace kgrep {
                 if (gnums.Length > 1) {
                     for (int i = 1; i < gnums.Length; i++) {
                         sb.Append((m.Groups[gnums[i]]));
-                        sb.Append(delim);
                     }
                 } else {
                     // Only include the substring that was matched.
                     sb.Append((m.Value));
-                    sb.Append(delim);
                 }
                 m = m.NextMatch();
             }

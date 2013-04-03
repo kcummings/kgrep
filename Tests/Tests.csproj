@@ -48,6 +48,8 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ScanAndPrintTokensTests.cs" />
+    <Compile Include="SearchAndReplaceTests.cs" />
     <Compile Include="ParseCommandLineTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReplacementArgumentTests.cs" />

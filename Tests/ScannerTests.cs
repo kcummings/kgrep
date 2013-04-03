@@ -8,37 +8,32 @@ namespace Tests {
             [Test]
             public void TestScannerForSingleToken() {
                 KgrepEngine engine = new KgrepEngine();
-                Assert.AreEqual("b", engine.ScanForTokens("abc", "a(b)c", ""));
+                Assert.AreEqual("b", engine.ScanForTokens("abc", "a(b)c"));
             }
 
             [Test]
             public void TestScannerForMultipleGroupsOnOneLine() {
                 KgrepEngine engine = new KgrepEngine();
-                Assert.AreEqual("ell|o|", engine.ScanForTokens("hello world", "h(...)(.)", "|"));
+                Assert.AreEqual("ello", engine.ScanForTokens("hello world", "h(...)(.)"));
             }
 
             [Test]
             public void TestScannerForNoMatch() {
                 KgrepEngine engine = new KgrepEngine();
-                Assert.AreEqual("", engine.ScanForTokens("abc", "def", ""));
+                Assert.AreEqual("", engine.ScanForTokens("abc", "def"));
             }
 
             [Test]
             public void TestScannerForSingleTokenWithDelim() {
                 KgrepEngine engine = new KgrepEngine();
-                Assert.AreEqual("bc\n", engine.ScanForTokens("abc", "a(bc)", "\n"));
+                Assert.AreEqual("bc", engine.ScanForTokens("abc", "a(bc)"));
             }
 
             [Test]
             public void TestScannerForMatchValue() {
                 KgrepEngine engine = new KgrepEngine();
-                Assert.AreEqual("b", engine.ScanForTokens("abc", "b", ""));
+                Assert.AreEqual("b", engine.ScanForTokens("abc", "b"));
             }
 
-            //[Test]
-            //public void TestScannerWithInvalidToken() {
-            //    KgrepEngine engine = new KgrepEngine();
-            //    Assert.AreEqual("bc",engine.ScanForTokens("abc", "a(bc", ""));
-            //}
         }
     }

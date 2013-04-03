@@ -1,6 +1,6 @@
 ##This is kgrep, as in Kevin's grep.
 
-A command line tool to search, replace, extract and/or print text based on regular expresions from stdin or input file(s). All output is written to stdout.
+A command line tool to search, replace, extract and/or print text based on regular expressions from stdin or input file(s). All output is written to stdout.
 
 
 Project Goals
@@ -31,6 +31,8 @@ There is no practical limit to the number of *ReplacementStrings* that can be in
 If supplied and is not found in a line, the "before~after" replacement will **not** be applied.
 
     Some examples:    
+    echo "Billy"|kgrep "(B|i)~"               # prints "iy" by removing all "B" and "i"s
+    echo "Billy"|kgrep "(.) ~ $1-"            # prints "B-i-l-l-y-" 
     echo "hello dolly bob"|kgrep "[ld]o~hi"   # prints "helhi hilly bob"
     echo "careful here"|kgrep "ere~ful~fully" # prints "carefully here"
     echo "careful here"|kgrep "abc~ful~fully" # "abc" not found, prints ""
@@ -48,9 +50,9 @@ The following controls can be embedded anywhere in the ReplacementFile or stacke
 
 - **comment=?** where ? is the character to designate the beginning of a comment. Default is "#".
 
-- **scope=[first|all]** If set to first, once the Replacement is found in the file it will be applied and no other replacement applied to that line. If set to all, all Replacements will be applied to all line in all circumstances.
+- **scope=[first|all]** If set to **first**, the first time a *ReplacementString* is found on the line, no other replacements are applied to that line. If set to **all**, as many Replacements as possible will be applied to a line.
 
-Caution: You can get unexpected results if you are not careful when using Control Options. For example, setting comment=~ still allows default delim=~ so the *ReplacementString* "comment=~; a~b" is interpretted as a *ReplacementString* but becomes just "a" since "~b" is now a comment and the expected replacement doesn't take effect. No change occures to the source inputs.
+Caution: You can get unexpected results if you are not careful when using Control Options. For example, setting comment=~ still allows default delim=~ so the *ReplacementString* "comment=~; a~b" is interpretted as a *ReplacementString* but becomes just "a" since "~b" is now a comment and the expected replacement doesn't take effect. No change occurs to the source inputs.
 
 ---
 

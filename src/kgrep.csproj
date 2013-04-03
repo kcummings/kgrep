@@ -56,6 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IHandleOutput.cs" />
     <Compile Include="ReadCommandLineArgumentAsFile.cs" />
     <Compile Include="IHandleInput.cs" />
     <Compile Include="kgrep.cs" />
@@ -67,6 +68,8 @@
     <Compile Include="ReadStdin.cs" />
     <Compile Include="ReplacementFile.cs" />
     <Compile Include="Replacement.cs" />
+    <Compile Include="WriteStdout.cs" />
+    <Compile Include="WriteToString.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

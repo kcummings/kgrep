@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 
 namespace kgrep {
 
@@ -11,10 +7,12 @@ namespace kgrep {
         public ReadFileFactory() {}
 
         public IHandleInput GetSource(string inputSource) {
-            if (inputSource.Contains("~") || inputSource.Contains("delim="))  // assume one ~ implies command line argument given as a Replacement command
+            if (inputSource.Contains("~") || inputSource.Contains("delim="))  // reading command line data as if a Replacement file
                 return new ReadCommandLineArgumentAsFile(inputSource);
-            else if (File.Exists(inputSource))
+            else if (File.Exists(inputSource))  // kgrep replacement inuptSource
                 return new ReadFile(inputSource);
+            else if (inputSource.Length > 0)  
+                return new ReadCommandLineArgumentAsFile(inputSource);  // reading command line data as if a text file; used for unit testing
             else
                 return new ReadStdin();
         }
