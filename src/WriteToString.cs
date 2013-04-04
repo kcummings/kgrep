@@ -6,7 +6,7 @@ namespace kgrep {
 
         public void Write(string line) {
             _sb.Append(line);
-            _sb.Append("\n");
+            if (!line.EndsWith("\n")) _sb.Append("\n");
         }
 
         public string Close() {

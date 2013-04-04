@@ -98,11 +98,13 @@ namespace kgrep {
                 int[] gnums = re.GetGroupNumbers();
                 if (gnums.Length > 1) {
                     for (int i = 1; i < gnums.Length; i++) {
-                        sb.Append((m.Groups[gnums[i]]));
+                        sb.Append(m.Groups[gnums[i]].ToString());
+                        sb.Append("\n");
                     }
                 } else {
                     // Only include the substring that was matched.
-                    sb.Append((m.Value));
+                    sb.Append(m.Value);
+                    sb.Append("\n");
                 }
                 m = m.NextMatch();
             }

@@ -8,13 +8,13 @@ namespace Tests {
             [Test]
             public void TestScannerForSingleToken() {
                 KgrepEngine engine = new KgrepEngine();
-                Assert.AreEqual("b", engine.ScanForTokens("abc", "a(b)c"));
+                Assert.AreEqual("b\n", engine.ScanForTokens("abc", "a(b)c"));
             }
 
             [Test]
             public void TestScannerForMultipleGroupsOnOneLine() {
                 KgrepEngine engine = new KgrepEngine();
-                Assert.AreEqual("ello", engine.ScanForTokens("hello world", "h(...)(.)"));
+                Assert.AreEqual("ell\no\n", engine.ScanForTokens("hello world", "h(...)(.)"));
             }
 
             [Test]
@@ -26,13 +26,13 @@ namespace Tests {
             [Test]
             public void TestScannerForSingleTokenWithDelim() {
                 KgrepEngine engine = new KgrepEngine();
-                Assert.AreEqual("bc", engine.ScanForTokens("abc", "a(bc)"));
+                Assert.AreEqual("bc\n", engine.ScanForTokens("abc", "a(bc)"));
             }
 
             [Test]
             public void TestScannerForMatchValue() {
                 KgrepEngine engine = new KgrepEngine();
-                Assert.AreEqual("b", engine.ScanForTokens("abc", "b"));
+                Assert.AreEqual("b\n", engine.ScanForTokens("abc", "b"));
             }
 
         }

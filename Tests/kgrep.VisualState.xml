@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <VisualState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ShowCheckBoxes="false">
   <TopNode>[0-1000]C:\work\kgrep\Tests\kgrep.nunit</TopNode>
-  <SelectedNode>[0-1060]Tests.ScanAndPrintTokensTests</SelectedNode>
+  <SelectedNode>[0-1061]Tests.ScannerTests.TestScannerForMatchValue</SelectedNode>
   <ExcludeCategories>false</ExcludeCategories>
   <Nodes>
     <Node UniqueName="[0-1000]C:\work\kgrep\Tests\kgrep.nunit" Expanded="true" />
     <Node UniqueName="[0-1062]C:\work\kgrep\Tests\bin\Debug\Tests.dll" Expanded="true" />
     <Node UniqueName="[0-1063]Tests" Expanded="true" />
     <Node UniqueName="[0-1001]Tests.ReplacementArgumentTests" Expanded="true" />
-    <Node UniqueName="[0-1060]Tests.ScanAndPrintTokensTests" Expanded="true" />
+    <Node UniqueName="[0-1047]Tests.ScanAndPrintTokensTests" Expanded="true" />
+    <Node UniqueName="[0-1056]Tests.ScannerTests" Expanded="true" />
+    <Node UniqueName="[0-1023]Tests.SearchAndReplaceTests" Expanded="true" />
   </Nodes>
 </VisualState>

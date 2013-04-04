@@ -11,10 +11,10 @@ namespace kgrep {
                 return new ReadCommandLineArgumentAsFile(inputSource);
             else if (File.Exists(inputSource))  // kgrep replacement inuptSource
                 return new ReadFile(inputSource);
-            else if (inputSource.Length > 0)  
-                return new ReadCommandLineArgumentAsFile(inputSource);  // reading command line data as if a text file; used for unit testing
-            else
+            else if (inputSource == "stdin?")  
                 return new ReadStdin();
+            else
+               return new ReadCommandLineArgumentAsFile(inputSource);  // reading command line data as if a text file; used for unit testing
         }
     }
 }
