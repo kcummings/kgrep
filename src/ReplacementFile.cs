@@ -1,27 +1,30 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Text.RegularExpressions;
 
 namespace kgrep
 {
     public class ReplacementFile
     {
-        private List<Replacement> replacementList = new List<Replacement>();
+        public List<Replacement> ReplacementList = new List<Replacement>();
         private bool _ScopeAll = true;
         public bool ScopeAll { get { return _ScopeAll; } }
         private String COMMENT = "#";
         private String DELIM = "~";
         private IHandleInput sr;
+        public Dictionary<string, Pickup> PickupDefinitions = new Dictionary<string, Pickup>();
+        private Regex _pickupDefinitionPattern = new Regex(@"\s*(\{[a-zA-Z][a-zA-Z0-9]*?\})\s*=\s*(.+)", RegexOptions.Compiled);
+
 
         public ReplacementFile(String filename) {
             sr = (new ReadFileFactory()).GetSource(filename);
+            ReplacementList = GetReplacements();
         }
  
-        public List<Replacement> GetReplacements() {
- 
+        private List<Replacement> GetReplacements() {
+
             String line;
             while ((line = sr.ReadLine()) != null) {
-
                 line = line.Trim();
 
                 // Remove comment lines.
@@ -38,7 +41,7 @@ namespace kgrep
                     DELIM = line.Substring("delim=".Length, 1);
                     continue;
                 }
-                
+
                 // Once true, it's true for the remaining replacements.
                 if (line.ToLower().StartsWith("scope=first")) {
                     _ScopeAll = false;
@@ -50,17 +53,25 @@ namespace kgrep
                 if (i >= 0)
                     line = line.Remove(i);
 
+                // Extract and store any Pickups.
+                Match m = _pickupDefinitionPattern.Match(line);
+                if (m.Success) {
+                    string pickupName = m.Groups[1].Value;
+                    string pickupPattern = m.Groups[2].Value;
+                    PickupDefinitions.Add( pickupName, new Pickup(pickupName, pickupPattern) );
+                    continue;
+                }
+
                 String[] parts = line.Split(DELIM.ToCharArray(),4);
                 if (parts.Length == 2) {  // just a~b pattern
-                    replacementList.Add( new Replacement("", parts[0].Trim(), parts[1].Trim()));
+                    ReplacementList.Add( new Replacement("", parts[0].Trim(), parts[1].Trim()));
                 }
                 if (parts.Length == 3) {    // anchored a~b pattern
-                    replacementList.Add(new Replacement(parts[0].Trim(), parts[1].Trim(), parts[2].Trim()));
+                    ReplacementList.Add(new Replacement(parts[0].Trim(), parts[1].Trim(), parts[2].Trim()));
                 }
             }
             sr.Close();
-            return replacementList;
+            return ReplacementList;
         }
-
     }
 }

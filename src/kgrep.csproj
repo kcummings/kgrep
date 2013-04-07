@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IHandleOutput.cs" />
+    <Compile Include="Pickup.cs" />
     <Compile Include="ReadCommandLineArgumentAsFile.cs" />
     <Compile Include="IHandleInput.cs" />
     <Compile Include="kgrep.cs" />

@@ -31,16 +31,17 @@ namespace kgrep {
                 ReplacementFile rf = new ReplacementFile(replacementFileName);
                 string line;
                 string alteredLine;
-                List<Replacement> repList = rf.GetReplacements();
-
+                
                 foreach (string filename in inputFilenames) {
                     IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
                     while ((line = sr.ReadLine()) != null) {
                         if (rf.ScopeAll)
-                            alteredLine = ApplyReplacementsAll(line, repList);
+                            alteredLine = ApplyReplacementsAll(line, rf.ReplacementList);
                         else
-                            alteredLine = ApplyReplacementsFirst(line, repList);
+                            alteredLine = ApplyReplacementsFirst(line, rf.ReplacementList);
+                        alteredLine = ReplacePickupPlaceholder(alteredLine, rf.PickupDefinitions);
                         if (!String.IsNullOrEmpty(alteredLine)) sw.Write(alteredLine);
+                        RefreshPickupValues(line, rf.PickupDefinitions);  // Only want Pickup values from lines before this one.
                     }
                     sr.Close();
                 }
@@ -86,6 +87,24 @@ namespace kgrep {
                 return false;
             }
             return true;
+        }
+
+        private void RefreshPickupValues(string line, Dictionary<string, Pickup> pickups) {
+            Match m;
+            foreach (var pickup in pickups) {
+                m = pickup.Value.PickupPattern.Match(line);
+                if (m.Success)
+                    pickup.Value.PickupValue = m.Groups[0].Value;
+            }
+        }
+
+        private string ReplacePickupPlaceholder(string line, Dictionary<string, Pickup> pickups) {
+            foreach (KeyValuePair<string, Pickup> kvp in pickups) {
+                while (line.Contains(kvp.Key)) {
+                       line = line.Replace(kvp.Key, kvp.Value.PickupValue);
+                }
+            }
+            return line;
         }
 
         public string ScanForTokens(string line, string tokenpattern) {

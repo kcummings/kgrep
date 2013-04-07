@@ -6,17 +6,16 @@ namespace kgrep
 {
     public class Replacement
     {
-        [XmlIgnore] public String Criteria = null;
-      //  public String pattern = null;
+        [XmlIgnore] 
+        public String Criteria = null;
         public String topattern = null;
-        public Regex frompattern;
+        public Regex frompattern = null;
 
         public Replacement() {}
 
         public Replacement(string pCriteria, string pFromPattern, string pToPattern) {
             try {
                 Criteria = pCriteria;
-                //pattern = ppattern.Trim();
                 frompattern = new Regex(pFromPattern.Trim(), RegexOptions.Compiled);
                 topattern = pToPattern.Trim().Replace(@"\s"," ");  // allow \s to represent a space in to pattern
 
