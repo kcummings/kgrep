@@ -44,25 +44,25 @@ If supplied and is not found in a line, the "before~after" replacement will **no
 
 **ReplacementString Control Options**
 
-The following controls can be embedded anywhere in the ReplacementFile or stacked *ReplacementStrings*. Control options are not case sensitive but must be at the beginning of a line. There is no seperate config file.
+The following controls can be embedded anywhere in the ReplacementFile or stacked *ReplacementStrings*. Control options are not case sensitive but must be at the beginning of a line. There is no separate config file.
 
-- **delim=?** where ? represents the new delimiter character. The delimitor is the character that seperates the ReplacementString fields. Default is "~".
+- **delim=?** where ? represents the new delimiter character. The delimiter is the character that separates the ReplacementString fields. Default is "~".
 
 - **comment=?** where ? is the character to designate the beginning of a comment. Default is "#".
 
-- **scope=[first|all]** If set to **first**, the first time a *ReplacementString* is found on the line, no other replacements are applied to that line. If set to **all**, as many Replacements as possible will be applied to a line.
+- **scope=[first|all]** If set to **first**, the first time a *ReplacementString* is found on the line, no other replacements are applied to that line. If set to **all** , as many Replacements as possible will be applied to a line.
 
-Caution: You can get unexpected results if you are not careful when using Control Options. For example, setting comment=~ still allows default delim=~ so the *ReplacementString* "comment=~; a~b" is interpretted as a *ReplacementString* but becomes just "a" since "~b" is now a comment and the expected replacement doesn't take effect. No change occurs to the source inputs.
+Caution: You can get unexpected results if you are not careful when using Control Options. For example, setting comment=~ still allows default delim=~ so the *ReplacementString* "comment=~; a~b" is interpreted as a *ReplacementString* but becomes just "a" since "~b" is now a comment and the expected replacement doesn't take effect. No change occurs to the source inputs.
 
 ---
 
 ### SearchToken
-A *SearchToken* is a regex string used to scan and print matching tokens each on a new line. A stacking character has no special meaning in a *SearchToken* and is interpreted as a normal character. Note: Currently you cannot scan a text string for a field delimitor. If found, the *SearchToken* is intrepreted as a *ReplacementString*.
+A *SearchToken* is a regex string used to scan and print matching patterns. Each match is printed on a separate line. This means matched groups will print on their own line also. A stacking character has no special meaning in a *SearchToken* and is interpreted as a normal character. Note: Currently you cannot scan a text string for a field delimiter. If found, the *SearchToken* is interpreted as a *ReplacementString*.
 
 Example: 
 
     echo "hello dolly bob"|kgrep "[ld]o" 
-   will print (writes matching strings on seperate lines)
+   will print (writes matching strings on separate lines)
 
     lo
     do

@@ -129,7 +129,7 @@ namespace Tests {
             reps.Add(new Replacement("ty", "you", "to"));
             Assert.AreEqual("from me to you today", engine.ApplyReplacementsFirst("from me to you today", reps));
         }
-
+ 
         [Test]
         public void TestWithAnchorMismatch() {
             KgrepEngine engine = new KgrepEngine();

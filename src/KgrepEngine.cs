@@ -31,15 +31,14 @@ namespace kgrep {
                 ReplacementFile rf = new ReplacementFile(replacementFileName);
                 string line;
                 string alteredLine;
-                List<Replacement> repList = rf.GetReplacements();
 
                 foreach (string filename in inputFilenames) {
                     IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
                     while ((line = sr.ReadLine()) != null) {
                         if (rf.ScopeAll)
-                            alteredLine = ApplyReplacementsAll(line, repList);
+                            alteredLine = ApplyReplacementsAll(line, rf.ReplacementList);
                         else
-                            alteredLine = ApplyReplacementsFirst(line, repList);
+                            alteredLine = ApplyReplacementsFirst(line, rf.ReplacementList);
                         if (!String.IsNullOrEmpty(alteredLine)) sw.Write(alteredLine);
                     }
                     sr.Close();

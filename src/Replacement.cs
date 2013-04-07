@@ -16,7 +16,6 @@ namespace kgrep
         public Replacement(string pCriteria, string pFromPattern, string pToPattern) {
             try {
                 Criteria = pCriteria;
-                //pattern = ppattern.Trim();
                 frompattern = new Regex(pFromPattern.Trim(), RegexOptions.Compiled);
                 topattern = pToPattern.Trim().Replace(@"\s"," ");  // allow \s to represent a space in to pattern
 
