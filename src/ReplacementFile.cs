@@ -55,10 +55,10 @@ namespace kgrep
 
                 String[] parts = line.Split(DELIM.ToCharArray(),4);
                 if (parts.Length == 2) {  // just a~b pattern
-                    replacementList.Add(new Replacement("", parts[0].Trim(), parts[1].Trim()));
+                    replacementList.Add(new Replacement(parts[0], parts[1]));
                 }
                 if (parts.Length == 3) {    // anchored a~b pattern
-                    replacementList.Add(new Replacement(parts[0].Trim(), parts[1].Trim(), parts[2].Trim()));
+                    replacementList.Add(new Replacement(parts[1], parts[2], parts[0]));
                 }
             }
             sr.Close();
