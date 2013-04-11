@@ -102,5 +102,13 @@ namespace Tests {
                                         new List<string> { "my is my hi world", "go hi mytoday" });
             Assert.AreEqual("my is my bye world\ngo bye mytoday\n", newline);
         }
+
+        [Test]
+        public void TestAnchorMatchingStartLine() {
+            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            string newline = engine.SearchAndReplaceTokens("^Th~hi~bye; all~gone",
+                                        new List<string> { "mTh my hi world", "Thgo hi mytoday" });
+            Assert.AreEqual("mTh my hi world\nThgo bye mytoday\n", newline);
+        }
     }
 }
