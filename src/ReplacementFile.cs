@@ -58,7 +58,7 @@ namespace kgrep
                     replacementList.Add(new Replacement(parts[0], parts[1]));
                 }
                 if (parts.Length == 3) {    // anchored a~b pattern
-                    replacementList.Add(new Replacement(parts[1], parts[2], parts[0]));
+                    replacementList.Add(new Replacement(parts[0], parts[1], parts[2]));
                 }
             }
             sr.Close();

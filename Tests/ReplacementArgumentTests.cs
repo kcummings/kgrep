@@ -188,7 +188,7 @@ namespace Tests {
 
         [Test]
         [ExpectedException(typeof(System.Exception))]
-        public void TestInvalidRegexToPattern() {
+        public void TestInvalidRegextopattern() {
             ReplacementFile rf = new ReplacementFile("a~b[.");
             List<Replacement> reps = rf.ReplacementList;
         }

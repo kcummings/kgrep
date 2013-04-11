@@ -79,8 +79,8 @@ namespace kgrep {
 
         private bool isCandidateForReplacement(string line, Replacement rep) {
             // Has a matching anchor?
-            if (rep.Criteria.Length > 0) {
-                if (Regex.IsMatch(line, rep.Criteria))
+            if (rep.criteria.Length > 0) {
+                if (Regex.IsMatch(line, rep.criteria))
                     return true;
                 return false;
             }
