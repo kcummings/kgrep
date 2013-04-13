@@ -28,9 +28,6 @@ namespace kgrep
     // kgrep matchpattern filename1 ... filenameN     
     // cat filename|kgrep matchpattern               
 
-    // If matchpattern is a file, it contains a ReplacementPatterns.
-    // If matchpattern contains a "~" it is treated as a ReplacementPattern, else a ScanToPrintPattern.
-
     class Kgrep
     {
         static void Main(string[] args) {
@@ -40,14 +37,10 @@ namespace kgrep
                 Usage("No input sources given/recognized.");
             }
 
-            if (cmdarg.ReplacementFileName != null) {
-                ReplacerEngine engine = new ReplacerEngine();
-                engine.SearchAndReplaceTokens(cmdarg.ReplacementFileName, cmdarg.InputSourceNames);
-            }
-            else if (cmdarg.SearchPattern != null) {
-                ScannerEngine eng = new ScannerEngine();
-                eng.ScanAndPrintTokens(cmdarg.SearchPattern, cmdarg.InputSourceNames);
-            }
+            if (cmdarg.ReplacementFileName != null) 
+                (new ReplacerEngine()).SearchAndReplaceTokens(cmdarg.ReplacementFileName, cmdarg.InputSourceNames);
+            else if (cmdarg.SearchPattern != null) 
+                (new ScannerEngine()).ScanAndPrintTokens(cmdarg.SearchPattern, cmdarg.InputSourceNames);
             else {
                 Usage("unknown command line argument pattern");
             }
