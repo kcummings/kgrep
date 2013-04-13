@@ -73,7 +73,7 @@ namespace Tests {
             ReplacementFile rf = new ReplacementFile("comment=:; :ignored;");
             List<Replacement> reps = rf.ReplacementList;
 
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             string result = engine.ApplyReplacementsAll("a b ca", reps);
             Assert.AreEqual("a b ca", result);
             Assert.IsTrue(reps.Count == 0);
@@ -84,7 +84,7 @@ namespace Tests {
             ReplacementFile rf = new ReplacementFile("# remove a from arg; a~");
             List<Replacement> reps = rf.ReplacementList;
 
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             string result = engine.ApplyReplacementsAll("a b ca", reps);
             Assert.AreEqual(" b c", result);
         }
@@ -94,7 +94,7 @@ namespace Tests {
             ReplacementFile rf = new ReplacementFile(@" a\s ~ b ");
             List<Replacement> reps = rf.ReplacementList;
 
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             string result = engine.ApplyReplacementsAll("a b ca", reps);
             Assert.AreEqual("bb ca", result);
         }
@@ -104,7 +104,7 @@ namespace Tests {
             ReplacementFile rf = new ReplacementFile(@" a\s\s ~ b ");
             List<Replacement> reps = rf.ReplacementList;
 
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             string result = engine.ApplyReplacementsAll("a   b ca", reps);
             Assert.AreEqual("b b ca", result);
         }
@@ -114,7 +114,7 @@ namespace Tests {
             ReplacementFile rf = new ReplacementFile(@" \sa ~ b ");
             List<Replacement> reps = rf.ReplacementList;
 
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             string result = engine.ApplyReplacementsAll(" da b ca", reps);
             Assert.AreEqual(" da b ca", result);
         }
@@ -124,7 +124,7 @@ namespace Tests {
             ReplacementFile rf = new ReplacementFile(@" \sa ~ b ");
             List<Replacement> reps = rf.ReplacementList;
 
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             string result = engine.ApplyReplacementsAll(" a b ca", reps);
             Assert.AreEqual("b b ca", result);
         }
@@ -134,7 +134,7 @@ namespace Tests {
             ReplacementFile rf = new ReplacementFile(@" \s\sa  ~ b ");
             List<Replacement> reps = rf.ReplacementList;
 
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             string result = engine.ApplyReplacementsAll("  a  b ca", reps);
             Assert.AreEqual("b  b ca", result);
         }
@@ -144,7 +144,7 @@ namespace Tests {
             ReplacementFile rf = new ReplacementFile(@" \sa  ~ b\s ");
             List<Replacement> reps = rf.ReplacementList;
 
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             string result = engine.ApplyReplacementsAll("3 ab ca", reps);
             Assert.AreEqual("3b b ca", result);
         }
@@ -154,7 +154,7 @@ namespace Tests {
             ReplacementFile rf = new ReplacementFile(@" a  ~ b\s\s ");
             List<Replacement> reps = rf.ReplacementList;
 
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             string result = engine.ApplyReplacementsAll("3 ab ca", reps);
             Assert.AreEqual("3 b  b cb  ", result);
         }
@@ -164,7 +164,7 @@ namespace Tests {
             ReplacementFile rf = new ReplacementFile(@" a  ~ \sb ");
             List<Replacement> reps = rf.ReplacementList;
 
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             string result = engine.ApplyReplacementsAll("3ab ca", reps);
             Assert.AreEqual("3 bb c b", result);
         }
@@ -174,7 +174,7 @@ namespace Tests {
             ReplacementFile rf = new ReplacementFile(@" \s\sa\s  ~ b ");
             List<Replacement> reps = rf.ReplacementList;
 
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             string result = engine.ApplyReplacementsAll("  a b ca", reps);
             Assert.AreEqual("bb ca", result);
         }

@@ -3,6 +3,7 @@
 /Tests/bin
 /Tests/obj
 /Tests/TestResult.xml
+/Tests/kgrep.VisualState.xml
 kgrep.suo
 *.user
-
+todo.txt

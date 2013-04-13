@@ -56,11 +56,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ReplacerEngine.cs" />
+    <Compile Include="ScannerEngine.cs" />
     <Compile Include="IHandleOutput.cs" />
     <Compile Include="ReadCommandLineArgumentAsFile.cs" />
     <Compile Include="IHandleInput.cs" />
     <Compile Include="kgrep.cs" />
-    <Compile Include="KgrepEngine.cs" />
     <Compile Include="ParseCommandLine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadFile.cs" />

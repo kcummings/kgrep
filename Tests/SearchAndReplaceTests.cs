@@ -9,63 +9,63 @@ namespace Tests {
 
         [Test]
         public void TestSimpleOneLineReplace() {
-            KgrepEngine engine = new KgrepEngine() {sw = new WriteToString()};
+            ReplacerEngine engine = new ReplacerEngine() {sw = new WriteToString()};
             string newline = engine.SearchAndReplaceTokens("a~b", new List<string> {"abc"});
             Assert.AreEqual("bbc\n", newline);
         }
 
         [Test]
         public void TestSimpleTwoLineReplace() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.SearchAndReplaceTokens("a~b", new List<string> { "abc", "daf" });
             Assert.AreEqual("bbc\ndbf\n", newline);
         }
 
         [Test]
         public void TestScopeAllReplace() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.SearchAndReplaceTokens("scope=all; a~b; b~c", new List<string> { "a b c", "a b c", "earth" });
             Assert.AreEqual("c c c\nc c c\necrth\n", newline);
         }
 
         [Test]
         public void TestScopeFirstReplace() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.SearchAndReplaceTokens("scope=first; a~b; b~c", new List<string> { "a b c", "a b c", "earth" });
             Assert.AreEqual("b b c\nb b c\nebrth\n", newline);
         }
 
         [Test]
         public void TestRemoveSpaces() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.SearchAndReplaceTokens(@"\s~", new List<string> { "a b c", "the   dog  ran. " });
             Assert.AreEqual("abc\nthedogran.\n", newline);
         }
 
         [Test]
         public void TestExpandEveryThirdLetter() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.SearchAndReplaceTokens(@"([a-z]{3})~$1-", new List<string> { "kgrep works today by"});
             Assert.AreEqual("kgr-ep wor-ks tod-ay by\n", newline);
         }
 
         [Test]
         public void TestSwapEveryOtherLetter() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.SearchAndReplaceTokens(@"([a-z])([a-z])~$2$1", new List<string> { "kgrep works today by" });
             Assert.AreEqual("gkerp owkrs otady yb\n", newline);
         } 
 
         [Test]
         public void TestChangeDelimReplace() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.SearchAndReplaceTokens("delim=,; hi,bye; here,there", new List<string> { "hi world", "go home today", "here is it" });
             Assert.AreEqual("bye world\ngo home today\nthere is it\n", newline);
         }
 
         [Test]
         public void TestChangeDelimTwiceReplace() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.SearchAndReplaceTokens("delim=,; hi,bye; delim=-; here-there", new List<string> { "hi world", "go home today", "here is it" });
             Assert.AreEqual("bye world\ngo home today\nthere is it\n", newline);
         }
@@ -73,7 +73,7 @@ namespace Tests {
         // Anchor tests
         [Test]
         public void TestAnchorMatchingOneLine() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.SearchAndReplaceTokens("my~hi~bye; all~gone", 
                                         new List<string> { "Now is my hi world", "go hi today" });
             Assert.AreEqual("Now is my bye world\ngo hi today\n", newline);
@@ -81,7 +81,7 @@ namespace Tests {
 
         [Test]
         public void TestAnchorMatchingOneLineFailure() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.SearchAndReplaceTokens("my~hi~bye; all~gone",
                                         new List<string> { "Now is your hi world", "go hi today" });
             Assert.AreEqual("Now is your hi world\ngo hi today\n", newline);
@@ -89,7 +89,7 @@ namespace Tests {
 
         [Test]
         public void TestAnchorMatchingMultipleSameLine() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.SearchAndReplaceTokens("my~hi~bye; all~gone",
                                         new List<string> { "This is my hi world", "go hi today" });
             Assert.AreEqual("Tbyes is my bye world\ngo hi today\n", newline);
@@ -97,7 +97,7 @@ namespace Tests {
 
         [Test]
         public void TestAnchorMatchingTwoLines() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.SearchAndReplaceTokens("my~hi~bye; all~gone",
                                         new List<string> { "my is my hi world", "go hi mytoday" });
             Assert.AreEqual("my is my bye world\ngo bye mytoday\n", newline);
@@ -105,7 +105,7 @@ namespace Tests {
 
         [Test]
         public void TestAnchorMatchingStartLine() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.SearchAndReplaceTokens("^Th~hi~bye; all~gone",
                                         new List<string> { "mTh my hi world", "Thgo hi mytoday" });
             Assert.AreEqual("mTh my hi world\nThgo bye mytoday\n", newline);

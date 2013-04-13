@@ -9,7 +9,7 @@ namespace Tests {
 
         [Test]
         public void TestSimpleFindToken() {
-            KgrepEngine engine = new KgrepEngine() { sw = new WriteToString() };
+            ScannerEngine engine = new ScannerEngine() { sw = new WriteToString() };
             string newline = engine.ScanAndPrintTokens("abc", new List<string> { "abc", "daf" });
             Assert.AreEqual("abc\n", newline);
         }

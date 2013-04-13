@@ -8,7 +8,7 @@ namespace Tests {
 
         [Test]
         public void TestRegexReplacement() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("e(..)o-(...)", "$1 $2"));
             Assert.AreEqual("hll bye", engine.ApplyReplacementsAll("hello-bye", reps));
@@ -16,7 +16,7 @@ namespace Tests {
 
         [Test]
         public void TestRegexExtractReplacement() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("<tag attr='(.+?)'>", "attr=$1"));
             Assert.AreEqual("attr=hi", engine.ApplyReplacementsAll("<tag attr='hi'>", reps));
@@ -24,14 +24,14 @@ namespace Tests {
 
         [Test]
         public void TestEmptyReplacementSet() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             Assert.AreEqual( "abc",engine.ApplyReplacementsFirst("abc", reps));
         }
 
         [Test]
         public void TestSimpleReplacementToRemoveToken() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("token", ""));
             Assert.AreEqual("abc", engine.ApplyReplacementsFirst("abctoken", reps));
@@ -39,7 +39,7 @@ namespace Tests {
 
         [Test]
         public void TestSimpleReplacementNoMatch() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("k", "def"));
             Assert.AreNotEqual("", engine.ApplyReplacementsFirst("abc", reps));
@@ -47,7 +47,7 @@ namespace Tests {
 
         [Test]
         public void TestSimpleReplacement() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("abc", "def"));
             Assert.AreEqual("def",engine.ApplyReplacementsFirst("abc", reps));
@@ -55,7 +55,7 @@ namespace Tests {
 
         [Test]
         public void TestEndPointReplacements() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("ab", "de"));
             Assert.AreEqual("dele dee lincode",engine.ApplyReplacementsFirst("able abe lincoab", reps));
@@ -63,7 +63,7 @@ namespace Tests {
 
         [Test]
         public void TestFirstReplacmentWithMultipleLines() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("from", "to"));
             reps.Add(new Replacement("to", "this"));
@@ -72,7 +72,7 @@ namespace Tests {
 
         [Test]
         public void TestAllReplacmentWithMultipleLines() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("from", "to"));
             reps.Add(new Replacement("to", "this"));
@@ -81,7 +81,7 @@ namespace Tests {
 
         [Test]
         public void TestFirstReplacmentWithMultipleLinesWithGroups() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("f(..)m", "$1"));
             reps.Add(new Replacement("to", "this"));
@@ -90,7 +90,7 @@ namespace Tests {
 
         [Test]
         public void TestFirstReplacmentWithMultipleLinesSwappingGroups() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement(@"(\w+)\s(\w+)", "$2 $1"));
             reps.Add(new Replacement("to", "this"));
@@ -99,7 +99,7 @@ namespace Tests {
 
         [Test]
         public void TestAllReplacmentWithMultipleLinesSwappingGroups() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement(@"(\w+)\s(\w+)", "$2 $1"));
             reps.Add(new Replacement("to", "this"));
@@ -108,7 +108,7 @@ namespace Tests {
 
         [Test]
         public void TestWithAnchor() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("today","you", "to"));
             Assert.AreEqual("from me to to today", engine.ApplyReplacementsFirst("from me to you today", reps));
@@ -116,7 +116,7 @@ namespace Tests {
 
         [Test]
         public void TestSuccessWithAnchorAsRegex() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("t...y", "you", "to"));
             Assert.AreEqual("from me to to today", engine.ApplyReplacementsFirst("from me to you today", reps));
@@ -124,7 +124,7 @@ namespace Tests {
 
         [Test]
         public void TestFailureWithAnchorAsRegex() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("to", "ty", "you"));
             Assert.AreEqual("from me to you today", engine.ApplyReplacementsFirst("from me to you today", reps));
@@ -132,7 +132,7 @@ namespace Tests {
  
         [Test]
         public void TestWithAnchorMismatch() {
-            KgrepEngine engine = new KgrepEngine();
+            ReplacerEngine engine = new ReplacerEngine();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("to", "Joe", "you"));
             Assert.AreEqual("from me to you", engine.ApplyReplacementsFirst("from me to you", reps));

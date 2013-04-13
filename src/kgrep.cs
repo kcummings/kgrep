@@ -40,11 +40,14 @@ namespace kgrep
                 Usage("No input sources given/recognized.");
             }
 
-            KgrepEngine engine = new KgrepEngine();
-            if (cmdarg.ReplacementFileName != null) 
+            if (cmdarg.ReplacementFileName != null) {
+                ReplacerEngine engine = new ReplacerEngine();
                 engine.SearchAndReplaceTokens(cmdarg.ReplacementFileName, cmdarg.InputSourceNames);
-            else if (cmdarg.SearchPattern != null)  
-                engine.ScanAndPrintTokens(cmdarg.SearchPattern, cmdarg.InputSourceNames);  
+            }
+            else if (cmdarg.SearchPattern != null) {
+                ScannerEngine eng = new ScannerEngine();
+                eng.ScanAndPrintTokens(cmdarg.SearchPattern, cmdarg.InputSourceNames);
+            }
             else {
                 Usage("unknown command line argument pattern");
             }
