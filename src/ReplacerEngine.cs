@@ -32,9 +32,6 @@ namespace kgrep {
 
         // "scope=First" in effect.
         public string ApplyReplacementsFirst(string line, List<Replacement> repList) {
-            if (repList.Count == 0)
-                return line;
-
             foreach (Replacement rep in repList) {
                 if (isCandidateForReplacement(line, rep)) {
                     if (rep.frompattern.IsMatch(line)) {
@@ -47,9 +44,6 @@ namespace kgrep {
 
         // "scope=All" in effect.
         public string ApplyReplacementsAll(string line, List<Replacement> repList) {
-            if (repList.Count == 0)
-                return line;
-
             foreach (Replacement rep in repList) {
                 if (isCandidateForReplacement(line, rep)) {
                     line = rep.frompattern.Replace(line, rep.topattern);

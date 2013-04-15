@@ -110,5 +110,21 @@ namespace Tests {
                                         new List<string> { "mTh my hi world", "Thgo hi mytoday" });
             Assert.AreEqual("mTh my hi world\nThgo bye mytoday\n", newline);
         }
+
+        [Test]
+        public void TestEmptyReplacementList() {
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
+            string newline = engine.SearchAndReplaceTokens("",
+                                        new List<string> { "mTh my hi world", "Thgo hi mytoday" });
+            Assert.AreEqual("mTh my hi world\nThgo hi mytoday\n", newline);
+        }
+
+        [Test]
+        public void TestEmptyReplacementFirstList() {
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
+            string newline = engine.SearchAndReplaceTokens("scope=first",
+                                        new List<string> { "mTh my hi world", "Thgo hi mytoday" });
+            Assert.AreEqual("mTh my hi world\nThgo hi mytoday\n", newline);
+        }
     }
 }
