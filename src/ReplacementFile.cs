@@ -47,6 +47,9 @@ namespace kgrep
                         line = line.Remove(i);
 
                     String[] parts = line.Split(_delim.ToCharArray(), 4);
+                    if (parts.Length == 1) { // just scan pattern
+                        replacementList.Add(new Replacement(parts[0]));
+                    }
                     if (parts.Length == 2) {
                         // just a~b pattern
                         replacementList.Add(new Replacement(parts[0], parts[1]));
