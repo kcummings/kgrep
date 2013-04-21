@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using MS.Internal.Xml.XPath;
 
 namespace kgrep
@@ -13,6 +14,7 @@ namespace kgrep
         private String _comment = "#";
         private String _delim = "~";
         private IHandleInput sr;
+        public string ScannerFS = "\n";
 
         public ReplacementFile(String filename) {
             sr = (new ReadFileFactory()).GetSource(filename);
@@ -32,23 +34,25 @@ namespace kgrep
                     continue;
                 }
 
+                // Remove any trailing comments.
+                int i = line.IndexOf(_comment);
+                if (i >= 0)
+                    line = line.Remove(i);
+
                 if (line.ToLower().StartsWith("comment=")) 
-                    _comment = line.Substring("comment=".Length, 1);
-                else if (line.ToLower().StartsWith("delim=")) 
-                    _delim = line.Substring("delim=".Length, 1);
+                    _comment = GetOption(line, "comment"); 
+                else if (line.ToLower().StartsWith("delim="))
+                    _delim = GetOption(line, "delim");
                 else if (line.ToLower().StartsWith("scope=first"))  // Once true, it's true for the remaining replacements.
                     _ScopeAll = false;
                 else if (line.ToLower().StartsWith("scope=all"))  
                     _ScopeAll = true;
+                else if (line.ToLower().StartsWith("scannerfs=")) 
+                    ScannerFS = GetOption(line, "FS");
                 else {
-                    // Remove any trailing comments.
-                    int i = line.IndexOf(_comment);
-                    if (i >= 0)
-                        line = line.Remove(i);
-
                     String[] parts = line.Split(_delim.ToCharArray(), 4);
                     if (parts.Length == 1) { // just scan pattern
-                        replacementList.Add(new Replacement(parts[0]));
+                        replacementList.Add(new Replacement(parts[0]) {ScannerFS = ScannerFS });
                     }
                     if (parts.Length == 2) {
                         // just a~b pattern
@@ -64,5 +68,13 @@ namespace kgrep
             return replacementList;
         }
 
+        // Get the provided value for the given Control Option.
+        // allow optional enclosing in quotes
+        private string GetOption(string line, string type) {
+            Match m = Regex.Match(line, type+"=\"(.+)\"", RegexOptions.IgnoreCase);  
+            if (!m.Success)
+                m = Regex.Match(line, type+"=(.+)", RegexOptions.IgnoreCase);
+            return m.Groups[1].Value;
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace kgrep
         public String topattern = null;
         public Regex frompattern;
         public Style style;
+        public string ScannerFS = "\n";
 
         public enum Style {
             Scan,

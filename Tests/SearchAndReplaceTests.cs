@@ -32,6 +32,15 @@ namespace Tests {
         }
 
         [Test]
+        public void TestFullCycleScannerFS() {
+            string[] args = new String[] { "ScannerFS=,; a;b", "a b ca" };
+            ParseCommandLine cmd = new ParseCommandLine(args);
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
+            string results = engine.ApplyReplacements(cmd.ReplacementFileName, cmd.InputSourceNames);
+            Assert.AreEqual("", results);
+        }
+
+        [Test]
         public void TestFullCycleScan() {
             string[] args = new String[] { "a", "abca" };
             ParseCommandLine cmd = new ParseCommandLine(args);

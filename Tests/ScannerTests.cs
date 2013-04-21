@@ -75,5 +75,19 @@ namespace Tests {
                 string results = engine.ApplyReplacements("[0-9]+", new List<string> { "85 dollars 123 lost" });
                 Assert.AreEqual("85\n123\n", results);
             }
+
+            [Test]
+            public void TestScanWithCommaSeparatedFSinQuotes() {
+                ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
+                string result = engine.ApplyReplacements("ScannerFS=\", \"; a", new List<string> { "a b ca" });
+                Assert.AreEqual("a, a\n", result);
+            }
+
+            [Test]
+            public void TestScanWithCommaSeparatedFSwithoutQuotes() {
+                ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
+                string result = engine.ApplyReplacements("ScannerFS=,; a", new List<string> { "a b ca" });
+                Assert.AreEqual("a,a\n", result);
+            }
         }
     }

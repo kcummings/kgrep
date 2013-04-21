@@ -44,11 +44,13 @@ If supplied and is not found in a line, the "before~after" replacement will **no
 
 **ReplacementString Control Options**
 
-The following controls can be embedded anywhere in the ReplacementFile or stacked *ReplacementStrings*. Control options are not case sensitive but must be at the beginning of a line. There is no separate config file.
+The following controls can be embedded anywhere in the ReplacementFile or stacked *ReplacementStrings*. Control options are not case sensitive but must be at the beginning of a line. Control Options are no case sensitive but there values are case sensitive when applied to a line. There is no separate config file.
 
-- **delim=?** where ? represents the new delimiter character. The delimiter is the character that separates the ReplacementString fields. Default is "~".
+- **delim=?** where ? represents a single or a series of character enclosed in optional quotes. Its value is the new delimiter. This value separates the ReplacementString fields. Default is "~".
 
-- **comment=?** where ? is the character to designate the beginning of a comment. Default is "#".
+- **comment=?** This value designates the beginning of a comment. Default is "#".
+
+- **ScannerFS=?** The scanned tokens are "glued" together with the value of this option. Default is "\n".
 
 - **scope=[first|all]** If set to **first**, the first time a *ReplacementString* is found on the line, no other replacements are applied to that line. If set to **all** , as many Replacements as possible will be applied to a line.
 
@@ -57,7 +59,7 @@ Caution: You can get unexpected results if you are not careful when using Contro
 ---
 
 ### SearchToken
-A *SearchToken* is a regex string used to scan and print matching patterns. Each match is printed on a separate line. This means matched groups will print on their own line also. A stacking character has no special meaning in a *SearchToken* and is interpreted as a normal character. Note: Currently you cannot scan a text string for a field delimiter. If found, the *SearchToken* is interpreted as a *ReplacementString*.
+A *SearchToken* is a regex string used to scan and print matching patterns. Only the matching tokens are printed. The rest of the line is trashed. Matches on each line are concatinated together with the ScannerFS string and then printed on a separate line. A stacking character has no special meaning in a *SearchToken* and is interpreted as a normal character. Note: Currently you cannot scan a text string for the field delimiter. If found, the *SearchToken* is interpreted as a *ReplacementString*. Use the Control Option ScannerFS to control the characters that are placed between each matched token.
 
 Example: 
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace kgrep {
     public class ReplacerEngine {
@@ -48,7 +49,7 @@ namespace kgrep {
             foreach (Replacement rep in repList) {
                 if (isCandidateForReplacement(line, rep)) {
                     if (rep.style == Replacement.Style.Scan)
-                        line = ScanForTokens(line, rep.frompattern);
+                        line = ScanForTokens(line, rep.frompattern,rep.ScannerFS);
                     else
                         line = rep.frompattern.Replace(line, rep.topattern);
                 }
@@ -66,8 +67,8 @@ namespace kgrep {
             return true;
         }
 
-        public string ScanForTokens(string line, Regex pattern) {
-            StringBuilder sb = new StringBuilder();
+        public string ScanForTokens(string line, Regex pattern, string FS) {
+            List<string> sb = new List<string>();
             Match m = pattern.Match(line);
 
             // Only return submatches if found, otherwise return any matches.
@@ -75,17 +76,15 @@ namespace kgrep {
                 int[] gnums = pattern.GetGroupNumbers();
                 if (gnums.Length > 1) {
                     for (int i = 1; i < gnums.Length; i++) {
-                        sb.Append(m.Groups[gnums[i]].ToString());
-                        sb.Append("\n");
+                        sb.Add(m.Groups[gnums[i]].ToString());
                     }
                 } else {
                     // Only include the substring that was matched.
-                    sb.Append(m.Value);
-                    sb.Append("\n");
+                    sb.Add(m.Value);
                 }
                 m = m.NextMatch();
             }
-            return sb.ToString();
+            return String.Join(FS, sb.ToArray());
         }
     }
 }
