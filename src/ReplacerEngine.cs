@@ -8,7 +8,7 @@ namespace kgrep {
 
         public IHandleOutput sw = new WriteStdout();
 
-        public string SearchAndReplaceTokens(string replacementFileName, List<string> inputFilenames) {
+        public string ApplyReplacements(string replacementFileName, List<string> inputFilenames) {
             try {
                 ReplacementFile rf = new ReplacementFile(replacementFileName);
                 string line;

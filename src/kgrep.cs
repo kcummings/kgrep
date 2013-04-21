@@ -33,15 +33,12 @@ namespace kgrep
         static void Main(string[] args) {
 
             ParseCommandLine cmdarg = new ParseCommandLine(args);
-            if (cmdarg.InputSourceNames.Count == 0) {
+            if (cmdarg.InputSourceNames.Count == 0)
                 Usage("No input sources given/recognized.");
-            }
+            if (cmdarg.ReplacementFileName == null) 
+               Usage("unknown command line argument pattern");
 
-            if (cmdarg.ReplacementFileName != null) 
-                new ReplacerEngine().SearchAndReplaceTokens(cmdarg.ReplacementFileName, cmdarg.InputSourceNames);
-            else {
-                Usage("unknown command line argument pattern");
-            }
+            new ReplacerEngine().ApplyReplacements(cmdarg.ReplacementFileName, cmdarg.InputSourceNames);
         }
 
         private static void Usage(string message) {
