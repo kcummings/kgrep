@@ -57,7 +57,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ReplacerEngine.cs" />
-    <Compile Include="ScannerEngine.cs" />
     <Compile Include="IHandleOutput.cs" />
     <Compile Include="ReadCommandLineArgumentAsFile.cs" />
     <Compile Include="IHandleInput.cs" />

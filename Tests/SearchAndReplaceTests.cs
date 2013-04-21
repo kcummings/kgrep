@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using kgrep;
 
@@ -16,9 +17,36 @@ namespace Tests {
 
         [Test]
         public void TestSimpleTwoLineReplace() {
-            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
-            string newline = engine.SearchAndReplaceTokens("a~b", new List<string> { "abc", "daf" });
+            ReplacerEngine engine = new ReplacerEngine() {sw = new WriteToString()};
+            string newline = engine.SearchAndReplaceTokens("a~b", new List<string> {"abc", "daf"});
             Assert.AreEqual("bbc\ndbf\n", newline);
+        }
+
+        [Test]
+        public void TestFullCycleReplace() {
+            string[] args = new String[] { "a~c", "abc" };
+            ParseCommandLine cmd = new ParseCommandLine(args);
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
+            string results = engine.SearchAndReplaceTokens(cmd.ReplacementFileName, cmd.InputSourceNames);
+            Assert.AreEqual("cbc\n", results);
+        }
+
+        [Test]
+        public void TestFullCycleScan() {
+            string[] args = new String[] { "a", "abca" };
+            ParseCommandLine cmd = new ParseCommandLine(args);
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
+            string results = engine.SearchAndReplaceTokens(cmd.ReplacementFileName, cmd.InputSourceNames);
+            Assert.AreEqual("a\na\n", results);
+        }
+
+        [Test]
+        public void TestFullCycleScanWithFile() {
+            string[] args = new String[] { "hi", "test.lst" };
+            ParseCommandLine cmd = new ParseCommandLine(args);
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
+            string results = engine.SearchAndReplaceTokens(cmd.ReplacementFileName, cmd.InputSourceNames);
+            Assert.AreEqual("hi\nhi\nhi\n", results);
         }
 
         [Test]

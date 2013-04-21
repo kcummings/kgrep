@@ -15,9 +15,8 @@ namespace Tests {
         public void TestScanAndReplacement() {
             string[] args = new String[] { "a~c", "abc" };
             ParseCommandLine cmd = new ParseCommandLine(args);
-            Assert.IsNull(cmd.SearchPattern);
             Assert.AreEqual("a~c", cmd.ReplacementFileName);
-            Assert.AreEqual(0, cmd.InputSourceNames.Count);
+            Assert.AreEqual(1, cmd.InputSourceNames.Count);
         }
 
         [Test]
@@ -25,9 +24,8 @@ namespace Tests {
         public void TestTwoScans() {
             string[] args = new String[] { "a~c", "a~bc" };
             ParseCommandLine cmd = new ParseCommandLine(args);
-            Assert.IsNull(cmd.SearchPattern);
             Assert.AreEqual("a~c", cmd.ReplacementFileName);
-            Assert.AreEqual(0, cmd.InputSourceNames.Count);
+            Assert.AreEqual(1, cmd.InputSourceNames.Count);
         }
 
         [Test]
@@ -35,8 +33,6 @@ namespace Tests {
         public void TestSimpleScanSingleFile() {
             string[] args = new String[] { "abc", "file1.txt" };
             ParseCommandLine cmd = new ParseCommandLine(args);
-            Assert.AreEqual("abc", cmd.SearchPattern);
-            Assert.IsNull(cmd.ReplacementFileName);
             Assert.AreEqual(1, cmd.InputSourceNames.Count);
             Assert.AreEqual("file1.txt", cmd.InputSourceNames[0]);
         }
@@ -46,8 +42,6 @@ namespace Tests {
         public void TestSimpleScanTwoFiles() {
             string[] args = new String[] { "abc", "file1.txt", "file2.txt" };
             ParseCommandLine cmd = new ParseCommandLine(args);
-            Assert.AreEqual("abc", cmd.SearchPattern);
-            Assert.IsNull(cmd.ReplacementFileName);
             Assert.AreEqual(2, cmd.InputSourceNames.Count);
             Assert.AreEqual("file1.txt", cmd.InputSourceNames[0]);
             Assert.AreEqual("file2.txt", cmd.InputSourceNames[1]);
@@ -59,7 +53,6 @@ namespace Tests {
             string[] args = new String[] { "a~c; b~d", "file1.txt", "file2.txt" };
             ParseCommandLine cmd = new ParseCommandLine(args);
             Assert.AreEqual("a~c; b~d", cmd.ReplacementFileName);
-            Assert.IsNull(cmd.SearchPattern);
             Assert.AreEqual(2, cmd.InputSourceNames.Count);
             Assert.AreEqual("file1.txt", cmd.InputSourceNames[0]);
             Assert.AreEqual("file2.txt", cmd.InputSourceNames[1]);
@@ -69,7 +62,6 @@ namespace Tests {
         public void TestReplacementFileScan() {
             string[] args = new String[] { "hi~bye" };
             ParseCommandLine cmd = new ParseCommandLine(args);
-            Assert.IsNull(cmd.SearchPattern);
             Assert.AreEqual("hi~bye", cmd.ReplacementFileName);
             Assert.AreEqual(1, cmd.InputSourceNames.Count);
             Assert.AreEqual(cmd.STDIN, cmd.InputSourceNames[0]);

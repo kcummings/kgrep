@@ -38,9 +38,7 @@ namespace kgrep
             }
 
             if (cmdarg.ReplacementFileName != null) 
-                (new ReplacerEngine()).SearchAndReplaceTokens(cmdarg.ReplacementFileName, cmdarg.InputSourceNames);
-            else if (cmdarg.SearchPattern != null) 
-                (new ScannerEngine()).ScanAndPrintTokens(cmdarg.SearchPattern, cmdarg.InputSourceNames);
+                new ReplacerEngine().SearchAndReplaceTokens(cmdarg.ReplacementFileName, cmdarg.InputSourceNames);
             else {
                 Usage("unknown command line argument pattern");
             }
