@@ -7,3 +7,5 @@
 kgrep.suo
 *.user
 todo.txt
+
+Tests/StdioTests/kgrep.exe

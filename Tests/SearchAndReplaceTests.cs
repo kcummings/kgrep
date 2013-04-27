@@ -50,15 +50,6 @@ namespace Tests {
         }
 
         [Test]
-        public void TestFullCycleScanWithFile() {
-            string[] args = new String[] { "hi", "test.lst" };
-            ParseCommandLine cmd = new ParseCommandLine(args);
-            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
-            string results = engine.ApplyReplacements(cmd.ReplacementFileName, cmd.InputSourceNames);
-            Assert.AreEqual("hi\nhi\nhi\n", results);
-        }
-
-        [Test]
         public void TestScopeAllReplace() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements("scope=all; a~b; b~c", new List<string> { "a b c", "a b c", "earth" });

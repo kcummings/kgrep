@@ -1,0 +1,1 @@
+Since unit tests do not test actual file i/o, this bash script tests actual file i/o. It was developed using cygwin under windows. It uses unix line endings.
