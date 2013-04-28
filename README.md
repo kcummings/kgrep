@@ -9,6 +9,11 @@ Project Goals
 * Refactor a working but untestable program into a "modern" application with Unit Tests, small methods, classes, etc. In other words, a sandbox to play, experiment and have a useful tool at the end of the day.
 * OS independence. Developed using VS2010, Nunit 2.6.1, NLog 2.0.1.2 & .NET 4.0. Should be compatible with Mono however it has not be compiled or tested under Mono. A sample log file is *SampleLog - 2013-04-28.log*.
 
+Dependencies
+-----
+You must have Nlog.dll either in the same directory as kgrep or in your path. There is a copy of Nlog.dll in kgrep/src directory.
+
+
 Usage
 -----
 
