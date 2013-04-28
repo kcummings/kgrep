@@ -38,8 +38,6 @@ namespace kgrep
             ParseCommandLine cmdarg = new ParseCommandLine(args);
             if (cmdarg.InputSourceNames.Count == 0)
                 Usage("No input sources given/recognized.");
-            if (cmdarg.ReplacementFileName == null) 
-               Usage("unknown command line argument pattern");
 
             new ReplacerEngine().ApplyReplacements(cmdarg.ReplacementFileName, cmdarg.InputSourceNames);
             logger.Debug("<<<<< Ending kgrep >>>>>");
