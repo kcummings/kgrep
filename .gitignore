@@ -4,6 +4,7 @@
 /Tests/StdioTests/Logs
 /Tests/bin
 /Tests/obj
+/Tests/StdioTests/suite/actual
 /Tests/TestResult.xml
 /Tests/kgrep.VisualState.xml
 kgrep.suo
