@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-using MS.Internal.Xml.XPath;
+using NLog;
 
 namespace kgrep
 {
     public class ReplacementFile
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         public List<Replacement> ReplacementList = new List<Replacement>();
         private bool _ScopeAll = true;
         public bool ScopeAll { get { return _ScopeAll; } }
@@ -17,16 +18,16 @@ namespace kgrep
         public string ScannerFS = "\n";
 
         public ReplacementFile(String filename) {
+            logger.Debug("Start reading replacementfile:{0}",filename);
             sr = (new ReadFileFactory()).GetSource(filename);
             ReplacementList = GetReplacementList();
         }
  
         public List<Replacement> GetReplacementList() {
-
             List<Replacement> replacementList = new List<Replacement>();
             String line;
             while ((line = sr.ReadLine()) != null) {
-
+                logger.Trace("   replacement source line:{0}",line);
                 line = line.Trim();
 
                 // Remove comment lines.
@@ -65,6 +66,7 @@ namespace kgrep
                 }
             }
             sr.Close();
+            logger.Debug("There are {0} replacements in replacement file", replacementList.Count);
             return replacementList;
         }
 

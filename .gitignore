@@ -1,5 +1,7 @@
 /src/bin
 /src/obj
+/packages
+/Tests/StdioTests/Logs
 /Tests/bin
 /Tests/obj
 /Tests/TestResult.xml
@@ -9,3 +11,4 @@ kgrep.suo
 todo.txt
 
 Tests/StdioTests/kgrep.exe
+src/packages.config

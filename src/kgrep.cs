@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using NLog;
 
 /*
 ##The MIT License (MIT)
@@ -30,8 +31,10 @@ namespace kgrep
 
     class Kgrep
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         static void Main(string[] args) {
 
+            logger.Debug("<<<<< Starting kgrep >>>>>");
             ParseCommandLine cmdarg = new ParseCommandLine(args);
             if (cmdarg.InputSourceNames.Count == 0)
                 Usage("No input sources given/recognized.");
@@ -39,6 +42,7 @@ namespace kgrep
                Usage("unknown command line argument pattern");
 
             new ReplacerEngine().ApplyReplacements(cmdarg.ReplacementFileName, cmdarg.InputSourceNames);
+            logger.Debug("<<<<< Ending kgrep >>>>>");
         }
 
         private static void Usage(string message) {

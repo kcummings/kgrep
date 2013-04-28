@@ -1,0 +1,133 @@
+2013-04-28 16:11:48.3125 DEBUG <<<<< Starting kgrep >>>>>
+2013-04-28 16:11:48.3437 DEBUG Reading from source files with replacement file ./suite/input/echo_lines.rep
+2013-04-28 16:11:48.3437 TRACE    adding source file:./suite/input/echo_lines.txt
+2013-04-28 16:11:48.3750 DEBUG Start reading replacementfile:./suite/input/echo_lines.rep
+2013-04-28 16:11:48.3906 DEBUG There are 0 replacements in replacement file
+2013-04-28 16:11:48.3906 DEBUG ApplyReplacements - Processing input file:./suite/input/echo_lines.txt
+2013-04-28 16:11:48.3906 DEBUG ApplyReplacementsAll before:This is a test
+2013-04-28 16:11:48.3906 DEBUG ApplyReplacementsAll  after:This is a test
+2013-04-28 16:11:48.4218 DEBUG ApplyReplacementsAll before:of line one
+2013-04-28 16:11:48.4375 DEBUG ApplyReplacementsAll  after:of line one
+2013-04-28 16:11:48.4375 DEBUG ApplyReplacementsAll before:and line two
+2013-04-28 16:11:48.4375 DEBUG ApplyReplacementsAll  after:and line two
+2013-04-28 16:11:48.4375 DEBUG ApplyReplacementsAll before:and the final line.
+2013-04-28 16:11:48.4375 DEBUG ApplyReplacementsAll  after:and the final line.
+2013-04-28 16:11:48.4531 DEBUG <<<<< Ending kgrep >>>>>
+2013-04-28 16:11:48.9218 DEBUG <<<<< Starting kgrep >>>>>
+2013-04-28 16:11:48.9531 DEBUG Reading from source files with replacement file ./suite/input/multiples.rep
+2013-04-28 16:11:48.9531 TRACE    adding source file:./suite/input/multiples.txt
+2013-04-28 16:11:48.9687 DEBUG Start reading replacementfile:./suite/input/multiples.rep
+2013-04-28 16:11:48.9687 TRACE    replacement source line:This~There
+2013-04-28 16:11:48.9843 TRACE    _replacement - anchor: frompattern:This topattern:There
+2013-04-28 16:11:48.9843 TRACE    replacement source line:and~but
+2013-04-28 16:11:48.9843 TRACE    _replacement - anchor: frompattern:and topattern:but
+2013-04-28 16:11:49.0000 TRACE    replacement source line:line~source
+2013-04-28 16:11:49.0000 TRACE    _replacement - anchor: frompattern:line topattern:source
+2013-04-28 16:11:49.0000 DEBUG There are 3 replacements in replacement file
+2013-04-28 16:11:49.0000 DEBUG ApplyReplacements - Processing input file:./suite/input/multiples.txt
+2013-04-28 16:11:49.0156 DEBUG ApplyReplacementsAll before:This is a test
+2013-04-28 16:11:49.0156 TRACE    ApplyReplacementsAll - applying (This --> There)  anchor:
+2013-04-28 16:11:49.0156 TRACE    ApplyReplacementsAll - line before:This is a test
+2013-04-28 16:11:49.0312 TRACE    ApplyReplacementsAll - line  after:There is a test
+2013-04-28 16:11:49.0312 TRACE    ApplyReplacementsAll - applying (and --> but)  anchor:
+2013-04-28 16:11:49.0312 TRACE    ApplyReplacementsAll - line before:There is a test
+2013-04-28 16:11:49.0312 TRACE    ApplyReplacementsAll - line  after:There is a test
+2013-04-28 16:11:49.0468 TRACE    ApplyReplacementsAll - applying (line --> source)  anchor:
+2013-04-28 16:11:49.0468 TRACE    ApplyReplacementsAll - line before:There is a test
+2013-04-28 16:11:49.0468 TRACE    ApplyReplacementsAll - line  after:There is a test
+2013-04-28 16:11:49.0468 DEBUG ApplyReplacementsAll  after:There is a test
+2013-04-28 16:11:49.0625 DEBUG ApplyReplacementsAll before:of line one
+2013-04-28 16:11:49.0625 TRACE    ApplyReplacementsAll - applying (This --> There)  anchor:
+2013-04-28 16:11:49.0625 TRACE    ApplyReplacementsAll - line before:of line one
+2013-04-28 16:11:49.0625 TRACE    ApplyReplacementsAll - line  after:of line one
+2013-04-28 16:11:49.0781 TRACE    ApplyReplacementsAll - applying (and --> but)  anchor:
+2013-04-28 16:11:49.0781 TRACE    ApplyReplacementsAll - line before:of line one
+2013-04-28 16:11:49.0781 TRACE    ApplyReplacementsAll - line  after:of line one
+2013-04-28 16:11:49.0781 TRACE    ApplyReplacementsAll - applying (line --> source)  anchor:
+2013-04-28 16:11:49.0937 TRACE    ApplyReplacementsAll - line before:of line one
+2013-04-28 16:11:49.0937 TRACE    ApplyReplacementsAll - line  after:of source one
+2013-04-28 16:11:49.0937 DEBUG ApplyReplacementsAll  after:of source one
+2013-04-28 16:11:49.1093 DEBUG ApplyReplacementsAll before:and line two
+2013-04-28 16:11:49.1093 TRACE    ApplyReplacementsAll - applying (This --> There)  anchor:
+2013-04-28 16:11:49.1093 TRACE    ApplyReplacementsAll - line before:and line two
+2013-04-28 16:11:49.1093 TRACE    ApplyReplacementsAll - line  after:and line two
+2013-04-28 16:11:49.1250 TRACE    ApplyReplacementsAll - applying (and --> but)  anchor:
+2013-04-28 16:11:49.1250 TRACE    ApplyReplacementsAll - line before:and line two
+2013-04-28 16:11:49.1250 TRACE    ApplyReplacementsAll - line  after:but line two
+2013-04-28 16:11:49.1406 TRACE    ApplyReplacementsAll - applying (line --> source)  anchor:
+2013-04-28 16:11:49.1406 TRACE    ApplyReplacementsAll - line before:but line two
+2013-04-28 16:11:49.1406 TRACE    ApplyReplacementsAll - line  after:but source two
+2013-04-28 16:11:49.1406 DEBUG ApplyReplacementsAll  after:but source two
+2013-04-28 16:11:49.1562 DEBUG ApplyReplacementsAll before:and the final line by line.
+2013-04-28 16:11:49.1562 TRACE    ApplyReplacementsAll - applying (This --> There)  anchor:
+2013-04-28 16:11:49.1562 TRACE    ApplyReplacementsAll - line before:and the final line by line.
+2013-04-28 16:11:49.1562 TRACE    ApplyReplacementsAll - line  after:and the final line by line.
+2013-04-28 16:11:49.1718 TRACE    ApplyReplacementsAll - applying (and --> but)  anchor:
+2013-04-28 16:11:49.1718 TRACE    ApplyReplacementsAll - line before:and the final line by line.
+2013-04-28 16:11:49.1718 TRACE    ApplyReplacementsAll - line  after:but the final line by line.
+2013-04-28 16:11:49.1875 TRACE    ApplyReplacementsAll - applying (line --> source)  anchor:
+2013-04-28 16:11:49.1875 TRACE    ApplyReplacementsAll - line before:but the final line by line.
+2013-04-28 16:11:49.1875 TRACE    ApplyReplacementsAll - line  after:but the final source by source.
+2013-04-28 16:11:49.1875 DEBUG ApplyReplacementsAll  after:but the final source by source.
+2013-04-28 16:11:49.2031 DEBUG <<<<< Ending kgrep >>>>>
+2013-04-28 16:11:49.6250 DEBUG <<<<< Starting kgrep >>>>>
+2013-04-28 16:11:49.6562 DEBUG Reading from source files with replacement file ./suite/input/scan.rep
+2013-04-28 16:11:49.6562 TRACE    adding source file:./suite/input/scan.txt
+2013-04-28 16:11:49.6718 DEBUG Start reading replacementfile:./suite/input/scan.rep
+2013-04-28 16:11:49.6875 TRACE    replacement source line:This
+2013-04-28 16:11:49.6875 TRACE    _replacement - anchor: frompattern:This topattern:
+2013-04-28 16:11:49.7031 DEBUG There are 1 replacements in replacement file
+2013-04-28 16:11:49.7031 DEBUG ApplyReplacements - Processing input file:./suite/input/scan.txt
+2013-04-28 16:11:49.7031 DEBUG ApplyReplacementsAll before:This is a test
+2013-04-28 16:11:49.7187 TRACE    ApplyReplacementsAll - applying (This --> )  anchor:
+2013-04-28 16:11:49.7187 TRACE    ApplyReplacementsAll - line before:This is a test
+2013-04-28 16:11:49.7343 DEBUG    ScanForTokens - scanpatten:This FS:
+
+2013-04-28 16:11:49.7343 TRACE       ScanForTokens - Found token:This
+2013-04-28 16:11:49.7343 DEBUG    ScanForTokens - returning:This
+2013-04-28 16:11:49.7343 TRACE    ApplyReplacementsAll - line  after:This
+2013-04-28 16:11:49.7500 DEBUG ApplyReplacementsAll  after:This
+2013-04-28 16:11:49.7500 DEBUG ApplyReplacementsAll before:of line one
+2013-04-28 16:11:49.7500 TRACE    ApplyReplacementsAll - applying (This --> )  anchor:
+2013-04-28 16:11:49.7500 TRACE    ApplyReplacementsAll - line before:of line one
+2013-04-28 16:11:49.7656 DEBUG    ScanForTokens - scanpatten:This FS:
+
+2013-04-28 16:11:49.7656 DEBUG    ScanForTokens - returning:
+2013-04-28 16:11:49.7656 TRACE    ApplyReplacementsAll - line  after:
+2013-04-28 16:11:49.7812 DEBUG ApplyReplacementsAll  after:
+2013-04-28 16:11:49.7812 DEBUG ApplyReplacementsAll before:and line two
+2013-04-28 16:11:49.7812 TRACE    ApplyReplacementsAll - applying (This --> )  anchor:
+2013-04-28 16:11:49.7812 TRACE    ApplyReplacementsAll - line before:and line two
+2013-04-28 16:11:49.7968 DEBUG    ScanForTokens - scanpatten:This FS:
+
+2013-04-28 16:11:49.7968 DEBUG    ScanForTokens - returning:
+2013-04-28 16:11:49.7968 TRACE    ApplyReplacementsAll - line  after:
+2013-04-28 16:11:49.8125 DEBUG ApplyReplacementsAll  after:
+2013-04-28 16:11:49.8125 DEBUG ApplyReplacementsAll before:and the final line by line.
+2013-04-28 16:11:49.8125 TRACE    ApplyReplacementsAll - applying (This --> )  anchor:
+2013-04-28 16:11:49.8125 TRACE    ApplyReplacementsAll - line before:and the final line by line.
+2013-04-28 16:11:49.8281 DEBUG    ScanForTokens - scanpatten:This FS:
+
+2013-04-28 16:11:49.8281 DEBUG    ScanForTokens - returning:
+2013-04-28 16:11:49.8281 TRACE    ApplyReplacementsAll - line  after:
+2013-04-28 16:11:49.8281 DEBUG ApplyReplacementsAll  after:
+2013-04-28 16:11:49.8437 DEBUG <<<<< Ending kgrep >>>>>
+2013-04-28 16:11:50.2812 DEBUG <<<<< Starting kgrep >>>>>
+2013-04-28 16:11:50.2968 DEBUG Reading from source files with replacement file ./suite/input/theworld.rep
+2013-04-28 16:11:50.3125 TRACE    adding source file:./suite/input/theworld.txt
+2013-04-28 16:11:50.3281 DEBUG Start reading replacementfile:./suite/input/theworld.rep
+2013-04-28 16:11:50.3281 TRACE    replacement source line:world~done.
+2013-04-28 16:11:50.3437 TRACE    _replacement - anchor: frompattern:world topattern:done.
+2013-04-28 16:11:50.3437 DEBUG There are 1 replacements in replacement file
+2013-04-28 16:11:50.3593 DEBUG ApplyReplacements - Processing input file:./suite/input/theworld.txt
+2013-04-28 16:11:50.3593 DEBUG ApplyReplacementsAll before:The world
+2013-04-28 16:11:50.3593 TRACE    ApplyReplacementsAll - applying (world --> done.)  anchor:
+2013-04-28 16:11:50.3593 TRACE    ApplyReplacementsAll - line before:The world
+2013-04-28 16:11:50.3750 TRACE    ApplyReplacementsAll - line  after:The done.
+2013-04-28 16:11:50.3750 DEBUG ApplyReplacementsAll  after:The done.
+2013-04-28 16:11:50.3906 DEBUG ApplyReplacementsAll before:is here
+2013-04-28 16:11:50.3906 TRACE    ApplyReplacementsAll - applying (world --> done.)  anchor:
+2013-04-28 16:11:50.3906 TRACE    ApplyReplacementsAll - line before:is here
+2013-04-28 16:11:50.3906 TRACE    ApplyReplacementsAll - line  after:is here
+2013-04-28 16:11:50.4062 DEBUG ApplyReplacementsAll  after:is here
+2013-04-28 16:11:50.4062 DEBUG <<<<< Ending kgrep >>>>>

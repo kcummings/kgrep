@@ -1,11 +1,14 @@
 using System;
 using System.Xml.Serialization;
 using System.Text.RegularExpressions;
+using NLog;
 
 namespace kgrep
 {
     public class Replacement
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         [XmlIgnore] 
         public String anchor = "";
         public String topattern = null;
@@ -37,6 +40,7 @@ namespace kgrep
 
         private void _replacement(string arganchor, string argfrompattern, string argtopattern) {
             try {
+                logger.Trace("   _replacement - anchor:{0} frompattern:{1} topattern:{2}",arganchor, argfrompattern, argtopattern);
                 anchor = arganchor.Trim();
                 frompattern = new Regex(argfrompattern.Trim(), RegexOptions.Compiled);
                 topattern = argtopattern.Trim().Replace(@"\s", " ");  // allow \s to represent a space in to pattern
