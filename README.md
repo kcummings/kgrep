@@ -9,9 +9,9 @@ Project Goals
 * Refactor a working but untestable program into a "modern" application with Unit Tests, small methods, classes, etc. In other words, a sandbox to play, experiment and have a useful tool at the end of the day.
 * OS independence. Developed using VS2010, Nunit 2.6.1, NLog 2.0.1.2 & .NET 4.0. Should be compatible with Mono however it has not be compiled or tested under Mono. A sample log file is *SampleLog - 2013-04-28.log*.
 
-Dependencies
+Binaries
 -----
-You must have Nlog.dll either in the same directory as kgrep or in your path. There is a copy of Nlog.dll in kgrep/dependencies directory. Everything you need to run kgrep is in the *deploy* folder.
+If you are anxious to try kgrep, the binaries are in the *deploy* folder. You must also have .net 4.0 installed.
 
 
 Usage
@@ -26,6 +26,7 @@ Usage
            ReplacementFilename is a file containing a ReplacementString per line.
 
         ScanToken =  a regex string that when found in input will print one match per line
+
 While the replacement file can contain both *ReplacementStrings* and *SearchTokens*, it is best to only have one or the other type in a given file. Since *SearchToken* only prints the matched part of a line and does not print the line if the token doesn't match any part of the line, two non-overlapping patterns will cause nothing to print. For example: echo "hello world"|kgrep "world;bye" will not print anything because the first match was to "world" which yields "world". This was search for "bye" which wasn't found so nothing prints. There must be some combination or enhancement can make beneficial use of this behavior.
  
 - - -
