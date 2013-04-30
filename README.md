@@ -11,7 +11,7 @@ Project Goals
 
 Dependencies
 -----
-You must have Nlog.dll either in the same directory as kgrep or in your path. There is a copy of Nlog.dll in kgrep/src directory.
+You must have Nlog.dll either in the same directory as kgrep or in your path. There is a copy of Nlog.dll in kgrep/dependencies directory. Everything you need to run kgrep is in the *deploy* folder.
 
 
 Usage
@@ -26,7 +26,8 @@ Usage
            ReplacementFilename is a file containing a ReplacementString per line.
 
         ScanToken =  a regex string that when found in input will print one match per line
-
+While the replacement file can contain both *ReplacementStrings* and *SearchTokens*, it is best to only have one or the other type in a given file. Since *SearchToken* only prints the matched part of a line and does not print the line if the token doesn't match any part of the line, two non-overlapping patterns will cause nothing to print. For example: echo "hello world"|kgrep "world;bye" will not print anything because the first match was to "world" which yields "world". This was search for "bye" which wasn't found so nothing prints. There must be some combination or enhancement can make beneficial use of this behavior.
+ 
 - - -
 
 ### ReplacementString
