@@ -4,9 +4,6 @@ using kgrep;
 
 namespace Tests {
 
-    // To successfully run these tests, the files "file1.txt" and "file2.txt" must
-    // exist in the src/bin/Debug folder. They are part of the repository.
-
     [TestFixture]
     public class ParseCommandLineTests {
 

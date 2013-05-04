@@ -1,142 +1,206 @@
-﻿using System.Collections.Generic;
-using kgrep;
+﻿
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
+using kgrep;
 
 namespace Tests {
+
     [TestFixture]
-    public class ReplacementTests {
+    public class ReplacementFileTests {
 
         [Test]
-        public void TestRegexReplacement() {
-            ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement("e(..)o-(...)", "$1 $2"));
-            Assert.AreEqual("hll bye", engine.ApplyReplacementsAll("hello-bye", reps));
+        public void TestSimpleArgument() {
+            ReplacementFile rf = new ReplacementFile("a~bc");
+            List<Replacement> reps = rf.ReplacementList;
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].frompattern.ToString());
+            Assert.AreEqual( "bc", reps[0].topattern);
         }
 
         [Test]
-        public void TestRegexExtractReplacement() {
-            ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement("<tag attr='(.+?)'>", "attr=$1"));
-            Assert.AreEqual("attr=hi", engine.ApplyReplacementsAll("<tag attr='hi'>", reps));
+        public void TestTwoArguments() {
+            ReplacementFile rf = new ReplacementFile("a~bc; g~jk");
+            List<Replacement> reps = rf.ReplacementList;
+            Assert.AreEqual("bc",reps[0].topattern);
+            Assert.AreEqual((new Regex("g".Trim(), RegexOptions.Compiled)).ToString(), reps[1].frompattern.ToString());
+            Assert.AreEqual("jk",  reps[1].topattern);
         }
 
         [Test]
-        public void TestEmptyReplacementSet() {
-            ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            Assert.AreEqual( "abc",engine.ApplyReplacementsFirst("abc", reps));
+        public void TestThreeArgument() {
+            ReplacementFile rf = new ReplacementFile("a~bc;   hello~world  ;  third ~ fourth ");
+            List<Replacement> reps = rf.ReplacementList;
+            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].frompattern.ToString());
+            Assert.AreEqual( "fourth", reps[2].topattern);
         }
 
         [Test]
-        public void TestSimpleReplacementToRemoveToken() {
-            ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement("token", ""));
-            Assert.AreEqual("abc", engine.ApplyReplacementsFirst("abctoken", reps));
+        public void TestEmbeddedDelim() {
+            ReplacementFile rf = new ReplacementFile("delim=,; a,bc;   hello,world  ;  third , fourth ");
+            List<Replacement> reps = rf.ReplacementList;
+            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].frompattern.ToString());
+            Assert.AreEqual("fourth", reps[2].topattern);
         }
 
         [Test]
-        public void TestSimpleReplacementNoMatch() {
-            ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement("k", "def"));
-            Assert.AreNotEqual("", engine.ApplyReplacementsFirst("abc", reps));
+        public void TestEmbeddedDelimAndScopeFirst() {
+            ReplacementFile rf = new ReplacementFile("scope=first;delim=,; a,b; b,c");
+            List<Replacement> reps = rf.ReplacementList;
+            Assert.IsTrue(reps.Count == 2);
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].frompattern.ToString());
+            Assert.AreEqual("b", reps[0].topattern);
         }
 
         [Test]
-        public void TestSimpleReplacement() {
-            ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement("abc", "def"));
-            Assert.AreEqual("def",engine.ApplyReplacementsFirst("abc", reps));
+        public void TestEmbeddedDelimAndScopeAll() {
+            ReplacementFile rf = new ReplacementFile("scope=all;delim=,; a,b; b,c");
+            List<Replacement> reps = rf.ReplacementList;
+            Assert.IsTrue(reps.Count == 2);
+            Assert.AreEqual((new Regex("b".Trim(), RegexOptions.Compiled)).ToString(), reps[1].frompattern.ToString());
+            Assert.AreEqual( "c", reps[1].topattern);
         }
 
         [Test]
-        public void TestEndPointReplacements() {
-            ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement("ab", "de"));
-            Assert.AreEqual("dele dee lincode",engine.ApplyReplacementsFirst("able abe lincoab", reps));
+        public void TestEmbeddedComment() {
+            ReplacementFile rf = new ReplacementFile("#comment; a~bc");
+            List<Replacement> reps = rf.ReplacementList;
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].frompattern.ToString());
+            Assert.AreEqual( "bc", reps[0].topattern);
         }
 
         [Test]
-        public void TestFirstReplacmentWithMultipleLines() {
+        public void TestEmbeddedControlsNoAction() {
+            ReplacementFile rf = new ReplacementFile("comment=:; :ignored;");
+            List<Replacement> reps = rf.ReplacementList;
+
             ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement("from", "to"));
-            reps.Add(new Replacement("to", "this"));
-            Assert.AreEqual("to me to you", engine.ApplyReplacementsFirst("from me to you", reps));
+            string result = engine.ApplyReplacementsAll("a b ca", reps);
+            Assert.AreEqual("a b ca", result);
+            Assert.IsTrue(reps.Count == 0);
         }
 
         [Test]
-        public void TestAllReplacmentWithMultipleLines() {
+        public void TestRemoveOneArgument() {
+            ReplacementFile rf = new ReplacementFile("# remove a from arg; a~");
+            List<Replacement> reps = rf.ReplacementList;
+
             ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement("from", "to"));
-            reps.Add(new Replacement("to", "this"));
-            Assert.AreEqual("this me this you", engine.ApplyReplacementsAll("from me to you", reps));
+            string result = engine.ApplyReplacementsAll("a b ca", reps);
+            Assert.AreEqual(" b c", result);
         }
 
         [Test]
-        public void TestFirstReplacmentWithMultipleLinesWithGroups() {
+        public void TestTrailingSpace() {
+            ReplacementFile rf = new ReplacementFile(@" a\s ~ b ");
+            List<Replacement> reps = rf.ReplacementList;
+
             ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement("f(..)m", "$1"));
-            reps.Add(new Replacement("to", "this"));
-            Assert.AreEqual("ro me to you", engine.ApplyReplacementsFirst("from me to you", reps));
+            string result = engine.ApplyReplacementsAll("a b ca", reps);
+            Assert.AreEqual("bb ca", result);
         }
 
         [Test]
-        public void TestFirstReplacmentWithMultipleLinesSwappingGroups() {
+        public void TestTrailingSpaces() {
+            ReplacementFile rf = new ReplacementFile(@" a\s\s ~ b ");
+            List<Replacement> reps = rf.ReplacementList;
+
             ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement(@"(\w+)\s(\w+)", "$2 $1"));
-            reps.Add(new Replacement("to", "this"));
-            Assert.AreEqual("me from you to", engine.ApplyReplacementsFirst("from me to you", reps));
+            string result = engine.ApplyReplacementsAll("a   b ca", reps);
+            Assert.AreEqual("b b ca", result);
         }
 
         [Test]
-        public void TestAllReplacmentWithMultipleLinesSwappingGroups() {
+        public void TestLeadingSpaceWillFail() {
+            ReplacementFile rf = new ReplacementFile(@" \sa ~ b ");
+            List<Replacement> reps = rf.ReplacementList;
+
             ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement(@"(\w+)\s(\w+)", "$2 $1"));
-            reps.Add(new Replacement("to", "this"));
-            Assert.AreEqual("me from you this", engine.ApplyReplacementsAll("from me to you", reps));
+            string result = engine.ApplyReplacementsAll(" da b ca", reps);
+            Assert.AreEqual(" da b ca", result);
         }
 
         [Test]
-        public void TestWithAnchor() {
+        public void TestLeadingSpace() {
+            ReplacementFile rf = new ReplacementFile(@" \sa ~ b ");
+            List<Replacement> reps = rf.ReplacementList;
+
             ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement("today","you", "to"));
-            Assert.AreEqual("from me to to today", engine.ApplyReplacementsFirst("from me to you today", reps));
+            string result = engine.ApplyReplacementsAll(" a b ca", reps);
+            Assert.AreEqual("b b ca", result);
         }
 
         [Test]
-        public void TestSuccessWithAnchorAsRegex() {
+        public void TestLeadingSpaces() {
+            ReplacementFile rf = new ReplacementFile(@" \s\sa  ~ b ");
+            List<Replacement> reps = rf.ReplacementList;
+
             ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement("t...y", "you", "to"));
-            Assert.AreEqual("from me to to today", engine.ApplyReplacementsFirst("from me to you today", reps));
+            string result = engine.ApplyReplacementsAll("  a  b ca", reps);
+            Assert.AreEqual("b  b ca", result);
         }
 
         [Test]
-        public void TestFailureWithAnchorAsRegex() {
+        [Ignore]
+        public void TestTrailingSpaceAfterField() {
+            ReplacementFile rf = new ReplacementFile(@" \sa  ~ b\s ");
+            List<Replacement> reps = rf.ReplacementList;
+
             ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement("to", "ty", "you"));
-            Assert.AreEqual("from me to you today", engine.ApplyReplacementsFirst("from me to you today", reps));
-        }
- 
-        [Test]
-        public void TestWithAnchorMismatch() {
-            ReplacerEngine engine = new ReplacerEngine();
-            List<Replacement> reps = new List<Replacement>();
-            reps.Add(new Replacement("to", "Joe", "you"));
-            Assert.AreEqual("from me to you", engine.ApplyReplacementsFirst("from me to you", reps));
+            string result = engine.ApplyReplacementsAll("3 ab ca", reps);
+            Assert.AreEqual("3b b ca", result);
         }
 
+        [Test]
+        [Ignore]
+        public void TestTrailingSpacesAfterField() {
+            ReplacementFile rf = new ReplacementFile(@" a  ~ b\s\s ");
+            List<Replacement> reps = rf.ReplacementList;
+
+            ReplacerEngine engine = new ReplacerEngine();
+            string result = engine.ApplyReplacementsAll("3 ab ca", reps);
+            Assert.AreEqual("3 b  b cb  ", result);
+        }
+
+        [Test]
+        [Ignore]
+        public void TestLeadingSpacesAfterField() {
+            ReplacementFile rf = new ReplacementFile(@" a  ~ \sb ");
+            List<Replacement> reps = rf.ReplacementList;
+
+            ReplacerEngine engine = new ReplacerEngine();
+            string result = engine.ApplyReplacementsAll("3ab ca", reps);
+            Assert.AreEqual("3 bb c b", result);
+        }
+
+        [Test]
+        public void TestLeadingAndTrailingSpaces() {
+            ReplacementFile rf = new ReplacementFile(@" \s\sa\s  ~ b ");
+            List<Replacement> reps = rf.ReplacementList;
+
+            ReplacerEngine engine = new ReplacerEngine();
+            string result = engine.ApplyReplacementsAll("  a b ca", reps);
+            Assert.AreEqual("bb ca", result);
+        }
+
+        [Test]
+        [ExpectedException(typeof(System.Exception))]
+        public void TestInvalidRegexFromPattern() {
+            ReplacementFile rf = new ReplacementFile("a[.~b");
+            List<Replacement> reps = rf.ReplacementList;
+        }
+
+        [Test]
+        [ExpectedException(typeof(System.Exception))]
+        public void TestInvalidRegextopattern() {
+            ReplacementFile rf = new ReplacementFile("a~b[.");
+            List<Replacement> reps = rf.ReplacementList;
+        }
+
+        [Test]
+        [ExpectedException(typeof(System.Exception))]
+        public void TestInvalidRegexWithAnchor() {
+            ReplacementFile rf = new ReplacementFile("[.a~c~b");
+            List<Replacement> reps = rf.ReplacementList;
+        }
     }
 }

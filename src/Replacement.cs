@@ -40,18 +40,29 @@ namespace kgrep
 
         private void _replacement(string arganchor, string argfrompattern, string argtopattern) {
             try {
-                logger.Trace("   _replacement - anchor:{0} frompattern:{1} topattern:{2}",arganchor, argfrompattern, argtopattern);
-                anchor = arganchor.Trim();
-                frompattern = new Regex(argfrompattern.Trim(), RegexOptions.Compiled);
-                topattern = argtopattern.Trim().Replace(@"\s", " ");  // allow \s to represent a space in to pattern
+                logger.Trace("   _replacement - anchor:{0} frompattern:{1} topattern:{2}", arganchor, argfrompattern, argtopattern);
+                anchor = RemoveEnclosingQuotesIfPresent(arganchor.Trim());
+                string frompat = RemoveEnclosingQuotesIfPresent(argfrompattern.Trim());
+                frompattern = new Regex(frompat, RegexOptions.Compiled);
+                topattern = RemoveEnclosingQuotesIfPresent(argtopattern.Trim());
 
                 // Just validation here
                 Regex topat = new Regex(topattern);
-                Regex anc = new Regex(anchor); 
+                Regex anc = new Regex(anchor);
             } catch (Exception e) {
                 Console.WriteLine("Regex error Replacement, from '{0}'  to '{1}'  anchor '{2}'", argfrompattern, argtopattern, anchor);
                 throw new Exception(e.Message);
             }
+        }
+
+        private string RemoveEnclosingQuotesIfPresent(string pattern) {
+            string pat = pattern.Trim();
+            if (pattern.StartsWith("\"") && pattern.EndsWith("\"")) {
+                string patWithoutQuotes = pat.Substring(1, pat.Length - 2);
+                logger.Trace("Removed quotes ({0} --> {1})", pattern, patWithoutQuotes);
+                return patWithoutQuotes;
+            }
+            return pattern; // return the original string untouched
         }
     }
 }
