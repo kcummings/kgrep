@@ -34,7 +34,10 @@ While the replacement file can contain both *ReplacementStrings* and *SearchToke
 ### ReplacementString
 The power of kgrep is the *ReplacementString*. These can be stacked into one string or stored in a file and given as the first argument on the command line. *ReplacementStrings* are stacked using the ";" stacking character, e.g. "dog~cat; h(..)~cold" contains two *ReplacementStrings*. The stacking character cannot be overridden. If the field delimitor (default is "~") is anywhere in the first argument, the argument is interpreted as a *ReplacementString* otherwise it's considered either a *SearchToken* or the name of a file that contains *ReplacementStrings*.
 
-There is no practical limit to the number of *ReplacementStrings* that can be in a replacement file. *ReplacementStrings* are processed in the order given. See SampleReplacementFile.txt for examples of *ReplacementStrings* in a file.  *ReplacementStrings* consists of two or three fields: an anchor, before and after field. Any or all can be a regex.The anchor field is optional. Leading and trailing spaces are removed from these fields. If you want to include a leading or trailing space, use '\s', e.g. " \sA" is a pattern to match a space followed by an uppercase A. 
+There is no practical limit to the number of *ReplacementStrings* that can be in a replacement file. *ReplacementStrings* are processed in the order given. See SampleReplacementFile.txt for examples of *ReplacementStrings* in a file.  *ReplacementStrings* consists of two or three fields: an anchor, before and after field. Any or all can be a regex.The anchor field is optional. 
+
+Leading and trailing spaces are removed from these fields. If you want to include leading or trailing spaces, enclose the string in double quotes, i.e. " world ". The enclosing double quotes will not be included as part of the search field but the blanks will be included.
+ 
 If supplied and is not found in a line, the "before~after" replacement will **not** be applied.
 
     Some examples:    
