@@ -9,7 +9,7 @@ namespace Tests {
 
         [TestCase("a~c", "abc", "a~c")]
         [TestCase("a~c", "a~bc", "a~c")]   
-        public void TestForTokenAndReplacementFileArguments(string token, string repfile, string expected) {
+        public void WhenThreeArguments_ExpectReplacementFileAndSourceFiles(string token, string repfile, string expected) {
             string[] args = new String[] { token, repfile };
             ParseCommandLine cmd = new ParseCommandLine(args);
             Assert.AreEqual(expected, cmd.ReplacementFileName);
@@ -18,7 +18,7 @@ namespace Tests {
 
         [Test]
         // kgrep frompattern filename1
-        public void TestForTokenAndFilenameArguments() {
+        public void WhenTwoArguments_ExpectReplacementFileAndSourceFile() {
             string[] args = new String[] { "abc", "file1.txt" };
             ParseCommandLine cmd = new ParseCommandLine(args);
             Assert.AreEqual(1, cmd.InputSourceNames.Count);
@@ -29,7 +29,7 @@ namespace Tests {
         [TestCase("a~c; b~d", "file1.txt", "file2.txt", "file1.txt","file2.txt")]
         [TestCase("#comment; a~c; b~d", "file1.txt", "file2.txt", "file1.txt", "file2.txt")]
         // kgrep frompattern filename1 filename2
-        public void TestForStackedTokensAndTwoSourceFilesArguments(string token, string file1, string file2, string expected1, string expected2) {
+        public void WhenManyArguments_ExpectReplacementFileAndManySourceFiles(string token, string file1, string file2, string expected1, string expected2) {
             string[] args = new String[] { token, file1, file2 };
             ParseCommandLine cmd = new ParseCommandLine(args);
             Assert.AreEqual(2, cmd.InputSourceNames.Count);
@@ -39,7 +39,7 @@ namespace Tests {
 
         [Test]
         // cat filename|kgrep replacementFilename
-        public void TestForStdinAsInputSourceArguments() {
+        public void WhenOnlyReplacementFileArgument_ExpectStdinAsInputSource() {
             string[] args = new String[] { "hi~bye" };
             ParseCommandLine cmd = new ParseCommandLine(args);
             Assert.AreEqual("hi~bye", cmd.ReplacementFileName);
@@ -48,7 +48,7 @@ namespace Tests {
         }
 
         [Test]
-        public void TestForNoInputSourceArguments() {
+        public void WhenNoArguments_ExpectNoArguments() {
             string[] args = new String[] { "" };
             ParseCommandLine cmd = new ParseCommandLine(args);
             Assert.AreEqual("", cmd.ReplacementFileName);

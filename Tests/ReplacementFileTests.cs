@@ -10,7 +10,7 @@ namespace Tests {
     public class ReplacementFileTests {
 
         [Test]
-        public void TestSimpleArgument() {
+        public void WhenOneArgument_ExpectOneReplacement() {
             ReplacementFile rf = new ReplacementFile("a~bc");
             List<Replacement> reps = rf.ReplacementList;
             Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].frompattern.ToString());
@@ -18,24 +18,26 @@ namespace Tests {
         }
 
         [Test]
-        public void TestTwoArguments() {
+        public void WhenTwoArguments_ExpectTwoReplacements() {
             ReplacementFile rf = new ReplacementFile("a~bc; g~jk");
             List<Replacement> reps = rf.ReplacementList;
+            Assert.AreEqual(2,reps.Count);
             Assert.AreEqual("bc",reps[0].topattern);
             Assert.AreEqual((new Regex("g".Trim(), RegexOptions.Compiled)).ToString(), reps[1].frompattern.ToString());
             Assert.AreEqual("jk",  reps[1].topattern);
         }
 
         [Test]
-        public void TestThreeArgument() {
+        public void WhenThreeArguments_ExpectThreeReplacements() {
             ReplacementFile rf = new ReplacementFile("a~bc;   hello~world  ;  third ~ fourth ");
             List<Replacement> reps = rf.ReplacementList;
+            Assert.AreEqual(3, reps.Count);
             Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].frompattern.ToString());
             Assert.AreEqual( "fourth", reps[2].topattern);
         }
 
         [Test]
-        public void TestEmbeddedDelim() {
+        public void WhenEmbeddedDelim_ExpectChangedDelim() {
             ReplacementFile rf = new ReplacementFile("delim=,; a,bc;   hello,world  ;  third , fourth ");
             List<Replacement> reps = rf.ReplacementList;
             Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].frompattern.ToString());
@@ -43,7 +45,7 @@ namespace Tests {
         }
 
         [Test]
-        public void TestEmbeddedDelimAndScopeFirst() {
+        public void WhenEmbeddedDelimAndScopeFirst_ExpectFirstOnlyReplaces() {
             ReplacementFile rf = new ReplacementFile("scope=first;delim=,; a,b; b,c");
             List<Replacement> reps = rf.ReplacementList;
             Assert.IsTrue(reps.Count == 2);
@@ -52,7 +54,7 @@ namespace Tests {
         }
 
         [Test]
-        public void TestEmbeddedDelimAndScopeAll() {
+        public void WhenEmbeddedDelimAndScopeAll_ExpectAllReplaces() {
             ReplacementFile rf = new ReplacementFile("scope=all;delim=,; a,b; b,c");
             List<Replacement> reps = rf.ReplacementList;
             Assert.IsTrue(reps.Count == 2);
@@ -61,7 +63,7 @@ namespace Tests {
         }
 
         [Test]
-        public void TestEmbeddedComment() {
+        public void WhenEmbeddedComment_ExpectCommentIgnored() {
             ReplacementFile rf = new ReplacementFile("#comment; a~bc");
             List<Replacement> reps = rf.ReplacementList;
             Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].frompattern.ToString());
@@ -69,7 +71,7 @@ namespace Tests {
         }
 
         [Test]
-        public void TestEmbeddedControlsNoAction() {
+        public void WhenEmbeddedComment_ExpectNoChange() {
             ReplacementFile rf = new ReplacementFile("comment=:; :ignored;");
             List<Replacement> reps = rf.ReplacementList;
 
@@ -80,8 +82,8 @@ namespace Tests {
         }
 
         [Test]
-        public void TestRemoveOneArgument() {
-            ReplacementFile rf = new ReplacementFile("# remove a from arg; a~");
+        public void WhenNoTopattern_ExpectFrompatternRemoved() {
+            ReplacementFile rf = new ReplacementFile("a~");
             List<Replacement> reps = rf.ReplacementList;
 
             ReplacerEngine engine = new ReplacerEngine();
@@ -90,8 +92,8 @@ namespace Tests {
         }
 
         [Test]
-        public void TestTrailingSpace() {
-            ReplacementFile rf = new ReplacementFile(@" a\s ~ b ");
+        public void WhenEnclosedQuotes_ExpectTrailingSpacesRetained() {
+            ReplacementFile rf = new ReplacementFile(" \"a \" ~ b ");
             List<Replacement> reps = rf.ReplacementList;
 
             ReplacerEngine engine = new ReplacerEngine();
@@ -99,108 +101,27 @@ namespace Tests {
             Assert.AreEqual("bb ca", result);
         }
 
-        [Test]
-        public void TestTrailingSpaces() {
-            ReplacementFile rf = new ReplacementFile(@" a\s\s ~ b ");
+        [TestCase("d a b ca", @" \sa ~ b ", "db b ca")]  // single leading
+        [TestCase(" ab  c", @" \s\sc~", " ab")]          // two leading spaces and remove it
+        [TestCase("abc d", @" bc\s~bc", "abcd")]         // single trailing
+        [TestCase("abc  d", @" bc\s\s~bc", "abcd")]      // two trailng spaces and remove it
+        public void WhenRegexSpaceInFrompattern_ExpectSpaces(string input, string repstring, string expect) {
+            ReplacementFile rf = new ReplacementFile(repstring);
             List<Replacement> reps = rf.ReplacementList;
 
             ReplacerEngine engine = new ReplacerEngine();
-            string result = engine.ApplyReplacementsAll("a   b ca", reps);
-            Assert.AreEqual("b b ca", result);
+            string result = engine.ApplyReplacementsAll(input, reps);
+            Assert.AreEqual(expect, result);
         }
 
-        [Test]
-        public void TestLeadingSpaceWillFail() {
-            ReplacementFile rf = new ReplacementFile(@" \sa ~ b ");
-            List<Replacement> reps = rf.ReplacementList;
-
-            ReplacerEngine engine = new ReplacerEngine();
-            string result = engine.ApplyReplacementsAll(" da b ca", reps);
-            Assert.AreEqual(" da b ca", result);
-        }
-
-        [Test]
-        public void TestLeadingSpace() {
-            ReplacementFile rf = new ReplacementFile(@" \sa ~ b ");
-            List<Replacement> reps = rf.ReplacementList;
-
-            ReplacerEngine engine = new ReplacerEngine();
-            string result = engine.ApplyReplacementsAll(" a b ca", reps);
-            Assert.AreEqual("b b ca", result);
-        }
-
-        [Test]
-        public void TestLeadingSpaces() {
-            ReplacementFile rf = new ReplacementFile(@" \s\sa  ~ b ");
-            List<Replacement> reps = rf.ReplacementList;
-
-            ReplacerEngine engine = new ReplacerEngine();
-            string result = engine.ApplyReplacementsAll("  a  b ca", reps);
-            Assert.AreEqual("b  b ca", result);
-        }
-
-        [Test]
-        [Ignore]
-        public void TestTrailingSpaceAfterField() {
-            ReplacementFile rf = new ReplacementFile(@" \sa  ~ b\s ");
-            List<Replacement> reps = rf.ReplacementList;
-
-            ReplacerEngine engine = new ReplacerEngine();
-            string result = engine.ApplyReplacementsAll("3 ab ca", reps);
-            Assert.AreEqual("3b b ca", result);
-        }
-
-        [Test]
-        [Ignore]
-        public void TestTrailingSpacesAfterField() {
-            ReplacementFile rf = new ReplacementFile(@" a  ~ b\s\s ");
-            List<Replacement> reps = rf.ReplacementList;
-
-            ReplacerEngine engine = new ReplacerEngine();
-            string result = engine.ApplyReplacementsAll("3 ab ca", reps);
-            Assert.AreEqual("3 b  b cb  ", result);
-        }
-
-        [Test]
-        [Ignore]
-        public void TestLeadingSpacesAfterField() {
-            ReplacementFile rf = new ReplacementFile(@" a  ~ \sb ");
-            List<Replacement> reps = rf.ReplacementList;
-
-            ReplacerEngine engine = new ReplacerEngine();
-            string result = engine.ApplyReplacementsAll("3ab ca", reps);
-            Assert.AreEqual("3 bb c b", result);
-        }
-
-        [Test]
-        public void TestLeadingAndTrailingSpaces() {
-            ReplacementFile rf = new ReplacementFile(@" \s\sa\s  ~ b ");
-            List<Replacement> reps = rf.ReplacementList;
-
-            ReplacerEngine engine = new ReplacerEngine();
-            string result = engine.ApplyReplacementsAll("  a b ca", reps);
-            Assert.AreEqual("bb ca", result);
-        }
-
-        [Test]
+        [TestCase("[.a~c~b")] // invalid anchor
+        [TestCase("a[.~b")]   // invalid from pattern
+        [TestCase("a~b[.")]   // invalid to pattern
         [ExpectedException(typeof(System.Exception))]
-        public void TestInvalidRegexFromPattern() {
-            ReplacementFile rf = new ReplacementFile("a[.~b");
+        public void WhenInvalidRegexPattern_ExpectException(string pattern) {
+            ReplacementFile rf = new ReplacementFile(pattern);
             List<Replacement> reps = rf.ReplacementList;
         }
 
-        [Test]
-        [ExpectedException(typeof(System.Exception))]
-        public void TestInvalidRegextopattern() {
-            ReplacementFile rf = new ReplacementFile("a~b[.");
-            List<Replacement> reps = rf.ReplacementList;
-        }
-
-        [Test]
-        [ExpectedException(typeof(System.Exception))]
-        public void TestInvalidRegexWithAnchor() {
-            ReplacementFile rf = new ReplacementFile("[.a~c~b");
-            List<Replacement> reps = rf.ReplacementList;
-        }
     }
 }
