@@ -6,88 +6,63 @@ namespace Tests {
  
         [TestFixture]
         public class ScannerTests {
+
             [Test]
-            public void TestScannerForEndingToken() {
+            public void WhenNoScanTokenGiven_ExpectNoChange() {
                 ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
-                string results = engine.ApplyReplacements("bye bye (.*?)$", new List<string> { "today bye bye birdie" });
-                Assert.AreEqual("birdie\n", results);
+                string results = engine.ApplyReplacements("", new List<string> { "today bye bye birdie" });
+                Assert.AreEqual("today bye bye birdie\n", results);
             }
 
             [Test]
-            public void TestScannerNew() {
-                ReplacerEngine engine = new ReplacerEngine() {sw = new WriteToString()};
-                string newline = engine.ApplyReplacements("bye", new List<string> {"today bye bye birdie"});
-                Assert.AreEqual("bye\nbye\n", newline);
-            }
-
-            [Test]
-            public void TestScannerForMultipleGroupsOnOneLine() {
-                ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
-                string results = engine.ApplyReplacements("h(...)(.)", new List<string> { "hello world" });
-                Assert.AreEqual("ell\no\n", results);
-            }
-
-            [Test]
-            public void TestScannerForNoMatch() {
+            public void WhenNoMatchFound_ExpectNoOutput() {
                 ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
                 string results = engine.ApplyReplacements("abc", new List<string> { "def" });
                 Assert.AreEqual("", results);
             }
 
-            [Test]
-            public void TestScannerForSingleGroup() {
+            [ExpectedException(typeof(System.Exception))]
+            public void WhenInvalidTokenGiven_ExpectException() {
                 ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
-                string results = engine.ApplyReplacements("a(bc)", new List<string> { "abc" });
-                Assert.AreEqual("bc\n", results);
+                string results = engine.ApplyReplacements("a[bc", new List<string> { "def" });
+                Assert.AreEqual("", results);
             }
 
-            [Test]
-            public void TestScannerForTwoGroups() {
+            // Args for cases: expected, pattern, input
+            [TestCase("bc\n", "a(bc)", "abc")]
+            [TestCase("bc\n89\n", "(..) ([0-9]+)", "abc 89")]
+            [TestCase("ell\no\n", "h(...)(.)", "hello world")]
+            public void WhenGroupsGiven_ExpectSubsetOutput(string expected, string scantoken, string input) {
                 ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
-                string results = engine.ApplyReplacements("(..) ([0-9]+)", new List<string> { "abc 89" });
-                Assert.AreEqual("bc\n89\n", results);
+                string results = engine.ApplyReplacements(scantoken, new List<string> { input });
+                Assert.AreEqual(expected, results);
             }
 
-            [Test]
-            public void TestScannerForMatchValue() {
+            [TestCase("b\n", "b", "abc")]
+            [TestCase("bye\nbye\n", "bye", "today bye bye birdie")]
+            [TestCase("birdie\n", "bye bye (.*?)$", "today bye bye birdie")]
+            public void WhenNonRegexTokenGiven_ExpectSimpleOutput(string expected, string scantoken, string input) {
                 ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
-                string results = engine.ApplyReplacements("b", new List<string> { "abc" });
-                Assert.AreEqual("b\n", results);
+                string results = engine.ApplyReplacements(scantoken, new List<string> {input });
+                Assert.AreEqual(expected, results);
             }
 
-            [Test]
-            public void TestScannerForSingleLetters() {
+            [TestCase("a\nb\nc\n \nd\n", ".", "abc d")]  // chars on seperate lines
+            [TestCase("8\n5\n1\n2\n3\n", "[0-9]", "85 dollars 123 lost")]  // digits on seperate lines
+            [TestCase("85\n123\n", "[0-9]+", "85 dollars 123 lost")]  // numbers on seperate lines
+            public void WhenRegexTokenGiven_ExpectFilteredOutput(string expected, string scantoken, string input) {
                 ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
-                string results = engine.ApplyReplacements(".", new List<string> { "abc d" });
-                Assert.AreEqual("a\nb\nc\n \nd\n", results);
+                string results = engine.ApplyReplacements(scantoken, new List<string> { input });
+                Assert.AreEqual(expected, results);
             }
 
-            [Test]
-            public void TestScannerForSingleDigits() {
+            [TestCase("a b ca", "ScannerFS=\", \"; a", "a, a\n")]   // ", " delimited
+            [TestCase("a b ca", "ScannerFS=,; a", "a,a\n")]         // "," delimited
+            public void WhenScannerFSUsed_ExpectDelimitedOutput(string input, string pattern, string expected) {
                 ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
-                string results = engine.ApplyReplacements("[0-9]", new List<string> { "85 dollars 123 lost" });
-                Assert.AreEqual("8\n5\n1\n2\n3\n", results);
+                string result = engine.ApplyReplacements(pattern, new List<string> { input });
+                Assert.AreEqual(expected, result);
             }
 
-            [Test]
-            public void TestScannerForNumbers() {
-                ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
-                string results = engine.ApplyReplacements("[0-9]+", new List<string> { "85 dollars 123 lost" });
-                Assert.AreEqual("85\n123\n", results);
-            }
-
-            [Test]
-            public void TestScanWithCommaSeparatedFSinQuotes() {
-                ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
-                string result = engine.ApplyReplacements("ScannerFS=\", \"; a", new List<string> { "a b ca" });
-                Assert.AreEqual("a, a\n", result);
-            }
-
-            [Test]
-            public void TestScanWithCommaSeparatedFSwithoutQuotes() {
-                ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
-                string result = engine.ApplyReplacements("ScannerFS=,; a", new List<string> { "a b ca" });
-                Assert.AreEqual("a,a\n", result);
-            }
         }
     }
