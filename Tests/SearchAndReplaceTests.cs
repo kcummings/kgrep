@@ -5,25 +5,35 @@ using kgrep;
 
 namespace Tests {
 
+    // A higher level test
     [TestFixture]
-    public class SearchAndReplaceTests {
+    public class SearchAndReplaceAcceptenceTests {
 
         [Test]
-        public void TestSimpleOneLineReplace() {
+        public void WhenReplacementWithOneLine_ExpectChanges() {
             ReplacerEngine engine = new ReplacerEngine() {sw = new WriteToString()};
             string newline = engine.ApplyReplacements("a~b", new List<string> {"abc"});
             Assert.AreEqual("bbc\n", newline);
         }
 
         [Test]
-        public void TestSimpleTwoLineReplace() {
+        public void WhenReplacementWithTwoInputLines_ExpectChanges() {
             ReplacerEngine engine = new ReplacerEngine() {sw = new WriteToString()};
             string newline = engine.ApplyReplacements("a~b", new List<string> {"abc", "daf"});
             Assert.AreEqual("bbc\ndbf\n", newline);
         }
 
         [Test]
-        public void TestFullCycleReplace() {
+        public void WhenFullCycleReplaceNoArguments_ExpectNothing() {
+            string[] args = new String[0]; 
+            ParseCommandLine cmd = new ParseCommandLine(args);
+            ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
+            string results = engine.ApplyReplacements(cmd.ReplacementFileName, cmd.InputSourceNames);
+            Assert.AreEqual("", results);
+        }
+
+        [Test]
+        public void WhenFullCycleReplace_ExpectChanges() {
             string[] args = new String[] { "a~c", "abc" };
             ParseCommandLine cmd = new ParseCommandLine(args);
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
@@ -32,7 +42,7 @@ namespace Tests {
         }
 
         [Test]
-        public void TestFullCycleScannerFS() {
+        public void WhenFullCycleWithScannerFS_ExpectDelimitedResults() {
             string[] args = new String[] { "ScannerFS=,; a;b", "a b ca" };
             ParseCommandLine cmd = new ParseCommandLine(args);
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
@@ -41,7 +51,7 @@ namespace Tests {
         }
 
         [Test]
-        public void TestFullCycleScan() {
+        public void WhenFullCycleScan_ExpectChanges() {
             string[] args = new String[] { "a", "abca" };
             ParseCommandLine cmd = new ParseCommandLine(args);
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
@@ -49,50 +59,51 @@ namespace Tests {
             Assert.AreEqual("a\na\n", results);
         }
 
+
         [Test]
-        public void TestScopeAllReplace() {
+        public void WhenScopeAllGiven_ExpectAllReplaced() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements("scope=all; a~b; b~c", new List<string> { "a b c", "a b c", "earth" });
             Assert.AreEqual("c c c\nc c c\necrth\n", newline);
         }
 
         [Test]
-        public void TestScopeFirstReplace() {
+        public void WhenScopeFirstGiven_ExpectFirstReplace() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements("scope=first; a~b; b~c", new List<string> { "a b c", "a b c", "earth" });
             Assert.AreEqual("b b c\nb b c\nebrth\n", newline);
         }
 
         [Test]
-        public void TestRemoveSpaces() {
+        public void WhenReplacementGiven_ExpectRemoveSpaces() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements(@"\s~", new List<string> { "a b c", "the   dog  ran. " });
             Assert.AreEqual("abc\nthedogran.\n", newline);
         }
 
         [Test]
-        public void TestExpandEveryThirdLetter() {
+        public void WhenReplacementGiven_ExpectExpandEveryThirdLetter() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements(@"([a-z]{3})~$1-", new List<string> { "kgrep works today by"});
             Assert.AreEqual("kgr-ep wor-ks tod-ay by\n", newline);
         }
 
         [Test]
-        public void TestSwapEveryOtherLetter() {
+        public void WhenReplacementGiven_ExpectEveryOtherLetterSwapped() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements(@"([a-z])([a-z])~$2$1", new List<string> { "kgrep works today by" });
             Assert.AreEqual("gkerp owkrs otady yb\n", newline);
         } 
 
         [Test]
-        public void TestChangeDelimReplace() {
+        public void WhenDelimIsChanged_ExpectChangeWithNewDelim() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements("delim=,; hi,bye; here,there", new List<string> { "hi world", "go home today", "here is it" });
             Assert.AreEqual("bye world\ngo home today\nthere is it\n", newline);
         }
 
         [Test]
-        public void TestChangeDelimTwiceReplace() {
+        public void WhenDelimChangesTwice_ExpectTwoChanges() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements("delim=,; hi,bye; delim=-; here-there", new List<string> { "hi world", "go home today", "here is it" });
             Assert.AreEqual("bye world\ngo home today\nthere is it\n", newline);
@@ -100,7 +111,7 @@ namespace Tests {
 
         // Anchor tests
         [Test]
-        public void TestAnchorMatchingOneLine() {
+        public void WhenAnchorMatchesFirstLineOnly_ExpectChanges() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements("my~hi~bye; all~gone", 
                                         new List<string> { "Now is my hi world", "go hi today" });
@@ -108,7 +119,7 @@ namespace Tests {
         }
 
         [Test]
-        public void TestAnchorMatchingOneLineFailure() {
+        public void WhenAnchorNotMatched_ExpectNoChange() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements("my~hi~bye; all~gone",
                                         new List<string> { "Now is your hi world", "go hi today" });
@@ -116,7 +127,7 @@ namespace Tests {
         }
 
         [Test]
-        public void TestAnchorMatchingMultipleSameLine() {
+        public void WhenReplacementHasAnchorThatMatchesManySameLine_ExpectMultipleChangesLine() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements("my~hi~bye; all~gone",
                                         new List<string> { "This is my hi world", "go hi today" });
@@ -124,7 +135,7 @@ namespace Tests {
         }
 
         [Test]
-        public void TestAnchorMatchingTwoLines() {
+        public void WhenReplacementHasAnchorThatMatchesOnTwoLines_ExpectChanges() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements("my~hi~bye; all~gone",
                                         new List<string> { "my is my hi world", "go hi mytoday" });
@@ -132,7 +143,7 @@ namespace Tests {
         }
 
         [Test]
-        public void TestAnchorMatchingStartLine() {
+        public void WhenReplacementHasAnchorThatMatches_ExpectChange() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements("^Th~hi~bye; all~gone",
                                         new List<string> { "mTh my hi world", "Thgo hi mytoday" });
@@ -140,19 +151,19 @@ namespace Tests {
         }
 
         [Test]
-        public void TestEmptyReplacementList() {
+        public void WhenEmptyReplacement_ExpectNoChange() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements("",
-                                        new List<string> { "mTh my hi world", "Thgo hi mytoday" });
-            Assert.AreEqual("mTh my hi world\nThgo hi mytoday\n", newline);
+                                        new List<string> { "Hello World", "See you later." });
+            Assert.AreEqual("Hello World\nSee you later.\n", newline);
         }
 
         [Test]
-        public void TestEmptyReplacementFirstList() {
+        public void WhenNoReplacementGiven_ExpectNoChange() {
             ReplacerEngine engine = new ReplacerEngine() { sw = new WriteToString() };
             string newline = engine.ApplyReplacements("scope=first",
-                                        new List<string> { "mTh my hi world", "Thgo hi mytoday" });
-            Assert.AreEqual("mTh my hi world\nThgo hi mytoday\n", newline);
+                                        new List<string> { "Hello World", "See you later." });
+            Assert.AreEqual("Hello World\nSee you later.\n", newline);
         }
     }
 }
