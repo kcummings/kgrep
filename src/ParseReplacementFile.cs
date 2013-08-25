@@ -6,7 +6,7 @@ using NLog;
 
 namespace kgrep
 {
-    public class ReplacementFile
+    public class ParseReplacementFile
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         public List<Replacement> ReplacementList = new List<Replacement>();
@@ -16,8 +16,10 @@ namespace kgrep
         private String _delim = "~";
         private IHandleInput sr;
         public string ScannerFS = "\n";
+        public bool useAsScanner = false;
 
-        public ReplacementFile(String filename) {
+        public ParseReplacementFile(String filename) {
+            if (filename == null) return;
             logger.Debug("Start reading replacementfile:{0}",filename);
             sr = (new ReadFileFactory()).GetSource(filename);
             ReplacementList = GetReplacementList();
@@ -54,14 +56,17 @@ namespace kgrep
                     String[] parts = line.Split(_delim.ToCharArray(), 4);
                     if (parts.Length == 1) { // just scan pattern
                         replacementList.Add(new Replacement(parts[0]) {ScannerFS = ScannerFS });
+                        useAsScanner = true;
                     }
                     if (parts.Length == 2) {
                         // just a~b pattern
                         replacementList.Add(new Replacement(parts[0], parts[1]));
+                        useAsScanner = false;
                     }
                     if (parts.Length == 3) {
                         // anchored a~b pattern
                         replacementList.Add(new Replacement(parts[0], parts[1], parts[2]));
+                        useAsScanner = false;
                     }
                 }
             }

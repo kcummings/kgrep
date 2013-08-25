@@ -8,14 +8,14 @@ namespace Tests {
 
         [Test]
         public void WhenEmptyReplacement_ExpectNoChange() {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             Assert.AreEqual("abc", engine.ApplyReplacementsFirst("abc", reps));
         }
 
         [Test]
         public void WhenEmptyTopatternMatches_ExpectTokenRemoved() {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("token", ""));
             Assert.AreEqual("abc", engine.ApplyReplacementsFirst("abctoken", reps));
@@ -23,7 +23,7 @@ namespace Tests {
 
         [Test]
         public void WhenNoMatchFound_FirstOnly_ExpectNoChange() {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("k", "def"));
             Assert.AreNotEqual("", engine.ApplyReplacementsFirst("abc", reps));
@@ -33,7 +33,7 @@ namespace Tests {
         [TestCase("hll bye", "e(..)o-(...)", "$1 $2", "hello-bye")]
         [TestCase("attr=hi","<tag attr='(.+?)'>", "attr=$1","<tag attr='hi'>")]
         public void WhenSimpleRegex_ExpectSimpleResults(string expected, string frompattern, string topattern, string input) {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement(frompattern, topattern));
             Assert.AreEqual(expected, engine.ApplyReplacementsAll(input, reps));
@@ -41,7 +41,7 @@ namespace Tests {
 
         [Test]
         public void WhenMatchesEndPoint_FirstOnly_ExpectChange() {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("ab", "de"));
             Assert.AreEqual("dele dee lincode",engine.ApplyReplacementsFirst("able abe lincoab", reps));
@@ -49,7 +49,7 @@ namespace Tests {
 
         [Test]
         public void WhenMatchesOnMultipleLines_FirstOnly_ExpectFirstReplaceOnly() {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("from", "to"));
             reps.Add(new Replacement("to", "this"));
@@ -58,7 +58,7 @@ namespace Tests {
 
         [Test]
         public void WhenMatchsOnMultipleLines_All_ExpectCummulativeChange() {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("from", "to"));
             reps.Add(new Replacement("to", "this"));
@@ -67,7 +67,7 @@ namespace Tests {
 
         [Test]
         public void WhenMatchesOnMultipleLinesWithGroups_FirstOnly_ExpectFirstReplaceOnly() {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("f(..)m", "$1"));
             reps.Add(new Replacement("to", "this"));
@@ -76,7 +76,7 @@ namespace Tests {
 
         [Test]
         public void WhenReplacmentWithMultipleLinesSwappingGroups_FirstOnly_ExpectChange() {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement(@"(\w+)\s(\w+)", "$2 $1"));
             reps.Add(new Replacement("to", "this"));
@@ -85,7 +85,7 @@ namespace Tests {
 
         [Test]
         public void WhenReplacmentWithMultipleLinesSwappingGroups_All_ExpectChange() {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement(@"(\w+)\s(\w+)", "$2 $1"));
             reps.Add(new Replacement("to", "this"));
@@ -94,7 +94,7 @@ namespace Tests {
 
         [Test]
         public void WhenAnchorMatchesButPatternDoesNot_All_ExpectNoChange() {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("today", "Joe", "to"));
             Assert.AreEqual("you and you today", engine.ApplyReplacementsAll("you and you today", reps));
@@ -102,7 +102,7 @@ namespace Tests {
 
         [Test]
         public void WhenAnchorAndPatternMatches_All_ExpectChange() {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("today", "you", "to"));
             Assert.AreEqual("to and to today", engine.ApplyReplacementsAll("you and you today", reps));
@@ -110,7 +110,7 @@ namespace Tests {
 
         [Test]
         public void WhenAnchorAndPatternMatches_FirstOnly_ExpectChange() {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("today","you", "to"));
             Assert.AreEqual("from me to to today", engine.ApplyReplacementsFirst("from me to you today", reps));
@@ -118,7 +118,7 @@ namespace Tests {
 
         [Test]
         public void WhenAnchorMatchesButPatternDoesNot_FirstOnly_ExpectNoChange() {
-            ReplacerEngine engine = new ReplacerEngine();
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
             List<Replacement> reps = new List<Replacement>();
             reps.Add(new Replacement("to", "Joe", "you"));
             Assert.AreEqual("from me to you", engine.ApplyReplacementsFirst("from me to you", reps));

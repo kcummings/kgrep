@@ -39,7 +39,11 @@ namespace kgrep
             if (cmdarg.InputSourceNames.Count == 0)
                 Usage("No input sources given/recognized.");
 
-            new ReplacerEngine().ApplyReplacements(cmdarg.ReplacementFileName, cmdarg.InputSourceNames);
+            ParseReplacementFile replacementCommands = new ParseReplacementFile(cmdarg.ReplacementFileName);
+            if (replacementCommands.useAsScanner)
+                new PrintTokensInSourceFiles().ApplyScanner(replacementCommands, cmdarg.InputSourceNames);
+            else
+                new ReplaceTokensInSourceFiles().ApplyReplacements(replacementCommands, cmdarg.InputSourceNames);
             logger.Debug("<<<<< Ending kgrep >>>>>");
         }
 

@@ -27,7 +27,9 @@ Usage
 
         ScanToken =  a regex string that when found in input will print one match per line
 
-While the replacement file can contain both *ReplacementStrings* and *SearchTokens*, it is best to only have one or the other type in a given file. Since *SearchToken* only prints the matched part of a line and does not print the line if the token doesn't match any part of the line, two non-overlapping patterns will cause nothing to print. For example: echo "hello world"|kgrep "world;bye" will not print anything because the first match was to "world" which yields "world". This was search for "bye" which wasn't found so nothing prints. There must be some combination or enhancement can make beneficial use of this behavior.
+Kgrep runs in two modes: A Scanner or a Search and Replace tool. 
+
+If the replacement file only contains *SearchTokens* then all found tokens will print to stdout. If it contains both *ReplacementStrings* and *SearchTokens*, it will search and replace the given tokens and print the results to stdout.
  
 - - -
 
@@ -60,7 +62,7 @@ The following controls can be embedded anywhere in the ReplacementFile or stacke
 
 - **comment=?** This value designates the beginning of a comment. Default is "#".
 
-- **ScannerFS=?** The scanned tokens are "glued" together with the value of this option. Default is "\n".
+- **ScannerFS=?** Only used in Scanner mode. The scanned tokens are "glued" together with the value of this option. Default is "\n".
 
 - **scope=[first|all]** If set to **first**, the first time a *ReplacementString* is found on the line, no other replacements are applied to that line. If set to **all** , as many Replacements as possible will be applied to a line.
 

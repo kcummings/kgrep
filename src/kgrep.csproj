@@ -60,7 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ReplacerEngine.cs" />
+    <Compile Include="ReplaceTokensInSourceFiles.cs" />
     <Compile Include="IHandleOutput.cs" />
     <Compile Include="ReadCommandLineArgumentAsFile.cs" />
     <Compile Include="IHandleInput.cs" />
@@ -70,8 +70,9 @@
     <Compile Include="ReadFile.cs" />
     <Compile Include="ReadFileFactory.cs" />
     <Compile Include="ReadStdin.cs" />
-    <Compile Include="ReplacementFile.cs" />
+    <Compile Include="ParseReplacementFile.cs" />
     <Compile Include="Replacement.cs" />
+    <Compile Include="PrintTokensInSourceFiles.cs" />
     <Compile Include="WriteStdout.cs" />
     <Compile Include="WriteToString.cs" />
   </ItemGroup>

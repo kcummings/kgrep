@@ -6,13 +6,12 @@ using System.Linq;
 using NLog;
 
 namespace kgrep {
-    public class ReplacerEngine {
+    public class ReplaceTokensInSourceFiles {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         public IHandleOutput sw = new WriteStdout();
 
-        public string ApplyReplacements(string replacementFileName, List<string> inputFilenames) {
+        public string ApplyReplacements(ParseReplacementFile rf, List<string> inputFilenames) {
             try {
-                ReplacementFile rf = new ReplacementFile(replacementFileName);
                 string line;
                 string alteredLine;
 
@@ -56,10 +55,7 @@ namespace kgrep {
                 logger.Trace("   ApplyReplacementsAll - applying ({0} --> {1})  anchor:{2}", rep.frompattern.ToString(), rep.topattern, rep.anchor);
                 logger.Trace("   ApplyReplacementsAll - line before:{0}", line);
                 if (isCandidateForReplacement(line, rep)) {
-                    if (rep.style == Replacement.Style.Scan)
-                        line = ScanForTokens(line, rep.frompattern,rep.ScannerFS);
-                    else
-                        line = rep.frompattern.Replace(line, rep.topattern);
+                   line = rep.frompattern.Replace(line, rep.topattern);
                 }
                 logger.Trace("   ApplyReplacementsAll - line  after:{0}",line);
             }
@@ -76,31 +72,6 @@ namespace kgrep {
                 return false;
             }
             return true;
-        }
-
-        public string ScanForTokens(string line, Regex pattern, string FS) {
-            List<string> sb = new List<string>();
-            Match m = pattern.Match(line);
-            logger.Debug("   ScanForTokens - scanpatten:{0} FS:{1}", pattern.ToString(), FS);
-
-            // Only return submatches if found, otherwise return any matches.
-            while (m.Success) {
-                int[] gnums = pattern.GetGroupNumbers();
-                if (gnums.Length > 1) {
-                    for (int i = 1; i < gnums.Length; i++) {
-                        string token = m.Groups[gnums[i]].ToString();
-                        logger.Trace("      ScanForTokens - Found grouped token:{0}", token);
-                        sb.Add(token);
-                    }
-                } else {
-                    // Only include the substring that was matched.
-                    logger.Trace("      ScanForTokens - Found token:{0}",m.Value);
-                    sb.Add(m.Value);
-                }
-                m = m.NextMatch();
-            }
-            logger.Debug("   ScanForTokens - returning:{0}",String.Join(FS, sb.ToArray()));
-            return String.Join(FS, sb.ToArray());
         }
     }
 }
