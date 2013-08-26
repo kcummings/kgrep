@@ -5,23 +5,25 @@ using NLog;
 
 namespace kgrep
 {
-    public class Replacement
-    {
+    public class Replacement {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        [XmlIgnore] 
-        public String anchor = "";
+        [XmlIgnore] public String anchor = "";
         public String topattern = null;
         public Regex frompattern;
         public Style style;
         public string ScannerFS = "\n";
+        public int NamedGroupCount = 0;
+        public int NamedGroupPlaceholderCount = 0;
 
         public enum Style {
             Scan,
             WithAnchor,
             Normal
         }
-        public Replacement() {}
+
+        public Replacement() {
+        }
 
         public Replacement(string anchor, string frompattern, string topattern) {
             _replacement(anchor, frompattern, topattern);
@@ -40,17 +42,22 @@ namespace kgrep
 
         private void _replacement(string arganchor, string argfrompattern, string argtopattern) {
             try {
-                logger.Trace("   _replacement - anchor:{0} frompattern:{1} topattern:{2}", arganchor, argfrompattern, argtopattern);
+                logger.Trace("   _replacement - anchor:{0} frompattern:{1} topattern:{2}", arganchor, argfrompattern,
+                             argtopattern);
                 anchor = RemoveEnclosingQuotesIfPresent(arganchor.Trim());
                 string frompat = RemoveEnclosingQuotesIfPresent(argfrompattern.Trim());
+                NamedGroupCount = GetNamedGroupCount(@"\(\?<.+?>.+?\)",frompat);  // how many named group captures are present?
+                NamedGroupPlaceholderCount = GetNamedGroupCount(@"\$\{.+?\}", argtopattern);
                 frompattern = new Regex(frompat, RegexOptions.Compiled);
                 topattern = RemoveEnclosingQuotesIfPresent(argtopattern.Trim());
 
                 // Just validation here
                 Regex topat = new Regex(topattern);
                 Regex anc = new Regex(anchor);
-            } catch (Exception e) {
-                Console.WriteLine("Regex error Replacement, from '{0}'  to '{1}'  anchor '{2}'", argfrompattern, argtopattern, anchor);
+            }
+            catch (Exception e) {
+                Console.WriteLine("Regex error Replacement, from '{0}'  to '{1}'  anchor '{2}'", argfrompattern,
+                                  argtopattern, anchor);
                 throw new Exception(e.Message);
             }
         }
@@ -63,6 +70,17 @@ namespace kgrep
                 return patWithoutQuotes;
             }
             return pattern; // return the original string untouched
+        }
+
+        private static int GetNamedGroupCount(string pattern, string line) {
+            try {
+              return Regex.Matches(line, pattern).Count;
+            }
+            catch(Exception e)
+            {
+                logger.Debug(String.Format("GetNamedGroupCount - Looking for '{0}' in '{1}' \n{2}",pattern,line,e.Message));
+                return 0;
+            }
         }
     }
 }
