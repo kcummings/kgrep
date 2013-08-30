@@ -46,7 +46,7 @@ namespace kgrep
                              argtopattern);
                 anchor = RemoveEnclosingQuotesIfPresent(arganchor.Trim());
                 string frompat = RemoveEnclosingQuotesIfPresent(argfrompattern.Trim());
-                NamedGroupCount = GetNamedGroupCount(@"\(\?<.+?>.+?\)",frompat);  // how many named group captures are present?
+                NamedGroupCount = GetNamedGroupCount(@"\(\?<.+?>.+?\)", frompat);  // how many named group captures are present?
                 NamedGroupPlaceholderCount = GetNamedGroupCount(@"\$\{.+?\}", argtopattern);
                 frompattern = new Regex(frompat, RegexOptions.Compiled);
                 topattern = RemoveEnclosingQuotesIfPresent(argtopattern.Trim());
@@ -74,7 +74,8 @@ namespace kgrep
 
         private static int GetNamedGroupCount(string pattern, string line) {
             try {
-              return Regex.Matches(line, pattern).Count;
+               Regex regex = new Regex(pattern);
+               return regex.Matches(line).Count;
             }
             catch(Exception e)
             {

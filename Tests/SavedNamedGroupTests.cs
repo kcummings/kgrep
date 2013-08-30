@@ -68,6 +68,86 @@ namespace Tests {
             ParseReplacementFile replacementCommands = new ParseReplacementFile("my bye~${titlehi");
             Assert.AreEqual(0, replacementCommands.ReplacementList[0].NamedGroupPlaceholderCount);
         }
+
+        [Test]
+        public void WhenTwoNamesGiven_ExpectTwo() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseReplacementFile replacementCommands = new ParseReplacementFile(@"scope=all; ^(?<name>[a-z]+).*?(?<second>[0-9]+)~b");
+            string newline = engine.ApplyReplacements(replacementCommands, new List<string> { "ab c 45" });
+            var results = engine.NamedGroupValues["name"];
+            Assert.AreEqual("ab", results);
+            results = engine.NamedGroupValues["second"];
+            Assert.AreEqual("45",results);
+        }
+
+        [Test]
+        public void WhenNameRepeats_ExpectLastValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseReplacementFile replacementCommands = new ParseReplacementFile(@"scope=all; ^(?<name>[a-z]+).*?(?<name>[0-9]+)~b");
+            string newline = engine.ApplyReplacements(replacementCommands, new List<string> { "ab c 45" });
+            var results = engine.NamedGroupValues["name"];
+            Assert.AreEqual("45", results);
+        }
+
+        [Test]
+        public void WhenFirstNameRepeats_ExpectLastValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseReplacementFile replacementCommands = new ParseReplacementFile(@"scope=first; ^(?<name>[a-z]+).*?(?<name>[0-9]+)~b");
+            string newline = engine.ApplyReplacements(replacementCommands, new List<string> { "ab c 45; ab 98" });
+            var results = engine.NamedGroupValues["name"];
+            Assert.AreEqual("45", results);
+        }
+
+        [Test]
+        public void WhenPlaceholderPresent_ExpectReplacedValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseReplacementFile replacementCommands = new ParseReplacementFile(@"scope=all; ^(?<name>[a-z]+)~c${name}");
+            string results = engine.ApplyReplacements(replacementCommands, new List<string> { "a" });
+            Assert.AreEqual("ca\n", results);
+        }
+
+        [Test]
+        public void WhenRepeatPlaceholderPresent_ExpectReplacedValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseReplacementFile replacementCommands = new ParseReplacementFile(@"scope=all; ^(?<name>[a-z]+)~c${name}${name}");
+            string results = engine.ApplyReplacements(replacementCommands, new List<string> { "a" });
+            Assert.AreEqual("caa\n", results);
+        }
+
+        [Test]
+        public void WhenPlaceholderSpansLines_ExpectReplacedValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseReplacementFile replacementCommands = new ParseReplacementFile(@"scope=all; ^(?<name>[a-z]+)~blue ${name};blue ~${name}");
+            string results = engine.ApplyReplacements(replacementCommands, new List<string> { "word" });
+            Assert.AreEqual("word word\n", results);
+        }
+
+        [Test]
+        public void WhenTwoPlaceholderSpansLines_ExpectReplacedValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseReplacementFile replacementCommands = new ParseReplacementFile(@"scope=all; ^(?<name>[a-z]+)~blue ${name};(?<digit>[0-9]+) ~${name}; blue~ ${name}${digit}");
+            string results = engine.ApplyReplacements(replacementCommands, new List<string> {  "ab 89 cd" });
+            Assert.AreEqual("ab89 ab ab cd\n", results);
+        }
+
+        [Test]
+        [Ignore]
+        public void WhenTwoPlaceholderSpansLinesWithMultipleReferences_ExpectReplacedValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseReplacementFile replacementCommands = new ParseReplacementFile(@"scope=all; ^(?<tag>\<chap=([a-z]+?)\>); end~${tag}");
+            string results = engine.ApplyReplacements(replacementCommands, new List<string> { "<chap=a> <last=z> end" });
+            Assert.AreEqual("ab89 ab ab cd\n", results);
+        }
+
+        [Test]
+        public void WhenPlaceholderInCollection_ExpectReplacedValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            Dictionary<string, string> groupValues = new Dictionary<string, string>(){ {"a", "hi" },{"b","bye"} };
+            string results = engine.ReplaceRegexPlaceholdersIfPresent("${a}", groupValues);
+            Assert.AreEqual("hi", results);
+            results = engine.ReplaceRegexPlaceholdersIfPresent("${b}", groupValues);
+            Assert.AreEqual("bye", results);
+        }
     }
 }
 
