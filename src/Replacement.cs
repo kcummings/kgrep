@@ -42,7 +42,7 @@ namespace kgrep
 
         private void _replacement(string arganchor, string argfrompattern, string argtopattern) {
             try {
-                logger.Trace("   _replacement - anchor:{0} frompattern:{1} topattern:{2}", arganchor, argfrompattern,
+                logger.Trace("   _replacement - anchor:'{0}' frompattern:'{1}' topattern:'{2}'", arganchor, argfrompattern,
                              argtopattern);
                 anchor = RemoveEnclosingQuotesIfPresent(arganchor.Trim());
                 string frompat = RemoveEnclosingQuotesIfPresent(argfrompattern.Trim());

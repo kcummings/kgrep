@@ -62,8 +62,8 @@ namespace kgrep {
         public string ApplyReplacementsAll(string line, List<Replacement> repList) {
             logger.Debug("ApplyReplacementsAll before:{0}", line);
             foreach (Replacement rep in repList) {
-                logger.Trace("   ApplyReplacementsAll - applying ({0} --> {1})  anchor:{2}", rep.frompattern.ToString(), rep.topattern, rep.anchor);
-                logger.Trace("   ApplyReplacementsAll - line before:{0}", line);
+                logger.Trace("   ApplyReplacementsAll - applying '{0}' --> '{1}'  anchor:'{2}'", rep.frompattern.ToString(), rep.topattern, rep.anchor);
+                logger.Trace("   ApplyReplacementsAll - line before:'{0}'", line);
                 if (isCandidateForReplacement(line, rep)) {
                     CollectPickups(line, rep);
                     if (rep.style != Replacement.Style.Scan) { 
@@ -75,9 +75,9 @@ namespace kgrep {
                         }
                     }
                 }
-                logger.Trace("   ApplyReplacementsAll - line  after:{0}",line);
+                logger.Trace("   ApplyReplacementsAll - line  after:'{0}'",line);
             }
-            logger.Debug("ApplyReplacementsAll  after:{0}", line);
+            logger.Debug("ApplyReplacementsAll  after:'{0}'", line);
             return line;
         }
 
