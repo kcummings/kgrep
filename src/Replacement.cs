@@ -13,8 +13,8 @@ namespace kgrep
         public Regex frompattern;
         public Style style;
         public string ScannerFS = "\n";
-        public int NamedGroupCount = 0;
-        public int NamedGroupPlaceholderCount = 0;
+        public int PickupCount = 0;
+        public int PickupPlaceholderCount = 0;
 
         public enum Style {
             Scan,
@@ -46,8 +46,8 @@ namespace kgrep
                              argtopattern);
                 anchor = RemoveEnclosingQuotesIfPresent(arganchor.Trim());
                 string frompat = RemoveEnclosingQuotesIfPresent(argfrompattern.Trim());
-                NamedGroupCount = GetNamedGroupCount(@"\(\?<.+?>.+?\)", frompat);  // how many named group captures are present?
-                NamedGroupPlaceholderCount = GetNamedGroupCount(@"\$\{.+?\}", argtopattern);
+                PickupCount = GetPickupCount(@"\(\?<.+?>.+?\)", frompat);  // how many named group captures are present?
+                PickupPlaceholderCount = GetPickupCount(@"\$\{.+?\}", argtopattern);
                 frompattern = new Regex(frompat, RegexOptions.Compiled);
                 topattern = RemoveEnclosingQuotesIfPresent(argtopattern.Trim());
 
@@ -72,14 +72,14 @@ namespace kgrep
             return pattern; // return the original string untouched
         }
 
-        private static int GetNamedGroupCount(string pattern, string line) {
+        private static int GetPickupCount(string pattern, string line) {
             try {
                Regex regex = new Regex(pattern);
                return regex.Matches(line).Count;
             }
             catch(Exception e)
             {
-                logger.Debug(String.Format("GetNamedGroupCount - Looking for '{0}' in '{1}' \n{2}",pattern,line,e.Message));
+                logger.Debug(String.Format("GetPickupCount - Looking for '{0}' in '{1}' \n{2}",pattern,line,e.Message));
                 return 0;
             }
         }

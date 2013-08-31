@@ -9,7 +9,7 @@ namespace kgrep {
     public class ReplaceTokensInSourceFiles {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         public IHandleOutput sw = new WriteStdout();
-        public Dictionary<string, string> NamedGroupValues = new Dictionary<string, string>();
+        public Dictionary<string, string> PickupList = new Dictionary<string, string>();
 
         public string ApplyReplacements(ParseReplacementFile rf, List<string> inputFilenames) {
             try {
@@ -41,10 +41,10 @@ namespace kgrep {
                 logger.Trace("   ApplyReplacementsFirst - ({0} --> {1})  anchor:{2}", rep.frompattern.ToString(), rep.topattern, rep.anchor);
                 if (isCandidateForReplacement(line, rep)) {
                     if (rep.frompattern.IsMatch(line)) {
-                        CollectNamedGroups(line, rep);
+                        CollectPickups(line, rep);
                         if (rep.style != Replacement.Style.Scan) {
                             line = rep.frompattern.Replace(line, rep.topattern);
-                            line = ReplaceRegexPlaceholdersIfPresent(line, NamedGroupValues);
+                            line = ReplacePickupPlaceholdersIfPresent(line, PickupList);
                             break;
                         }
                     }
@@ -61,13 +61,13 @@ namespace kgrep {
                 logger.Trace("   ApplyReplacementsAll - applying ({0} --> {1})  anchor:{2}", rep.frompattern.ToString(), rep.topattern, rep.anchor);
                 logger.Trace("   ApplyReplacementsAll - line before:{0}", line);
                 if (isCandidateForReplacement(line, rep)) {
-                    CollectNamedGroups(line, rep);
+                    CollectPickups(line, rep);
                     if (rep.style != Replacement.Style.Scan) { 
                         if (rep.frompattern.ToString() == "")
-                            line = ReplaceRegexPlaceholdersIfPresent(rep.topattern, NamedGroupValues); // ~${name}    force print of placeholders
+                            line = ReplacePickupPlaceholdersIfPresent(rep.topattern, PickupList); // ~${name}    force print of placeholders
                         else {
                             line = rep.frompattern.Replace(line, rep.topattern);
-                            line = ReplaceRegexPlaceholdersIfPresent(line, NamedGroupValues);
+                            line = ReplacePickupPlaceholdersIfPresent(line, PickupList);
                         }
                     }
                 }
@@ -77,27 +77,29 @@ namespace kgrep {
             return line;
         }
 
-        private void CollectNamedGroups(string line, Replacement rep) {
-            if (rep.NamedGroupCount > 0) {
+        private void CollectPickups(string line, Replacement rep) {
+            if (rep.PickupCount > 0) {
                 GroupCollection groups = rep.frompattern.Match(line).Groups;
 
                 foreach (string groupName in rep.frompattern.GetGroupNames()) {
-                    if (NamedGroupValues.ContainsKey(groupName))
-                        NamedGroupValues[groupName] = groups[groupName].Value;
+                    if (PickupList.ContainsKey(groupName))
+                        PickupList[groupName] = groups[groupName].Value;
                     else
-                        NamedGroupValues.Add(groupName, groups[groupName].Value);
+                        PickupList.Add(groupName, groups[groupName].Value);
                 }
             }
         }
 
 
-        private string ReplaceRegexPlaceholdersIfPresent(string line, Dictionary<string, string> groupNameValues) {
+        private string ReplacePickupPlaceholdersIfPresent(string line, Dictionary<string, string> pickupList) {
             Regex re = new Regex(@"\$\{(.+?)\}",RegexOptions.Compiled);
             MatchCollection mc = re.Matches(line);
+            string PickupValue;
 
             foreach (Match m in mc) {
-                if (groupNameValues.ContainsKey(m.Groups[1].Value))
-                    line = line.Replace("${" + m.Groups[1].Value+"}", groupNameValues[m.Groups[1].Value]);
+                PickupValue = m.Groups[1].Value;
+                if (pickupList.ContainsKey(PickupValue))
+                    line = line.Replace("${" + PickupValue + "}", pickupList[PickupValue]);
             }
             return line;
         }

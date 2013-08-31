@@ -52,10 +52,10 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PickupTests.cs" />
     <Compile Include="ReplacementFileTests.cs" />
     <Compile Include="ReplacementTests.cs" />
     <Compile Include="ReplacerEngineTests.cs" />
-    <Compile Include="SavedNamedGroupTests.cs" />
     <Compile Include="SearchAndReplaceTests.cs" />
     <Compile Include="ParseCommandLineTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
