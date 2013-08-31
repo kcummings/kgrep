@@ -63,8 +63,12 @@ namespace kgrep {
                 if (isCandidateForReplacement(line, rep)) {
                     CollectNamedGroups(line, rep);
                     if (rep.style != Replacement.Style.Scan) { 
-                        line = rep.frompattern.Replace(line, rep.topattern);
-                        line = ReplaceRegexPlaceholdersIfPresent(line, NamedGroupValues);
+                        if (rep.frompattern.ToString() == "")
+                            line = ReplaceRegexPlaceholdersIfPresent(rep.topattern, NamedGroupValues); // ~${name}    force print of placeholders
+                        else {
+                            line = rep.frompattern.Replace(line, rep.topattern);
+                            line = ReplaceRegexPlaceholdersIfPresent(line, NamedGroupValues);
+                        }
                     }
                 }
                 logger.Trace("   ApplyReplacementsAll - line  after:{0}",line);
@@ -87,7 +91,7 @@ namespace kgrep {
         }
 
 
-        public string ReplaceRegexPlaceholdersIfPresent(string line, Dictionary<string, string> groupNameValues) {
+        private string ReplaceRegexPlaceholdersIfPresent(string line, Dictionary<string, string> groupNameValues) {
             Regex re = new Regex(@"\$\{(.+?)\}",RegexOptions.Compiled);
             MatchCollection mc = re.Matches(line);
 

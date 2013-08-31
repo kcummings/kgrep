@@ -131,23 +131,22 @@ namespace Tests {
         }
 
         [Test]
-        [Ignore]
         public void WhenTwoPlaceholderSpansLinesWithMultipleReferences_ExpectReplacedValue() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
-            ParseReplacementFile replacementCommands = new ParseReplacementFile(@"scope=all; ^(?<tag>\<chap=([a-z]+?)\>); end~${tag}");
-            string results = engine.ApplyReplacements(replacementCommands, new List<string> { "<chap=a> <last=z> end" });
-            Assert.AreEqual("ab89 ab ab cd\n", results);
+            ParseReplacementFile replacementCommands = new ParseReplacementFile(@"scope=all; ^<chap=(?<tag>[a-z]+?)>~; end~chapter=${tag}");
+            string results = engine.ApplyReplacements(replacementCommands, new List<string> { "<chap=a><last=z> end" });
+            Assert.AreEqual("<last=z> chapter=a\n", results);
         }
 
         [Test]
-        public void WhenPlaceholderInCollection_ExpectReplacedValue() {
+        public void WhenOverlappingPickups_ExpectOverlappedResults() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
-            Dictionary<string, string> groupValues = new Dictionary<string, string>(){ {"a", "hi" },{"b","bye"} };
-            string results = engine.ReplaceRegexPlaceholdersIfPresent("${a}", groupValues);
-            Assert.AreEqual("hi", results);
-            results = engine.ReplaceRegexPlaceholdersIfPresent("${b}", groupValues);
-            Assert.AreEqual("bye", results);
+            ParseReplacementFile replacementCommands =
+                new ParseReplacementFile(@"scope=all; ^(?<firstname>[a-z]+)\.; \.(?<lastname>[a-z]+)@; @(?<company>[a-z.]+); ~${company}@${lastname}.${firstname}");
+            string results = engine.ApplyReplacements(replacementCommands, new List<string> { "john.doe@linux.org" });
+            Assert.AreEqual("linux.org@doe.john\n", results);
         }
+
     }
 }
 
