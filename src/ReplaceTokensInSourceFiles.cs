@@ -43,8 +43,12 @@ namespace kgrep {
                     if (rep.frompattern.IsMatch(line)) {
                         CollectPickups(line, rep);
                         if (rep.style != Replacement.Style.Scan) {
-                            line = rep.frompattern.Replace(line, rep.topattern);
-                            line = ReplacePickupPlaceholdersIfPresent(line, PickupList);
+                            if (rep.frompattern.ToString() == "")
+                                line = ReplacePickupPlaceholders(rep.topattern, PickupList); // ~${name}    force print of placeholders
+                            else {
+                                line = rep.frompattern.Replace(line, rep.topattern);
+                                line = ReplacePickupPlaceholders(line, PickupList);
+                            }
                             break;
                         }
                     }
@@ -64,10 +68,10 @@ namespace kgrep {
                     CollectPickups(line, rep);
                     if (rep.style != Replacement.Style.Scan) { 
                         if (rep.frompattern.ToString() == "")
-                            line = ReplacePickupPlaceholdersIfPresent(rep.topattern, PickupList); // ~${name}    force print of placeholders
+                            line = ReplacePickupPlaceholders(rep.topattern, PickupList); // ~${name}    force print of placeholders
                         else {
                             line = rep.frompattern.Replace(line, rep.topattern);
-                            line = ReplacePickupPlaceholdersIfPresent(line, PickupList);
+                            line = ReplacePickupPlaceholders(line, PickupList);
                         }
                     }
                 }
@@ -91,7 +95,7 @@ namespace kgrep {
         }
 
 
-        private string ReplacePickupPlaceholdersIfPresent(string line, Dictionary<string, string> pickupList) {
+        private string ReplacePickupPlaceholders(string line, Dictionary<string, string> pickupList) {
             Regex re = new Regex(@"\$\{(.+?)\}",RegexOptions.Compiled);
             MatchCollection mc = re.Matches(line);
             string PickupValue;

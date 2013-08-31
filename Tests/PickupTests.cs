@@ -146,6 +146,22 @@ namespace Tests {
             Assert.AreEqual("linux.org@doe.john\n", results);
         }
 
+        [Test]
+        public void WhenOverlappingPickupsFirst_ExpectOverlappedResults() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseReplacementFile replacementCommands =
+                new ParseReplacementFile(@"scope=first; ^(?<firstname>[a-z]+)\.; \.(?<lastname>[a-z]+)@; @(?<company>[a-z.]+); ~${company}@${lastname}.${firstname}");
+            string results = engine.ApplyReplacements(replacementCommands, new List<string> { "john.doe@linux.org" });
+            Assert.AreEqual("linux.org@doe.john\n", results);
+        }
+
+        [Test]
+        public void WhenTwoPickupPlaceholderSpansLinesFirst_ExpectFirstReplacedValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseReplacementFile replacementCommands = new ParseReplacementFile(@"scope=first; ^(?<name>[a-z]+)~blue ${name};(?<digit>[0-9]+) ~${name}; blue~ ${name}${digit}");
+            string results = engine.ApplyReplacements(replacementCommands, new List<string> { "ab 89 cd", "ab 89 cd" });
+            Assert.AreEqual("blue ab 89 cd\nblue ab 89 cd\n", results);
+        }
     }
 }
 
