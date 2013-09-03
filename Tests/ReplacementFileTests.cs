@@ -13,8 +13,8 @@ namespace Tests {
         public void WhenOneArgument_ExpectOneReplacement() {
             ParseReplacementFile rf = new ParseReplacementFile("a~bc");
             List<Replacement> reps = rf.ReplacementList;
-            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].frompattern.ToString());
-            Assert.AreEqual( "bc", reps[0].topattern);
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].FromPattern.ToString());
+            Assert.AreEqual( "bc", reps[0].ToPattern);
         }
 
         [Test]
@@ -22,9 +22,9 @@ namespace Tests {
             ParseReplacementFile rf = new ParseReplacementFile("a~bc; g~jk");
             List<Replacement> reps = rf.ReplacementList;
             Assert.AreEqual(2,reps.Count);
-            Assert.AreEqual("bc",reps[0].topattern);
-            Assert.AreEqual((new Regex("g".Trim(), RegexOptions.Compiled)).ToString(), reps[1].frompattern.ToString());
-            Assert.AreEqual("jk",  reps[1].topattern);
+            Assert.AreEqual("bc",reps[0].ToPattern);
+            Assert.AreEqual((new Regex("g".Trim(), RegexOptions.Compiled)).ToString(), reps[1].FromPattern.ToString());
+            Assert.AreEqual("jk",  reps[1].ToPattern);
         }
 
         [Test]
@@ -32,16 +32,16 @@ namespace Tests {
             ParseReplacementFile rf = new ParseReplacementFile("a~bc;   hello~world  ;  third ~ fourth ");
             List<Replacement> reps = rf.ReplacementList;
             Assert.AreEqual(3, reps.Count);
-            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].frompattern.ToString());
-            Assert.AreEqual( "fourth", reps[2].topattern);
+            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].FromPattern.ToString());
+            Assert.AreEqual( "fourth", reps[2].ToPattern);
         }
 
         [Test]
         public void WhenEmbeddedDelim_ExpectChangedDelim() {
             ParseReplacementFile rf = new ParseReplacementFile("delim=,; a,bc;   hello,world  ;  third , fourth ");
             List<Replacement> reps = rf.ReplacementList;
-            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].frompattern.ToString());
-            Assert.AreEqual("fourth", reps[2].topattern);
+            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].FromPattern.ToString());
+            Assert.AreEqual("fourth", reps[2].ToPattern);
         }
 
         [Test]
@@ -49,8 +49,8 @@ namespace Tests {
             ParseReplacementFile rf = new ParseReplacementFile("scope=first;delim=,; a,b; b,c");
             List<Replacement> reps = rf.ReplacementList;
             Assert.IsTrue(reps.Count == 2);
-            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].frompattern.ToString());
-            Assert.AreEqual("b", reps[0].topattern);
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].FromPattern.ToString());
+            Assert.AreEqual("b", reps[0].ToPattern);
         }
 
         [Test]
@@ -58,16 +58,16 @@ namespace Tests {
             ParseReplacementFile rf = new ParseReplacementFile("scope=all;delim=,; a,b; b,c");
             List<Replacement> reps = rf.ReplacementList;
             Assert.IsTrue(reps.Count == 2);
-            Assert.AreEqual((new Regex("b".Trim(), RegexOptions.Compiled)).ToString(), reps[1].frompattern.ToString());
-            Assert.AreEqual( "c", reps[1].topattern);
+            Assert.AreEqual((new Regex("b".Trim(), RegexOptions.Compiled)).ToString(), reps[1].FromPattern.ToString());
+            Assert.AreEqual( "c", reps[1].ToPattern);
         }
 
         [Test]
         public void WhenEmbeddedComment_ExpectCommentIgnored() {
             ParseReplacementFile rf = new ParseReplacementFile("#comment; a~bc");
             List<Replacement> reps = rf.ReplacementList;
-            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].frompattern.ToString());
-            Assert.AreEqual( "bc", reps[0].topattern);
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].FromPattern.ToString());
+            Assert.AreEqual( "bc", reps[0].ToPattern);
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace Tests {
             Assert.AreEqual(expect, result);
         }
 
-        [TestCase("[.a~c~b")] // invalid anchor
+        [TestCase("[.a~c~b")] // invalid AnchorPattern
         [TestCase("a[.~b")]   // invalid from pattern
         [TestCase("a~b[.")]   // invalid to pattern
         [ExpectedException(typeof(System.Exception))]

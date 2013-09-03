@@ -103,7 +103,7 @@ namespace Tests {
             Assert.AreEqual("bye world\ngo home today\nthere is it\n", newline);
         }
 
-        // Anchor tests
+        // AnchorPattern tests
         [Test]
         public void WhenAnchorMatchesFirstLineOnly_ExpectChanges() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };

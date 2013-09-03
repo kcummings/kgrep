@@ -35,15 +35,15 @@ namespace kgrep
         static void Main(string[] args) {
 
             logger.Debug("<<<<< Starting kgrep >>>>>");
-            ParseCommandLine cmdarg = new ParseCommandLine(args);
-            if (cmdarg.InputSourceNames.Count == 0)
+            ParseCommandLine commandLine = new ParseCommandLine(args);
+            if (commandLine.InputSourceNames.Count == 0)
                 Usage("No input sources given/recognized.");
 
-            ParseReplacementFile replacementCommands = new ParseReplacementFile(cmdarg.ReplacementFileName);
-            if (replacementCommands.useAsScanner)
-                new PrintTokensInSourceFiles().ApplyScanner(replacementCommands, cmdarg.InputSourceNames);
+            ParseReplacementFile replacementCommands = new ParseReplacementFile(commandLine.ReplacementFileName);
+            if (replacementCommands.UseAsScanner)
+                new PrintTokensInSourceFiles().ApplyScanner(replacementCommands, commandLine.InputSourceNames);
             else
-                new ReplaceTokensInSourceFiles().ApplyReplacements(replacementCommands, cmdarg.InputSourceNames);
+                new ReplaceTokensInSourceFiles().ApplyReplacements(replacementCommands, commandLine.InputSourceNames);
             logger.Debug("<<<<< Ending kgrep >>>>>");
         }
 

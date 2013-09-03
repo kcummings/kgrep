@@ -31,14 +31,14 @@ namespace Tests {
             public void WhenOnlyScanTokensGiven_ExpectScannerEnabled() {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles { sw = new WriteToString() };
                 ParseReplacementFile replacementCommands = new ParseReplacementFile("a; b; c");
-                Assert.IsTrue(replacementCommands.useAsScanner);
+                Assert.IsTrue(replacementCommands.UseAsScanner);
             }
 
             [Test]
             public void WhenReplacementTokenGiven_ExpectScannerDisabled() {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles { sw = new WriteToString() };
                 ParseReplacementFile replacementCommands = new ParseReplacementFile("a; b; b~c");
-                Assert.IsFalse(replacementCommands.useAsScanner);
+                Assert.IsFalse(replacementCommands.UseAsScanner);
             }
 
             [Test]

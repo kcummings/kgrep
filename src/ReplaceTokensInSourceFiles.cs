@@ -35,18 +35,18 @@ namespace kgrep {
         }
 
         // "scope=First" in effect.
-        public string ApplyReplacementsFirst(string line, List<Replacement> repList) {
+        public string ApplyReplacementsFirst(string line, List<Replacement> replacementList) {
             logger.Debug("ApplyReplacementsFirst before:{0}", line);
-            foreach (Replacement rep in repList) {
-                logger.Trace("   ApplyReplacementsFirst - ({0} --> {1})  anchor:{2}", rep.frompattern.ToString(), rep.topattern, rep.anchor);
-                if (isCandidateForReplacement(line, rep)) {
-                    if (rep.frompattern.IsMatch(line)) {
-                        CollectPickups(line, rep);
-                        if (rep.style != Replacement.Style.Scan) {
-                            if (rep.frompattern.ToString() == "")
-                                line = ReplacePickupPlaceholders(rep.topattern, PickupList); // ~${name}    force print of placeholders
+            foreach (Replacement replacement in replacementList) {
+                logger.Trace("   ApplyReplacementsFirst - ({0} --> {1})  AnchorPattern:{2}", replacement.FromPattern.ToString(), replacement.ToPattern, replacement.AnchorPattern);
+                if (isCandidateForReplacement(line, replacement)) {
+                    if (replacement.FromPattern.IsMatch(line)) {
+                        CollectPickups(line, replacement);
+                        if (replacement.Style != Replacement.ReplacementType.Scan) {
+                            if (replacement.FromPattern.ToString() == "")
+                                line = ReplacePickupPlaceholders(replacement.ToPattern, PickupList); // ~${name}    force print of placeholders
                             else {
-                                line = rep.frompattern.Replace(line, rep.topattern);
+                                line = replacement.FromPattern.Replace(line, replacement.ToPattern);
                                 line = ReplacePickupPlaceholders(line, PickupList);
                             }
                             break;
@@ -59,18 +59,18 @@ namespace kgrep {
         }
 
         // "scope=All" in effect.
-        public string ApplyReplacementsAll(string line, List<Replacement> repList) {
+        public string ApplyReplacementsAll(string line, List<Replacement> replacementList) {
             logger.Debug("ApplyReplacementsAll before:{0}", line);
-            foreach (Replacement rep in repList) {
-                logger.Trace("   ApplyReplacementsAll - applying '{0}' --> '{1}'  anchor:'{2}'", rep.frompattern.ToString(), rep.topattern, rep.anchor);
+            foreach (Replacement replacement in replacementList) {
+                logger.Trace("   ApplyReplacementsAll - applying '{0}' --> '{1}'  AnchorPattern:'{2}'", replacement.FromPattern.ToString(), replacement.ToPattern, replacement.AnchorPattern);
                 logger.Trace("   ApplyReplacementsAll - line before:'{0}'", line);
-                if (isCandidateForReplacement(line, rep)) {
-                    CollectPickups(line, rep);
-                    if (rep.style != Replacement.Style.Scan) { 
-                        if (rep.frompattern.ToString() == "")
-                            line = ReplacePickupPlaceholders(rep.topattern, PickupList); // ~${name}    force print of placeholders
+                if (isCandidateForReplacement(line, replacement)) {
+                    CollectPickups(line, replacement);
+                    if (replacement.Style != Replacement.ReplacementType.Scan) { 
+                        if (replacement.FromPattern.ToString() == "")
+                            line = ReplacePickupPlaceholders(replacement.ToPattern, PickupList); // ~${name}    force print of placeholders
                         else {
-                            line = rep.frompattern.Replace(line, rep.topattern);
+                            line = replacement.FromPattern.Replace(line, replacement.ToPattern);
                             line = ReplacePickupPlaceholders(line, PickupList);
                         }
                     }
@@ -81,11 +81,11 @@ namespace kgrep {
             return line;
         }
 
-        private void CollectPickups(string line, Replacement rep) {
-            if (rep.PickupCount > 0) {
-                GroupCollection groups = rep.frompattern.Match(line).Groups;
+        private void CollectPickups(string line, Replacement replacement) {
+            if (replacement.PickupCount > 0) {
+                GroupCollection groups = replacement.FromPattern.Match(line).Groups;
 
-                foreach (string groupName in rep.frompattern.GetGroupNames()) {
+                foreach (string groupName in replacement.FromPattern.GetGroupNames()) {
                     if (PickupList.ContainsKey(groupName))
                         PickupList[groupName] = groups[groupName].Value;
                     else
@@ -108,10 +108,10 @@ namespace kgrep {
             return line;
         }
 
-        private bool isCandidateForReplacement(string line, Replacement rep) {
-            // Has a matching anchor?
-            if (rep.anchor.Length > 0) {
-                if (Regex.IsMatch(line, rep.anchor))
+        private bool isCandidateForReplacement(string line, Replacement replacement) {
+            // Has a matching AnchorPattern?
+            if (replacement.AnchorPattern.Length > 0) {
+                if (Regex.IsMatch(line, replacement.AnchorPattern))
                     return true;
                 logger.Trace("   is not a replacement candidate");
                 return false;

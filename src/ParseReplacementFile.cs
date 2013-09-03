@@ -10,13 +10,13 @@ namespace kgrep
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         public List<Replacement> ReplacementList = new List<Replacement>();
-        private bool _ScopeAll = true;
-        public bool ScopeAll { get { return _ScopeAll; } }
+        private bool _scopeAll = true;
+        public bool ScopeAll { get { return _scopeAll; } }
         private String _comment = "#";
         private String _delim = "~";
         private IHandleInput sr;
         public string ScannerFS = "\n";
-        public bool useAsScanner = false;
+        public bool UseAsScanner = false;
 
         public ParseReplacementFile(String filename) {
             if (filename == null) return;
@@ -47,26 +47,26 @@ namespace kgrep
                 else if (line.ToLower().StartsWith("delim="))
                     _delim = GetOption(line, "delim");
                 else if (line.ToLower().StartsWith("scope=first"))  // Once true, it's true for the remaining replacements.
-                    _ScopeAll = false;
+                    _scopeAll = false;
                 else if (line.ToLower().StartsWith("scope=all"))  
-                    _ScopeAll = true;
+                    _scopeAll = true;
                 else if (line.ToLower().StartsWith("scannerfs=")) 
                     ScannerFS = GetOption(line, "FS");
                 else {
                     String[] parts = line.Split(_delim.ToCharArray(), 4);
                     if (parts.Length == 1) { // just scan pattern
                         replacementList.Add(new Replacement(parts[0]) {ScannerFS = ScannerFS });
-                        useAsScanner = true;
+                        UseAsScanner = true;
                     }
                     if (parts.Length == 2) {
                         // just a~b pattern
                         replacementList.Add(new Replacement(parts[0], parts[1]));
-                        useAsScanner = false;
+                        UseAsScanner = false;
                     }
                     if (parts.Length == 3) {
                         // anchored a~b pattern
                         replacementList.Add(new Replacement(parts[0], parts[1], parts[2]));
-                        useAsScanner = false;
+                        UseAsScanner = false;
                     }
                 }
             }

@@ -18,7 +18,7 @@ namespace kgrep {
                     while ((line = sr.ReadLine()) != null) {
                         logger.Debug("Scanning line:{0}", line);
                         foreach (Replacement rep in rf.ReplacementList) {
-                            sw.Write(ScanForTokens(line, rep.frompattern, rep.ScannerFS));
+                            sw.Write(ScanForTokens(line, rep.FromPattern, rep.ScannerFS));
                         }
                     }
                     sr.Close();
