@@ -11,19 +11,19 @@ namespace kgrep {
         public IHandleOutput sw = new WriteStdout();
         public Dictionary<string, string> PickupList = new Dictionary<string, string>();
 
-        public string ApplyReplacements(ParseReplacementFile rf, List<string> inputFilenames) {
+        public string ApplyCommands(ParseCommandFile rf, List<string> inputFilenames) {
             try {
                 string line;
                 string alteredLine;
 
                 foreach (string filename in inputFilenames) {
-                    logger.Debug("ApplyReplacements - Processing input file:{0}", filename);
+                    logger.Debug("ApplyCommands - Processing input file:{0}", filename);
                     IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
                     while ((line = sr.ReadLine()) != null) {
                         if (rf.ScopeAll)
-                            alteredLine = ApplyReplacementsAll(line, rf.ReplacementList);
+                            alteredLine = ApplyCommandsAllMatches(line, rf.CommandList);
                         else
-                            alteredLine = ApplyReplacementsFirst(line, rf.ReplacementList);
+                            alteredLine = ApplyCommandsFirstMatch(line, rf.CommandList);
                         if (!String.IsNullOrEmpty(alteredLine)) sw.Write(alteredLine);
                     }
                     sr.Close();
@@ -35,18 +35,18 @@ namespace kgrep {
         }
 
         // "scope=First" in effect.
-        public string ApplyReplacementsFirst(string line, List<Replacement> replacementList) {
-            logger.Debug("ApplyReplacementsFirst before:{0}", line);
-            foreach (Replacement replacement in replacementList) {
-                logger.Trace("   ApplyReplacementsFirst - ({0} --> {1})  AnchorPattern:{2}", replacement.FromPattern.ToString(), replacement.ToPattern, replacement.AnchorPattern);
-                if (isCandidateForReplacement(line, replacement)) {
-                    if (replacement.FromPattern.IsMatch(line)) {
-                        CollectPickups(line, replacement);
-                        if (replacement.Style != Replacement.ReplacementType.Scan) {
-                            if (replacement.FromPattern.ToString() == "")
-                                line = ReplacePickupPlaceholders(replacement.ToPattern, PickupList); // ~${name}    force print of placeholders
+        public string ApplyCommandsFirstMatch(string line, List<Command> commandList) {
+            logger.Debug("ApplyCommandsFirstMatch before:{0}", line);
+            foreach (Command command in commandList) {
+                logger.Trace("   ApplyCommandsFirstMatch - ({0} --> {1})  AnchorString:{2}", command.SubjectString.ToString(), command.ReplacementString, command.AnchorString);
+                if (isCandidateForReplacement(line, command)) {
+                    if (command.SubjectString.IsMatch(line)) {
+                        CollectPickups(line, command);
+                        if (command.Style != Command.CommandType.Scan) {
+                            if (command.SubjectString.ToString() == "")
+                                line = ReplacePickupPlaceholders(command.ReplacementString, PickupList); // ~${name}    force print of placeholders
                             else {
-                                line = replacement.FromPattern.Replace(line, replacement.ToPattern);
+                                line = command.SubjectString.Replace(line, command.ReplacementString);
                                 line = ReplacePickupPlaceholders(line, PickupList);
                             }
                             break;
@@ -54,38 +54,38 @@ namespace kgrep {
                     }
                 }
             }
-            logger.Debug("ApplyReplacementsFirst  after:{0}", line);
+            logger.Debug("ApplyCommandsFirstMatch  after:{0}", line);
             return line;
         }
 
         // "scope=All" in effect.
-        public string ApplyReplacementsAll(string line, List<Replacement> replacementList) {
-            logger.Debug("ApplyReplacementsAll before:{0}", line);
-            foreach (Replacement replacement in replacementList) {
-                logger.Trace("   ApplyReplacementsAll - applying '{0}' --> '{1}'  AnchorPattern:'{2}'", replacement.FromPattern.ToString(), replacement.ToPattern, replacement.AnchorPattern);
-                logger.Trace("   ApplyReplacementsAll - line before:'{0}'", line);
-                if (isCandidateForReplacement(line, replacement)) {
-                    CollectPickups(line, replacement);
-                    if (replacement.Style != Replacement.ReplacementType.Scan) { 
-                        if (replacement.FromPattern.ToString() == "")
-                            line = ReplacePickupPlaceholders(replacement.ToPattern, PickupList); // ~${name}    force print of placeholders
+        public string ApplyCommandsAllMatches(string line, List<Command> commandList) {
+            logger.Debug("ApplyCommandsAllMatches before:{0}", line);
+            foreach (Command command in commandList) {
+                logger.Trace("   ApplyCommandsAllMatches - applying '{0}' --> '{1}'  AnchorString:'{2}'", command.SubjectString.ToString(), command.ReplacementString, command.AnchorString);
+                logger.Trace("   ApplyCommandsAllMatches - line before:'{0}'", line);
+                if (isCandidateForReplacement(line, command)) {
+                    CollectPickups(line, command);
+                    if (command.Style != Command.CommandType.Scan) { 
+                        if (command.SubjectString.ToString() == "")
+                            line = ReplacePickupPlaceholders(command.ReplacementString, PickupList); // ~${name}    force print of placeholders
                         else {
-                            line = replacement.FromPattern.Replace(line, replacement.ToPattern);
+                            line = command.SubjectString.Replace(line, command.ReplacementString);
                             line = ReplacePickupPlaceholders(line, PickupList);
                         }
                     }
                 }
-                logger.Trace("   ApplyReplacementsAll - line  after:'{0}'",line);
+                logger.Trace("   ApplyCommandsAllMatches - line  after:'{0}'",line);
             }
-            logger.Debug("ApplyReplacementsAll  after:'{0}'", line);
+            logger.Debug("ApplyCommandsAllMatches  after:'{0}'", line);
             return line;
         }
 
-        private void CollectPickups(string line, Replacement replacement) {
-            if (replacement.PickupCount > 0) {
-                GroupCollection groups = replacement.FromPattern.Match(line).Groups;
+        private void CollectPickups(string line, Command command) {
+            if (command.PickupCount > 0) {
+                GroupCollection groups = command.SubjectString.Match(line).Groups;
 
-                foreach (string groupName in replacement.FromPattern.GetGroupNames()) {
+                foreach (string groupName in command.SubjectString.GetGroupNames()) {
                     if (PickupList.ContainsKey(groupName))
                         PickupList[groupName] = groups[groupName].Value;
                     else
@@ -108,12 +108,12 @@ namespace kgrep {
             return line;
         }
 
-        private bool isCandidateForReplacement(string line, Replacement replacement) {
-            // Has a matching AnchorPattern?
-            if (replacement.AnchorPattern.Length > 0) {
-                if (Regex.IsMatch(line, replacement.AnchorPattern))
+        private bool isCandidateForReplacement(string line, Command command) {
+            // Has a matching AnchorString?
+            if (command.AnchorString.Length > 0) {
+                if (Regex.IsMatch(line, command.AnchorString))
                     return true;
-                logger.Trace("   is not a replacement candidate");
+                logger.Trace("   is not a Command candidate");
                 return false;
             }
             return true;

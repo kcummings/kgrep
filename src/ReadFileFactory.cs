@@ -7,12 +7,12 @@ namespace kgrep {
         public ReadFileFactory() {}
 
         public IHandleInput GetSource(string inputSource) {
-            if (File.Exists(inputSource))  // kgrep replacement inuptSource
+            if (File.Exists(inputSource))  // kgrep command inuptSource
                 return new ReadFile(inputSource);
             else if (inputSource == "stdin?")  
                 return new ReadStdin();
             else
-               return new ReadCommandLineArgumentAsFile(inputSource);  // reading command line data as if a Replacement file
+               return new ReadCommandLineArgumentAsFile(inputSource);  // reading command line data as if a Command file
         }
     }
 }

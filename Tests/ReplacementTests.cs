@@ -9,32 +9,32 @@ namespace Tests {
 
         [Test]
         public void WhenEnclosedQuotesInTopattern_ExpectQuotesRemoved() {
-            Replacement rep = new Replacement("this", "\" with blanks \"");
-            Assert.AreEqual(" with blanks ", rep.ToPattern);
+            Command command = new Command("this", "\" with blanks \"");
+            Assert.AreEqual(" with blanks ", command.ReplacementString);
         }
 
         [Test]
         public void WhenEnclosedQuotesInFrompattern_ExpectQuotesRemoved() {
-            Replacement rep = new Replacement("\" from  \"", "to");
-            Assert.AreEqual(" from  ", rep.FromPattern.ToString());
+            Command command = new Command("\" from  \"", "to");
+            Assert.AreEqual(" from  ", command.SubjectString.ToString());
         }
 
         [Test]
         public void WhenEnclosedQuotesInAnchor_ExpectQuotesRemoved() {
-            Replacement rep = new Replacement("\" AnchorPattern  \"", " from  ", "to");
-            Assert.AreEqual(" AnchorPattern  ", rep.AnchorPattern);
+            Command command = new Command("\" AnchorString  \"", " from  ", "to");
+            Assert.AreEqual(" AnchorString  ", command.AnchorString);
         }
 
         [Test]
         public void WhenEnclosedQuotesInTopatternWithExcessSpacesFollowing_ExpectQuotesRemoved() {
-            Replacement rep = new Replacement("this", "\" with blanks \"  ");
-            Assert.AreEqual(" with blanks ", rep.ToPattern);
+            Command command = new Command("this", "\" with blanks \"  ");
+            Assert.AreEqual(" with blanks ", command.ReplacementString);
         }
 
         [Test]
         public void WhenEnclosedQuotesInTopatternWithExcessSpacesPreceeding_ExpectQuotesRemoved() {
-            Replacement rep = new Replacement("this", "   \" with blanks \"");
-            Assert.AreEqual(" with blanks ", rep.ToPattern);
+            Command command = new Command("this", "   \" with blanks \"");
+            Assert.AreEqual(" with blanks ", command.ReplacementString);
         }
 
     }

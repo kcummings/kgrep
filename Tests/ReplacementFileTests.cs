@@ -11,93 +11,93 @@ namespace Tests {
 
         [Test]
         public void WhenOneArgument_ExpectOneReplacement() {
-            ParseReplacementFile rf = new ParseReplacementFile("a~bc");
-            List<Replacement> reps = rf.ReplacementList;
-            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].FromPattern.ToString());
-            Assert.AreEqual( "bc", reps[0].ToPattern);
+            ParseCommandFile rf = new ParseCommandFile("a~bc");
+            List<Command> reps = rf.CommandList;
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].SubjectString.ToString());
+            Assert.AreEqual( "bc", reps[0].ReplacementString);
         }
 
         [Test]
         public void WhenTwoArguments_ExpectTwoReplacements() {
-            ParseReplacementFile rf = new ParseReplacementFile("a~bc; g~jk");
-            List<Replacement> reps = rf.ReplacementList;
+            ParseCommandFile rf = new ParseCommandFile("a~bc; g~jk");
+            List<Command> reps = rf.CommandList;
             Assert.AreEqual(2,reps.Count);
-            Assert.AreEqual("bc",reps[0].ToPattern);
-            Assert.AreEqual((new Regex("g".Trim(), RegexOptions.Compiled)).ToString(), reps[1].FromPattern.ToString());
-            Assert.AreEqual("jk",  reps[1].ToPattern);
+            Assert.AreEqual("bc",reps[0].ReplacementString);
+            Assert.AreEqual((new Regex("g".Trim(), RegexOptions.Compiled)).ToString(), reps[1].SubjectString.ToString());
+            Assert.AreEqual("jk",  reps[1].ReplacementString);
         }
 
         [Test]
         public void WhenThreeArguments_ExpectThreeReplacements() {
-            ParseReplacementFile rf = new ParseReplacementFile("a~bc;   hello~world  ;  third ~ fourth ");
-            List<Replacement> reps = rf.ReplacementList;
+            ParseCommandFile rf = new ParseCommandFile("a~bc;   hello~world  ;  third ~ fourth ");
+            List<Command> reps = rf.CommandList;
             Assert.AreEqual(3, reps.Count);
-            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].FromPattern.ToString());
-            Assert.AreEqual( "fourth", reps[2].ToPattern);
+            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].SubjectString.ToString());
+            Assert.AreEqual( "fourth", reps[2].ReplacementString);
         }
 
         [Test]
         public void WhenEmbeddedDelim_ExpectChangedDelim() {
-            ParseReplacementFile rf = new ParseReplacementFile("delim=,; a,bc;   hello,world  ;  third , fourth ");
-            List<Replacement> reps = rf.ReplacementList;
-            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].FromPattern.ToString());
-            Assert.AreEqual("fourth", reps[2].ToPattern);
+            ParseCommandFile rf = new ParseCommandFile("delim=,; a,bc;   hello,world  ;  third , fourth ");
+            List<Command> reps = rf.CommandList;
+            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].SubjectString.ToString());
+            Assert.AreEqual("fourth", reps[2].ReplacementString);
         }
 
         [Test]
         public void WhenEmbeddedDelimAndScopeFirst_ExpectFirstOnlyReplaces() {
-            ParseReplacementFile rf = new ParseReplacementFile("scope=first;delim=,; a,b; b,c");
-            List<Replacement> reps = rf.ReplacementList;
+            ParseCommandFile rf = new ParseCommandFile("scope=first;delim=,; a,b; b,c");
+            List<Command> reps = rf.CommandList;
             Assert.IsTrue(reps.Count == 2);
-            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].FromPattern.ToString());
-            Assert.AreEqual("b", reps[0].ToPattern);
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].SubjectString.ToString());
+            Assert.AreEqual("b", reps[0].ReplacementString);
         }
 
         [Test]
         public void WhenEmbeddedDelimAndScopeAll_ExpectAllReplaces() {
-            ParseReplacementFile rf = new ParseReplacementFile("scope=all;delim=,; a,b; b,c");
-            List<Replacement> reps = rf.ReplacementList;
+            ParseCommandFile rf = new ParseCommandFile("scope=all;delim=,; a,b; b,c");
+            List<Command> reps = rf.CommandList;
             Assert.IsTrue(reps.Count == 2);
-            Assert.AreEqual((new Regex("b".Trim(), RegexOptions.Compiled)).ToString(), reps[1].FromPattern.ToString());
-            Assert.AreEqual( "c", reps[1].ToPattern);
+            Assert.AreEqual((new Regex("b".Trim(), RegexOptions.Compiled)).ToString(), reps[1].SubjectString.ToString());
+            Assert.AreEqual( "c", reps[1].ReplacementString);
         }
 
         [Test]
         public void WhenEmbeddedComment_ExpectCommentIgnored() {
-            ParseReplacementFile rf = new ParseReplacementFile("#comment; a~bc");
-            List<Replacement> reps = rf.ReplacementList;
-            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].FromPattern.ToString());
-            Assert.AreEqual( "bc", reps[0].ToPattern);
+            ParseCommandFile rf = new ParseCommandFile("#comment; a~bc");
+            List<Command> reps = rf.CommandList;
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].SubjectString.ToString());
+            Assert.AreEqual( "bc", reps[0].ReplacementString);
         }
 
         [Test]
         public void WhenEmbeddedComment_ExpectNoChange() {
-            ParseReplacementFile rf = new ParseReplacementFile("comment=:; :ignored;");
-            List<Replacement> reps = rf.ReplacementList;
+            ParseCommandFile rf = new ParseCommandFile("comment=:; :ignored;");
+            List<Command> reps = rf.CommandList;
 
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
-            string result = engine.ApplyReplacementsAll("a b ca", reps);
+            string result = engine.ApplyCommandsAllMatches("a b ca", reps);
             Assert.AreEqual("a b ca", result);
             Assert.IsTrue(reps.Count == 0);
         }
 
         [Test]
         public void WhenNoTopattern_ExpectFrompatternRemoved() {
-            ParseReplacementFile rf = new ParseReplacementFile("a~");
-            List<Replacement> reps = rf.ReplacementList;
+            ParseCommandFile rf = new ParseCommandFile("a~");
+            List<Command> reps = rf.CommandList;
 
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
-            string result = engine.ApplyReplacementsAll("a b ca", reps);
+            string result = engine.ApplyCommandsAllMatches("a b ca", reps);
             Assert.AreEqual(" b c", result);
         }
 
         [Test]
         public void WhenEnclosedQuotes_ExpectTrailingSpacesRetained() {
-            ParseReplacementFile rf = new ParseReplacementFile(" \"a \" ~ b ");
-            List<Replacement> reps = rf.ReplacementList;
+            ParseCommandFile rf = new ParseCommandFile(" \"a \" ~ b ");
+            List<Command> reps = rf.CommandList;
 
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
-            string result = engine.ApplyReplacementsAll("a b ca", reps);
+            string result = engine.ApplyCommandsAllMatches("a b ca", reps);
             Assert.AreEqual("bb ca", result);
         }
 
@@ -106,21 +106,21 @@ namespace Tests {
         [TestCase("abc d", @" bc\s~bc", "abcd")]         // single trailing
         [TestCase("abc  d", @" bc\s\s~bc", "abcd")]      // two trailng spaces and remove it
         public void WhenRegexSpaceInFrompattern_ExpectSpaces(string input, string repstring, string expect) {
-            ParseReplacementFile rf = new ParseReplacementFile(repstring);
-            List<Replacement> reps = rf.ReplacementList;
+            ParseCommandFile rf = new ParseCommandFile(repstring);
+            List<Command> reps = rf.CommandList;
 
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
-            string result = engine.ApplyReplacementsAll(input, reps);
+            string result = engine.ApplyCommandsAllMatches(input, reps);
             Assert.AreEqual(expect, result);
         }
 
-        [TestCase("[.a~c~b")] // invalid AnchorPattern
+        [TestCase("[.a~c~b")] // invalid AnchorString
         [TestCase("a[.~b")]   // invalid from pattern
         [TestCase("a~b[.")]   // invalid to pattern
         [ExpectedException(typeof(System.Exception))]
         public void WhenInvalidRegexPattern_ExpectException(string pattern) {
-            ParseReplacementFile rf = new ParseReplacementFile(pattern);
-            List<Replacement> reps = rf.ReplacementList;
+            ParseCommandFile rf = new ParseCommandFile(pattern);
+            List<Command> reps = rf.CommandList;
         }
 
     }

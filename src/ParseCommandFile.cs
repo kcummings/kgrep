@@ -6,10 +6,10 @@ using NLog;
 
 namespace kgrep
 {
-    public class ParseReplacementFile
+    public class ParseCommandFile
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
-        public List<Replacement> ReplacementList = new List<Replacement>();
+        public List<Command> CommandList = new List<Command>();
         private bool _scopeAll = true;
         public bool ScopeAll { get { return _scopeAll; } }
         private String _comment = "#";
@@ -18,18 +18,18 @@ namespace kgrep
         public string ScannerFS = "\n";
         public bool UseAsScanner = false;
 
-        public ParseReplacementFile(String filename) {
+        public ParseCommandFile(String filename) {
             if (filename == null) return;
-            logger.Debug("Start reading replacementfile:{0}",filename);
+            logger.Debug("Start reading commandfile:{0}",filename);
             sr = (new ReadFileFactory()).GetSource(filename);
-            ReplacementList = GetReplacementList();
+            CommandList = GetReplacementList();
         }
  
-        public List<Replacement> GetReplacementList() {
-            List<Replacement> replacementList = new List<Replacement>();
+        public List<Command> GetReplacementList() {
+            List<Command> commandList = new List<Command>();
             String line;
             while ((line = sr.ReadLine()) != null) {
-                logger.Trace("   replacement source line:{0}",line);
+                logger.Trace("   command source line:{0}",line);
                 line = line.Trim();
 
                 // Remove comment lines.
@@ -46,7 +46,7 @@ namespace kgrep
                     _comment = GetOption(line, "comment"); 
                 else if (line.ToLower().StartsWith("delim="))
                     _delim = GetOption(line, "delim");
-                else if (line.ToLower().StartsWith("scope=first"))  // Once true, it's true for the remaining replacements.
+                else if (line.ToLower().StartsWith("scope=first"))  // Once true, it's true for the remaining commands.
                     _scopeAll = false;
                 else if (line.ToLower().StartsWith("scope=all"))  
                     _scopeAll = true;
@@ -55,24 +55,24 @@ namespace kgrep
                 else {
                     String[] parts = line.Split(_delim.ToCharArray(), 4);
                     if (parts.Length == 1) { // just scan pattern
-                        replacementList.Add(new Replacement(parts[0]) {ScannerFS = ScannerFS });
+                        commandList.Add(new Command(parts[0]) {ScannerFS = ScannerFS });
                         UseAsScanner = true;
                     }
                     if (parts.Length == 2) {
                         // just a~b pattern
-                        replacementList.Add(new Replacement(parts[0], parts[1]));
+                        commandList.Add(new Command(parts[0], parts[1]));
                         UseAsScanner = false;
                     }
                     if (parts.Length == 3) {
-                        // anchored a~b pattern
-                        replacementList.Add(new Replacement(parts[0], parts[1], parts[2]));
+                        // anchorStringed a~b pattern
+                        commandList.Add(new Command(parts[0], parts[1], parts[2]));
                         UseAsScanner = false;
                     }
                 }
             }
             sr.Close();
-            logger.Debug("There are {0} replacements in replacement file", replacementList.Count);
-            return replacementList;
+            logger.Debug("There are {0} commands in command file", commandList.Count);
+            return commandList;
         }
 
         // Get the provided value for the given Control Option.

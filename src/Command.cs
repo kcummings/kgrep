@@ -5,59 +5,59 @@ using NLog;
 
 namespace kgrep
 {
-    public class Replacement {
+    public class Command {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        [XmlIgnore] public String AnchorPattern = "";
-        public String ToPattern = null;
-        public Regex FromPattern;
-        public ReplacementType Style;
+        [XmlIgnore] public String AnchorString = "";
+        public String ReplacementString = null;
+        public Regex SubjectString;
+        public CommandType Style;
         public string ScannerFS = "\n";
         public int PickupCount = 0;
         public int PickupPlaceholderCount = 0;
 
-        public enum ReplacementType {
+        public enum CommandType {
             Scan,
             WithAnchor,
             Normal
         }
 
-        public Replacement() {
+        public Command() {
         }
 
-        public Replacement(string anchor, string fromPattern, string toPattern) {
-            _replacement(anchor, fromPattern, toPattern);
-            Style = ReplacementType.WithAnchor;
+        public Command(string anchorString, string subjectString, string replacementString) {
+            _command(anchorString, subjectString, replacementString);
+            Style = CommandType.WithAnchor;
         }
 
-        public Replacement(string fromPattern, string toPattern) {
-            _replacement("", fromPattern, toPattern);
-            Style = ReplacementType.Normal;
+        public Command(string subjectString, string replacementString) {
+            _command("", subjectString, replacementString);
+            Style = CommandType.Normal;
         }
 
-        public Replacement(string scanPattern) {
-            _replacement("", scanPattern, "");
-            Style = ReplacementType.Scan;
+        public Command(string scanPattern) {
+            _command("", scanPattern, "");
+            Style = CommandType.Scan;
         }
 
-        private void _replacement(string anchor, string fromPattern, string toPattern) {
+        private void _command(string anchorString, string subjectString, string replacementString) {
             try {
-                logger.Trace("   _replacement - AnchorPattern:'{0}' FromPattern:'{1}' ToPattern:'{2}'", anchor, fromPattern,
-                             toPattern);
-                AnchorPattern = RemoveEnclosingQuotesIfPresent(anchor.Trim());
-                fromPattern = RemoveEnclosingQuotesIfPresent(fromPattern.Trim());
-                PickupCount = GetPickupCount(@"\(\?<.+?>.+?\)", fromPattern);  // how many named group captures are present?
-                PickupPlaceholderCount = GetPickupCount(@"\$\{.+?\}", toPattern);
-                FromPattern = new Regex(fromPattern, RegexOptions.Compiled);
-                ToPattern = RemoveEnclosingQuotesIfPresent(toPattern.Trim());
+                logger.Trace("   _command - AnchorString:'{0}' SubjectString:'{1}' ReplacementString:'{2}'", anchorString, subjectString,
+                             replacementString);
+                AnchorString = RemoveEnclosingQuotesIfPresent(anchorString.Trim());
+                subjectString = RemoveEnclosingQuotesIfPresent(subjectString.Trim());
+                PickupCount = GetPickupCount(@"\(\?<.+?>.+?\)", subjectString);  // how many named group captures are present?
+                PickupPlaceholderCount = GetPickupCount(@"\$\{.+?\}", replacementString);
+                SubjectString = new Regex(subjectString, RegexOptions.Compiled);
+                ReplacementString = RemoveEnclosingQuotesIfPresent(replacementString.Trim());
 
                 // Just validation here. Will the given pattern throw an exception?
-                Regex topat = new Regex(ToPattern);
-                Regex anc = new Regex(AnchorPattern);
+                Regex topat = new Regex(ReplacementString);
+                Regex anc = new Regex(AnchorString);
             }
             catch (Exception e) {
-                Console.WriteLine("Regex error Replacement, from '{0}'  to '{1}'  AnchorPattern '{2}'", fromPattern,
-                                  toPattern, AnchorPattern);
+                Console.WriteLine("Regex error Command, from '{0}'  to '{1}'  AnchorString '{2}'", subjectString,
+                                  replacementString, AnchorString);
                 throw new Exception(e.Message);
             }
         }

@@ -8,7 +8,7 @@ namespace kgrep {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         public IHandleOutput sw = new WriteStdout();
 
-        public string ApplyScanner(ParseReplacementFile rf, List<string> inputFilenames) {
+        public string ApplyScanner(ParseCommandFile rf, List<string> inputFilenames) {
             try {
                 string line;
 
@@ -17,8 +17,8 @@ namespace kgrep {
                     IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
                     while ((line = sr.ReadLine()) != null) {
                         logger.Debug("Scanning line:{0}", line);
-                        foreach (Replacement rep in rf.ReplacementList) {
-                            sw.Write(ScanForTokens(line, rep.FromPattern, rep.ScannerFS));
+                        foreach (Command command in rf.CommandList) {
+                            sw.Write(ScanForTokens(line, command.SubjectString, command.ScannerFS));
                         }
                     }
                     sr.Close();

@@ -14,46 +14,46 @@ namespace Tests {
                 string[] args = new String[] { "ScannerFS=,; a;b", "a b ca" };
                 ParseCommandLine cmd = new ParseCommandLine(args);
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
-                ParseReplacementFile replacementCommands = new ParseReplacementFile(cmd.ReplacementFileName);
-                string results = engine.ApplyScanner(replacementCommands, cmd.InputSourceNames);
+                ParseCommandFile commands = new ParseCommandFile(cmd.ReplacementFileName);
+                string results = engine.ApplyScanner(commands, cmd.InputSourceNames);
                 Assert.AreEqual("a,a\nb\n", results);
             }
 
             [Test]
             public void WhenNoScanTokenGiven_ExpectNoChange() {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles { sw = new WriteToString() };
-                ParseReplacementFile replacementCommands = new ParseReplacementFile("bye");
-                string results = engine.ApplyScanner(replacementCommands, new List<string> { "today bye bye birdie" });
+                ParseCommandFile commands = new ParseCommandFile("bye");
+                string results = engine.ApplyScanner(commands, new List<string> { "today bye bye birdie" });
                 Assert.AreEqual("bye\nbye\n", results);
             }
 
             [Test]
             public void WhenOnlyScanTokensGiven_ExpectScannerEnabled() {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles { sw = new WriteToString() };
-                ParseReplacementFile replacementCommands = new ParseReplacementFile("a; b; c");
-                Assert.IsTrue(replacementCommands.UseAsScanner);
+                ParseCommandFile commands = new ParseCommandFile("a; b; c");
+                Assert.IsTrue(commands.UseAsScanner);
             }
 
             [Test]
             public void WhenReplacementTokenGiven_ExpectScannerDisabled() {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles { sw = new WriteToString() };
-                ParseReplacementFile replacementCommands = new ParseReplacementFile("a; b; b~c");
-                Assert.IsFalse(replacementCommands.UseAsScanner);
+                ParseCommandFile commands = new ParseCommandFile("a; b; b~c");
+                Assert.IsFalse(commands.UseAsScanner);
             }
 
             [Test]
             public void WhenNoMatchFound_ExpectNoOutput() {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
-                ParseReplacementFile replacementCommands = new ParseReplacementFile("abc");
-                string results = engine.ApplyScanner(replacementCommands, new List<string> { "def" });
+                ParseCommandFile commands = new ParseCommandFile("abc");
+                string results = engine.ApplyScanner(commands, new List<string> { "def" });
                 Assert.AreEqual("", results);
             }
 
             [ExpectedException(typeof(System.Exception))]
             public void WhenInvalidTokenGiven_ExpectException() {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
-                ParseReplacementFile replacementCommands = new ParseReplacementFile("a[bc");
-                string results = engine.ApplyScanner(replacementCommands, new List<string> { "def" });
+                ParseCommandFile commands = new ParseCommandFile("a[bc");
+                string results = engine.ApplyScanner(commands, new List<string> { "def" });
                 Assert.AreEqual("", results);
             }
 
@@ -63,8 +63,8 @@ namespace Tests {
             [TestCase("ell\no\n", "h(...)(.)", "hello world")]
             public void WhenGroupsGiven_ExpectSubsetOutput(string expected, string scantoken, string input) {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
-                ParseReplacementFile replacementCommands = new ParseReplacementFile(scantoken);
-                string results = engine.ApplyScanner(replacementCommands, new List<string> { input });
+                ParseCommandFile commands = new ParseCommandFile(scantoken);
+                string results = engine.ApplyScanner(commands, new List<string> { input });
                 Assert.AreEqual(expected, results);
             }
 
@@ -73,8 +73,8 @@ namespace Tests {
             [TestCase("birdie\n", "bye bye (.*?)$", "today bye bye birdie")]
             public void WhenNonRegexTokenGiven_ExpectSimpleOutput(string expected, string scantoken, string input) {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
-                ParseReplacementFile replacementCommands = new ParseReplacementFile(scantoken);
-                string results = engine.ApplyScanner(replacementCommands, new List<string> { input });
+                ParseCommandFile commands = new ParseCommandFile(scantoken);
+                string results = engine.ApplyScanner(commands, new List<string> { input });
                 Assert.AreEqual(expected, results);
             }
 
@@ -83,8 +83,8 @@ namespace Tests {
             [TestCase("85\n123\n", "[0-9]+", "85 dollars 123 lost")]  // numbers on seperate lines
             public void WhenRegexTokenGiven_ExpectFilteredOutput(string expected, string scantoken, string input) {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
-                ParseReplacementFile replacementCommands = new ParseReplacementFile(scantoken);
-                string results = engine.ApplyScanner(replacementCommands, new List<string> { input });
+                ParseCommandFile commands = new ParseCommandFile(scantoken);
+                string results = engine.ApplyScanner(commands, new List<string> { input });
                 Assert.AreEqual(expected, results);
             }
 
@@ -92,8 +92,8 @@ namespace Tests {
             [TestCase("a b ca", "ScannerFS=,; a", "a,a\n")]         // "," delimited
             public void WhenScannerFSUsed_ExpectDelimitedOutput(string input, string pattern, string expected) {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
-                ParseReplacementFile replacementCommands = new ParseReplacementFile(pattern);
-                string result = engine.ApplyScanner(replacementCommands, new List<string> { input });
+                ParseCommandFile commands = new ParseCommandFile(pattern);
+                string result = engine.ApplyScanner(commands, new List<string> { input });
                 Assert.AreEqual(expected, result);
             }
 

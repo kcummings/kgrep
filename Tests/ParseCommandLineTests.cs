@@ -17,7 +17,7 @@ namespace Tests {
         }
 
         [Test]
-        // kgrep FromPattern filename1
+        // kgrep SubjectString filename1
         public void WhenTwoArguments_ExpectReplacementFileAndSourceFile() {
             string[] args = new String[] { "abc", "file1.txt" };
             ParseCommandLine cmd = new ParseCommandLine(args);
@@ -28,7 +28,7 @@ namespace Tests {
         [TestCase("abc","file1.txt","file2.txt", "file1.txt", "file2.txt")]
         [TestCase("a~c; b~d", "file1.txt", "file2.txt", "file1.txt","file2.txt")]
         [TestCase("#comment; a~c; b~d", "file1.txt", "file2.txt", "file1.txt", "file2.txt")]
-        // kgrep FromPattern filename1 filename2
+        // kgrep SubjectString filename1 filename2
         public void WhenManyArguments_ExpectReplacementFileAndManySourceFiles(string token, string file1, string file2, string expected1, string expected2) {
             string[] args = new String[] { token, file1, file2 };
             ParseCommandLine cmd = new ParseCommandLine(args);
@@ -38,7 +38,7 @@ namespace Tests {
         }
 
         [Test]
-        // cat filename|kgrep replacementFilename
+        // cat filename|kgrep commandFilename
         public void WhenOnlyReplacementFileArgument_ExpectStdinAsInputSource() {
             string[] args = new String[] { "hi~bye" };
             ParseCommandLine cmd = new ParseCommandLine(args);

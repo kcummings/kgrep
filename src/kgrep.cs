@@ -39,11 +39,11 @@ namespace kgrep
             if (commandLine.InputSourceNames.Count == 0)
                 Usage("No input sources given/recognized.");
 
-            ParseReplacementFile replacementCommands = new ParseReplacementFile(commandLine.ReplacementFileName);
-            if (replacementCommands.UseAsScanner)
-                new PrintTokensInSourceFiles().ApplyScanner(replacementCommands, commandLine.InputSourceNames);
+            ParseCommandFile commands = new ParseCommandFile(commandLine.ReplacementFileName);
+            if (commands.UseAsScanner)
+                new PrintTokensInSourceFiles().ApplyScanner(commands, commandLine.InputSourceNames);
             else
-                new ReplaceTokensInSourceFiles().ApplyReplacements(replacementCommands, commandLine.InputSourceNames);
+                new ReplaceTokensInSourceFiles().ApplyCommands(commands, commandLine.InputSourceNames);
             logger.Debug("<<<<< Ending kgrep >>>>>");
         }
 
@@ -53,7 +53,7 @@ namespace kgrep
             Console.WriteLine("kgrep (Kevin's grep) v{0}",versionNumber);
             Console.WriteLine("Usage: kgrep matchpattern filename1 ... filenameN");
             Console.WriteLine("       cat filename|kgrep matchpattern");
-            Console.WriteLine(" matchpattern can be either a regex string to scan or a replacement commands");
+            Console.WriteLine(" matchpattern can be either a regex string to scan or replace based on a regex");
             Environment.Exit(1);
         }
     }
