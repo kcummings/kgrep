@@ -13,8 +13,9 @@ namespace kgrep
         public Regex SubjectString;
         public CommandType Style;
         public string ScannerFS = "\n";
-        public int PickupCount = 0;
-        public int PickupPlaceholderCount = 0;
+        public int CountOfNamedCapturesInSubjectString = 0;
+        public int CountOfPickupsInReplacementString = 0;   // pickup syntax: ${name}
+        public int CountOfPickupsInSubjectString = 0;
 
         public enum CommandType {
             Scan,
@@ -46,8 +47,9 @@ namespace kgrep
                              replacementString);
                 AnchorString = RemoveEnclosingQuotesIfPresent(anchorString.Trim());
                 subjectString = RemoveEnclosingQuotesIfPresent(subjectString.Trim());
-                PickupCount = GetPickupCount(@"\(\?<.+?>.+?\)", subjectString);  // how many named group captures are present?
-                PickupPlaceholderCount = GetPickupCount(@"\$\{.+?\}", replacementString);
+                CountOfNamedCapturesInSubjectString = CountMatchesInString(@"\(\?<.+?>.+?\)", subjectString);
+                CountOfPickupsInReplacementString = CountMatchesInString(@"\$\{.+?\}", replacementString);
+                CountOfPickupsInSubjectString = CountMatchesInString(@"\$\{.+?\}", subjectString);
                 SubjectString = new Regex(subjectString, RegexOptions.Compiled);
                 ReplacementString = RemoveEnclosingQuotesIfPresent(replacementString.Trim());
 
@@ -72,14 +74,14 @@ namespace kgrep
             return pattern; // return the original string untouched
         }
 
-        private static int GetPickupCount(string pattern, string line) {
+        private static int CountMatchesInString(string pattern, string line) {
             try {
                Regex regex = new Regex(pattern);
                return regex.Matches(line).Count;
             }
             catch(Exception e)
             {
-                logger.Debug(String.Format("GetPickupCount - Looking for '{0}' in '{1}' \n{2}",pattern,line,e.Message));
+                logger.Debug(String.Format("CountMatchesInString - Looking for '{0}' in '{1}' \n{2}",pattern,line,e.Message));
                 return 0;
             }
         }

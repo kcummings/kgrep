@@ -13,30 +13,30 @@ namespace Tests {
         public void WhenNoPickupPresentInFromPart_ExpectCountZeroResults() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (bye)~hi(?<title>[a-z]+) ");
-            Assert.AreEqual(0, commands.CommandList[0].PickupCount);
+            Assert.AreEqual(0, commands.CommandList[0].CountOfNamedCapturesInSubjectString);
         }
 
         [Test]
         public void WhenOnePickupPresent_ExpectCountOneResults() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() {sw = new WriteToString()};
             ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) bye~hi");
-            Assert.AreEqual(1, commands.CommandList[0].PickupCount);
+            Assert.AreEqual(1, commands.CommandList[0].CountOfNamedCapturesInSubjectString);
         }
 
         [Test]
         public void WhenTwoPickupsPresent_ExpectCountTwoResults() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) (?<title>[a-z]+)bye~hi");
-            Assert.AreEqual(2, commands.CommandList[0].PickupCount);
+            Assert.AreEqual(2, commands.CommandList[0].CountOfNamedCapturesInSubjectString);
         }
 
         [Test]
         public void WhenPickupPresentInMultipleLines_ExpectResults() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("a~b; my (?<title>[a-z]+) (?<title>[a-z]+)bye~hi; hi~bye");
-            Assert.AreEqual(0, commands.CommandList[0].PickupCount);
-            Assert.AreEqual(2, commands.CommandList[1].PickupCount);
-            Assert.AreEqual(0, commands.CommandList[2].PickupCount);
+            Assert.AreEqual(0, commands.CommandList[0].CountOfNamedCapturesInSubjectString);
+            Assert.AreEqual(2, commands.CommandList[1].CountOfNamedCapturesInSubjectString);
+            Assert.AreEqual(0, commands.CommandList[2].CountOfNamedCapturesInSubjectString);
         }
 
         [Test]
@@ -44,28 +44,28 @@ namespace Tests {
         public void WhenInvalidPickupPresent_ExpectException() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (?<title) bye~hi");
-            Assert.AreEqual(0, commands.CommandList[0].PickupCount);
+            Assert.AreEqual(0, commands.CommandList[0].CountOfNamedCapturesInSubjectString);
         }
 
         [Test]
-        public void WhenOnePickupPlaceholderPresent_ExpectCountOneResults() {
+        public void WhenOnePickupPresent_ExpectResults() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) (?<title>[a-z]+)bye~${title}hi");
-            Assert.AreEqual(1, commands.CommandList[0].PickupPlaceholderCount);
+            Assert.AreEqual(1, commands.CommandList[0].CountOfPickupsInReplacementString);
         }
 
         [Test]
-        public void WhenTwoPickupPlaceholderPresent_ExpectCountTwoResults() {
+        public void WhenTwoPickupPresent_ExpectCountTwoResults() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) (?<title>[a-z]+)bye~${title}hi${title}");
-            Assert.AreEqual(2, commands.CommandList[0].PickupPlaceholderCount);
+            Assert.AreEqual(2, commands.CommandList[0].CountOfPickupsInReplacementString);
         }
 
         [Test]
-        public void WhenNoPickupPlaceholderPresent_ExpectZeroResults() {
+        public void WhenNoPickupPresent_ExpectZeroResults() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my bye~${titlehi");
-            Assert.AreEqual(0, commands.CommandList[0].PickupPlaceholderCount);
+            Assert.AreEqual(0, commands.CommandList[0].CountOfPickupsInReplacementString);
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenPickupPlaceholderPresent_ExpectReplacedValue() {
+        public void WhenPickupPresent_ExpectReplacedValue() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~c${name}");
             string results = engine.ApplyCommands(commands, new List<string> { "a" });
@@ -106,7 +106,7 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenPickupPlaceholderRepeats_ExpectReplacedValue() {
+        public void WhenPickupRepeats_ExpectReplacedValue() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~c${name}${name}");
             string results = engine.ApplyCommands(commands, new List<string> { "a" });
@@ -114,7 +114,7 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenPickupPlaceholderSpansLines_ExpectReplacedValue() {
+        public void WhenPickupSpansLines_ExpectReplacedValue() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~blue ${name};blue ~${name}");
             string results = engine.ApplyCommands(commands, new List<string> { "word" });
@@ -122,7 +122,7 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenTwoPickupPlaceholderSpansLines_ExpectReplacedValue() {
+        public void WhenTwoPickupSpansLines_ExpectReplacedValue() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~blue ${name};(?<digit>[0-9]+) ~${name}; blue~ ${name}${digit}");
             string results = engine.ApplyCommands(commands, new List<string> {  "ab 89 cd" });
@@ -130,7 +130,7 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenTwoPickupPlaceholderSpansLinesWithMultipleReferences_ExpectReplacedValue() {
+        public void WhenTwoPickupSpansLinesWithMultipleReferences_ExpectReplacedValue() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^<chap=(?<tag>[a-z]+?)>~; end~chapter=${tag}");
             string results = engine.ApplyCommands(commands, new List<string> { "<chap=a><last=z> end" });
@@ -156,11 +156,54 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenTwoPickupPlaceholderSpansLinesFirst_ExpectFirstReplacedValue() {
+        public void WhenTwoPickupSpansLinesFirst_ExpectFirstReplacedValue() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=first; ^(?<name>[a-z]+)~blue ${name};(?<digit>[0-9]+) ~${name}; blue~ ${name}${digit}");
             string results = engine.ApplyCommands(commands, new List<string> { "ab 89 cd", "ab 89 cd" });
             Assert.AreEqual("blue ab 89 cd\nblue ab 89 cd\n", results);
+        }
+
+        [Test]
+        public void WhenPickupInSubjectString_ExpectReplacedValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~blue;(?<digit>[0-9]+)${name} ~x${name}x");
+            string results = engine.ApplyCommands(commands, new List<string> { "ab cd", "89ab cd" });
+            Assert.AreEqual("blue cd\nxabx cd\n", results);
+        }
+
+        [Test]
+        public void WhenTwoPickupInSubjectString_ExpectReplacedValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(
+                @"scope=all; ^(?<name1>[a-z]+) (?<name2>[a-z]+)~blue;${name2}(?<digit>[0-9]+)${name1} ~x${name2}${name1}x");
+            string results = engine.ApplyCommands(commands, new List<string> { "ab cd", "cd89ab cd" });
+            Assert.AreEqual("blue\nxcdabx cd\n", results);
+        }
+
+        [Test]
+        [Ignore]
+        public void WhenMultipleMatchedPickups_ExpectReplacedValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+)~blue;(?<digit>[0-9]+)~${name}");
+            string results = engine.ApplyCommands(commands, new List<string> { "ab cd", "89ab" });
+            Assert.AreEqual("blue blue\ncdab\n", results);
+        }
+
+        [Test]
+        public void WhenDifferentNamedPickups_ExpectReplacedValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+) (?<name2>[a-z]+)~blue;(?<digit>[0-9]+)~${name}");
+            string results = engine.ApplyCommands(commands, new List<string> { "ab cd", "89ab" });
+            Assert.AreEqual("blue\nabab\n", results);
+        }
+
+        [Test]
+        [Ignore]
+        public void WhenNamedPickupChanged_ExpectReplacedValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+) (?<name>[a-z]+)~blue;(?<digit>[0-9]+)~${name}");
+            string results = engine.ApplyCommands(commands, new List<string> { "ab cd", "89ab" });
+            Assert.AreEqual("blue\ncdab\n", results);
         }
     }
 }

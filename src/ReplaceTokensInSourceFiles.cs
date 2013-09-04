@@ -41,14 +41,9 @@ namespace kgrep {
                 logger.Trace("   ApplyCommandsFirstMatch - ({0} --> {1})  AnchorString:{2}", command.SubjectString.ToString(), command.ReplacementString, command.AnchorString);
                 if (isCandidateForReplacement(line, command)) {
                     if (command.SubjectString.IsMatch(line)) {
-                        CollectPickups(line, command);
+                        CollectPickupValues(line, command);
                         if (command.Style != Command.CommandType.Scan) {
-                            if (command.SubjectString.ToString() == "")
-                                line = ReplacePickupPlaceholders(command.ReplacementString, PickupList); // ~${name}    force print of placeholders
-                            else {
-                                line = command.SubjectString.Replace(line, command.ReplacementString);
-                                line = ReplacePickupPlaceholders(line, PickupList);
-                            }
+                            line = ApplySingleCommand(line, command);
                             break;
                         }
                     }
@@ -65,14 +60,9 @@ namespace kgrep {
                 logger.Trace("   ApplyCommandsAllMatches - applying '{0}' --> '{1}'  AnchorString:'{2}'", command.SubjectString.ToString(), command.ReplacementString, command.AnchorString);
                 logger.Trace("   ApplyCommandsAllMatches - line before:'{0}'", line);
                 if (isCandidateForReplacement(line, command)) {
-                    CollectPickups(line, command);
+                    CollectPickupValues(line, command);
                     if (command.Style != Command.CommandType.Scan) { 
-                        if (command.SubjectString.ToString() == "")
-                            line = ReplacePickupPlaceholders(command.ReplacementString, PickupList); // ~${name}    force print of placeholders
-                        else {
-                            line = command.SubjectString.Replace(line, command.ReplacementString);
-                            line = ReplacePickupPlaceholders(line, PickupList);
-                        }
+                        line = ApplySingleCommand(line, command);
                     }
                 }
                 logger.Trace("   ApplyCommandsAllMatches - line  after:'{0}'",line);
@@ -81,11 +71,31 @@ namespace kgrep {
             return line;
         }
 
-        private void CollectPickups(string line, Command command) {
-            if (command.PickupCount > 0) {
+        private string ApplySingleCommand(string line, Command command) {
+            if (command.SubjectString.ToString() == "")
+                line = ReplacePickupsWithStoredValue(command.ReplacementString);   // ~${name}    force print of placeholders
+            else {
+                if (command.CountOfPickupsInSubjectString > 0) {
+                    string subjectStringWithReplacedPickups = ReplacePickupsWithStoredValue(command.SubjectString.ToString());
+                    Regex subjectString = new Regex(subjectStringWithReplacedPickups);
+                    line = subjectString.Replace(line, command.ReplacementString);
+                }
+                else {
+                    line = command.SubjectString.Replace(line, command.ReplacementString);   
+                }
+                line = ReplacePickupsWithStoredValue(line);
+            }
+            return line;
+        }
+
+        // Values are in Named Captures which are only in SubjectString.
+        private void CollectPickupValues(string line, Command command) {
+            if (command.CountOfNamedCapturesInSubjectString > 0) {
+                // TODO: Doesn't handle when regex matches several named captures on same line.
                 GroupCollection groups = command.SubjectString.Match(line).Groups;
 
                 foreach (string groupName in command.SubjectString.GetGroupNames()) {
+                    if (String.IsNullOrEmpty(groups[groupName].Value)) continue;
                     if (PickupList.ContainsKey(groupName))
                         PickupList[groupName] = groups[groupName].Value;
                     else
@@ -95,15 +105,15 @@ namespace kgrep {
         }
 
 
-        private string ReplacePickupPlaceholders(string line, Dictionary<string, string> pickupList) {
+        private string ReplacePickupsWithStoredValue(string line) {
             Regex re = new Regex(@"\$\{(.+?)\}",RegexOptions.Compiled);
             MatchCollection mc = re.Matches(line);
             string PickupValue;
 
             foreach (Match m in mc) {
                 PickupValue = m.Groups[1].Value;
-                if (pickupList.ContainsKey(PickupValue))
-                    line = line.Replace("${" + PickupValue + "}", pickupList[PickupValue]);
+                if (PickupList.ContainsKey(PickupValue))
+                    line = line.Replace("${" + PickupValue + "}", PickupList[PickupValue]);
             }
             return line;
         }
