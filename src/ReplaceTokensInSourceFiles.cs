@@ -42,7 +42,7 @@ namespace kgrep {
                 if (isCandidateForReplacement(line, command)) {
                     if (command.SubjectString.IsMatch(line)) {
                         CollectPickupValues(line, command);
-                        if (command.Style != Command.CommandType.Scan) {
+                        if (command.Style != Command.CommandType.Pickup) {
                             line = ApplySingleCommand(line, command);
                             break;
                         }
@@ -61,7 +61,7 @@ namespace kgrep {
                 logger.Trace("   ApplyCommandsAllMatches - line before:'{0}'", line);
                 if (isCandidateForReplacement(line, command)) {
                     CollectPickupValues(line, command);
-                    if (command.Style != Command.CommandType.Scan) { 
+                    if (command.Style != Command.CommandType.Pickup) { 
                         line = ApplySingleCommand(line, command);
                     }
                 }
@@ -72,7 +72,7 @@ namespace kgrep {
         }
 
         private string ApplySingleCommand(string line, Command command) {
-            if (command.SubjectString.ToString() == "")
+            if (command.Style == Command.CommandType.Print)
                 line = ReplacePickupsWithStoredValue(command.ReplacementString);   // ~${name}    force print of placeholders
             else {
                 if (command.CountOfPickupsInSubjectString > 0) {

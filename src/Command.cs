@@ -18,9 +18,10 @@ namespace kgrep
         public int CountOfPickupsInSubjectString = 0;
 
         public enum CommandType {
-            Scan,
-            WithAnchor,
-            Normal
+            Pickup,
+            Anchored,
+            Normal,
+            Print
         }
 
         public Command() {
@@ -28,17 +29,17 @@ namespace kgrep
 
         public Command(string anchorString, string subjectString, string replacementString) {
             _command(anchorString, subjectString, replacementString);
-            Style = CommandType.WithAnchor;
+            Style = CommandType.Anchored;
         }
 
         public Command(string subjectString, string replacementString) {
             _command("", subjectString, replacementString);
-            Style = CommandType.Normal;
+            Style = subjectString.Length > 0 ? CommandType.Normal : CommandType.Print;
         }
 
         public Command(string scanPattern) {
             _command("", scanPattern, "");
-            Style = CommandType.Scan;
+            Style = CommandType.Pickup;
         }
 
         private void _command(string anchorString, string subjectString, string replacementString) {
