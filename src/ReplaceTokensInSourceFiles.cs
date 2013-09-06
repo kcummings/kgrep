@@ -88,12 +88,12 @@ namespace kgrep {
             return line;
         }
 
-        // Values are in Named Captures which are only in SubjectString.
-        private void CollectPickupValues(string line, Command command) {
+        // Values are in Named and unnamed Captures which are only in SubjectString.
+        // e.g. named capture syntax: (?<digit>[0-9]+)  yeilds pickup name ${digit} 
+        //    unnamed capture syntax: ([0-9]+)    yeilds pickup name ${1}
+        public void CollectPickupValues(string line, Command command) {
             if (command.CountOfNamedCapturesInSubjectString > 0) {
-                // TODO: Doesn't handle when regex matches several named captures on same line.
                 GroupCollection groups = command.SubjectString.Match(line).Groups;
-
                 foreach (string groupName in command.SubjectString.GetGroupNames()) {
                     if (String.IsNullOrEmpty(groups[groupName].Value)) continue;
                     if (PickupList.ContainsKey(groupName))

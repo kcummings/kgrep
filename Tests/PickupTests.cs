@@ -182,11 +182,12 @@ namespace Tests {
 
         [Test]
         [Ignore]
-        public void WhenMultipleMatchedPickups_ExpectReplacedValue() {
+        public void WhenMatchedNamedAndUnnamedPickups_ExpectReplacedValue() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+)~blue;(?<digit>[0-9]+)~${name}");
+            // Here ${1} the regex immediately replaces as if $1 or \1. Doesn't put prior value of ${1} into it.
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+).+([a-e])$~blue;(?<digit>[0-9]+)~${name}${1}");
             string results = engine.ApplyCommands(commands, new List<string> { "ab cd", "89ab" });
-            Assert.AreEqual("blue blue\ncdab\n", results);
+            Assert.AreEqual("blue\nabdab\n", results);
         }
 
         [Test]
@@ -198,12 +199,24 @@ namespace Tests {
         }
 
         [Test]
-        [Ignore]
         public void WhenNamedPickupChanged_ExpectReplacedValue() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+) (?<name>[a-z]+)~blue;(?<digit>[0-9]+)~${name}");
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~blue;(?<digit>[0-9]+)~${name}");
             string results = engine.ApplyCommands(commands, new List<string> { "ab cd", "89ab" });
-            Assert.AreEqual("blue\ncdab\n", results);
+            Assert.AreEqual("blue cd\nabab\n", results);
+        }
+
+        [Test]
+        // If the same name is given to more than one capture in the SubjectString, the pickup's value will be the first match.
+        // e.g. given source line "ab cd ed" and SubjectString "(?<letter>[a-z]+)", ${letter} will be "ab", not "ed". 
+        public void WhenTwoNamedCaptures_ExpectTwoValues() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            Command command = new Command(@"(?<letter>[a-z]+) ([a-z])");
+            engine.CollectPickupValues("ab cd", command);
+            string results = engine.PickupList["letter"];
+            Assert.AreEqual("ab", results);
+            results = engine.PickupList["1"];   // first unnamed capture group
+            Assert.AreEqual("c", results);
         }
     }
 }
