@@ -10,33 +10,33 @@ namespace Tests {
     public class PickupTests {
 
         [Test]
-        public void WhenNoPickupPresentInFromPart_ExpectCountZeroResults() {
+        public void WhenNoPickupPresentInSubjectString_ExpectCountZeroResults() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("my (bye)~hi(?<title>[a-z]+) ");
-            Assert.AreEqual(0, commands.CommandList[0].CountOfNamedCapturesInSubjectString);
+            ParseCommandFile commands = new ParseCommandFile("my bye~hi(?<title>[a-z]+) ");
+            Assert.AreEqual(0, commands.CommandList[0].CountOfCapturesInSubjectString);
         }
 
         [Test]
         public void WhenOnePickupPresent_ExpectCountOneResults() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() {sw = new WriteToString()};
             ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) bye~hi");
-            Assert.AreEqual(1, commands.CommandList[0].CountOfNamedCapturesInSubjectString);
+            Assert.AreEqual(1, commands.CommandList[0].CountOfCapturesInSubjectString);
         }
 
         [Test]
         public void WhenTwoPickupsPresent_ExpectCountTwoResults() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) (?<title>[a-z]+)bye~hi");
-            Assert.AreEqual(2, commands.CommandList[0].CountOfNamedCapturesInSubjectString);
+            Assert.AreEqual(2, commands.CommandList[0].CountOfCapturesInSubjectString);
         }
 
         [Test]
         public void WhenPickupPresentInMultipleLines_ExpectResults() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("a~b; my (?<title>[a-z]+) (?<title>[a-z]+)bye~hi; hi~bye");
-            Assert.AreEqual(0, commands.CommandList[0].CountOfNamedCapturesInSubjectString);
-            Assert.AreEqual(2, commands.CommandList[1].CountOfNamedCapturesInSubjectString);
-            Assert.AreEqual(0, commands.CommandList[2].CountOfNamedCapturesInSubjectString);
+            ParseCommandFile commands = new ParseCommandFile("(a)~b; my (?<title>[a-z]+) (?<title>[a-z]+)bye~hi; hi~bye");
+            Assert.AreEqual(1, commands.CommandList[0].CountOfCapturesInSubjectString);
+            Assert.AreEqual(2, commands.CommandList[1].CountOfCapturesInSubjectString);
+            Assert.AreEqual(0, commands.CommandList[2].CountOfCapturesInSubjectString);
         }
 
         [Test]
@@ -44,7 +44,7 @@ namespace Tests {
         public void WhenInvalidPickupPresent_ExpectException() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (?<title) bye~hi");
-            Assert.AreEqual(0, commands.CommandList[0].CountOfNamedCapturesInSubjectString);
+            Assert.AreEqual(0, commands.CommandList[0].CountOfCapturesInSubjectString);
         }
 
         [Test]
@@ -181,21 +181,27 @@ namespace Tests {
         }
 
         [Test]
-        [Ignore]
+        public void WhenMatchedNamedAndUnnamedCaptures_ExpectReplacedValue() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+).*([0-9])$~blue;~${1}--${name}");
+            string results = engine.ApplyCommands(commands, new List<string> { "ab 12" });
+            Assert.AreEqual("2--ab\n", results);
+        }
+
+        [Test]
         public void WhenMatchedNamedAndUnnamedPickups_ExpectReplacedValue() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
-            // Here ${1} the regex immediately replaces as if $1 or \1. Doesn't put prior value of ${1} into it.
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+).+([a-e])$~blue;(?<digit>[0-9]+)~${name}${1}");
-            string results = engine.ApplyCommands(commands, new List<string> { "ab cd", "89ab" });
-            Assert.AreEqual("blue\nabdab\n", results);
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<letter>[a-z]+).*([0-9])$~blue;~${1}${letter}");
+            string results = engine.ApplyCommands(commands, new List<string> { "ab 12" });
+            Assert.AreEqual("2ab\n", results);
         }
 
         [Test]
         public void WhenDifferentNamedPickups_ExpectReplacedValue() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+) (?<name2>[a-z]+)~blue;(?<digit>[0-9]+)~${name}");
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+) (?<name2>[a-z]+);(?<digit>[0-9]+)~${name}");
             string results = engine.ApplyCommands(commands, new List<string> { "ab cd", "89ab" });
-            Assert.AreEqual("blue\nabab\n", results);
+            Assert.AreEqual("ab cd\nabab\n", results);
         }
 
         [Test]
@@ -211,12 +217,26 @@ namespace Tests {
         // e.g. given source line "ab cd ed" and SubjectString "(?<letter>[a-z]+)", ${letter} will be "ab", not "ed". 
         public void WhenTwoNamedCaptures_ExpectTwoValues() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
-            Command command = new Command(@"(?<letter>[a-z]+) ([a-z])");
-            engine.CollectPickupValues("ab cd", command);
-            string results = engine.PickupList["letter"];
-            Assert.AreEqual("ab", results);
-            results = engine.PickupList["1"];   // first unnamed capture group
-            Assert.AreEqual("c", results);
+            Command command = new Command(@"([a-z]+) .([a-z])$","a");
+            Assert.AreEqual(Command.CommandType.Normal,command.Style);
+        }
+
+        [Test]
+        public void WhenVariousTokensGiven_ExpectAppropiateCommandTypes() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"a~b; a; ~b; d~a~b");
+            Assert.AreEqual(Command.CommandType.Normal, commands.CommandList[0].Style);
+            Assert.AreEqual(Command.CommandType.Pickup, commands.CommandList[1].Style);
+            Assert.AreEqual(Command.CommandType.Print, commands.CommandList[2].Style);
+            Assert.AreEqual(Command.CommandType.Anchored, commands.CommandList[3].Style);
+            Assert.AreEqual(false, commands.UseAsScanner);
+        }
+
+        [Test]
+        public void WhenOnlyScanTokensGiven_ExpectScannerMode() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"b; a; c");
+            Assert.AreEqual(true, commands.UseAsScanner);
         }
     }
 }

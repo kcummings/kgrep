@@ -13,7 +13,7 @@ namespace kgrep
         public Regex SubjectString;
         public CommandType Style;
         public string ScannerFS = "\n";
-        public int CountOfNamedCapturesInSubjectString = 0;
+        public int CountOfCapturesInSubjectString = 0;
         public int CountOfPickupsInReplacementString = 0;   // pickup syntax: ${name}
         public int CountOfPickupsInSubjectString = 0;
 
@@ -48,7 +48,7 @@ namespace kgrep
                              replacementString);
                 AnchorString = RemoveEnclosingQuotesIfPresent(anchorString.Trim());
                 subjectString = RemoveEnclosingQuotesIfPresent(subjectString.Trim());
-                CountOfNamedCapturesInSubjectString = CountMatchesInString(@"\(\?<.+?>.+?\)", subjectString);
+                CountOfCapturesInSubjectString = CountMatchesInString(@"(\(\?<.+?>.+?\)|\(.*?\))", subjectString);
                 CountOfPickupsInReplacementString = CountMatchesInString(@"\$\{.+?\}", replacementString);
                 CountOfPickupsInSubjectString = CountMatchesInString(@"\$\{.+?\}", subjectString);
                 SubjectString = new Regex(subjectString, RegexOptions.Compiled);

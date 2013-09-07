@@ -73,7 +73,7 @@ namespace kgrep {
 
         private string ApplySingleCommand(string line, Command command) {
             if (command.Style == Command.CommandType.Print)
-                line = ReplacePickupsWithStoredValue(command.ReplacementString);   // ~${name}    force print of placeholders
+                line = ReplacePickupsWithStoredValue(command.ReplacementString);   
             else {
                 if (command.CountOfPickupsInSubjectString > 0) {
                     string subjectStringWithReplacedPickups = ReplacePickupsWithStoredValue(command.SubjectString.ToString());
@@ -88,22 +88,23 @@ namespace kgrep {
             return line;
         }
 
-        // Values are in Named and unnamed Captures which are only in SubjectString.
+        // Values are in Named and unnamed Captures  are only in SubjectString.
         // e.g. named capture syntax: (?<digit>[0-9]+)  yeilds pickup name ${digit} 
         //    unnamed capture syntax: ([0-9]+)    yeilds pickup name ${1}
         public void CollectPickupValues(string line, Command command) {
-            if (command.CountOfNamedCapturesInSubjectString > 0) {
-                GroupCollection groups = command.SubjectString.Match(line).Groups;
-                foreach (string groupName in command.SubjectString.GetGroupNames()) {
-                    if (String.IsNullOrEmpty(groups[groupName].Value)) continue;
-                    if (PickupList.ContainsKey(groupName))
-                        PickupList[groupName] = groups[groupName].Value;
-                    else
-                        PickupList.Add(groupName, groups[groupName].Value);
+            if (command.CountOfCapturesInSubjectString > 0) {
+                Match m = command.SubjectString.Match(line);
+                if (m.Success) {
+                    foreach (int groupNumber in command.SubjectString.GetGroupNumbers()) {
+                        string name = command.SubjectString.GroupNameFromNumber(groupNumber);
+                        if (PickupList.ContainsKey(name))
+                            PickupList[name] = m.Groups[groupNumber].Value;
+                        else
+                            PickupList.Add(name, m.Groups[groupNumber].Value);
+                    }
                 }
             }
         }
-
 
         private string ReplacePickupsWithStoredValue(string line) {
             Regex re = new Regex(@"\$\{(.+?)\}",RegexOptions.Compiled);
