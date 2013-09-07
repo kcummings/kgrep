@@ -9,8 +9,8 @@ namespace kgrep
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         [XmlIgnore] public String AnchorString = "";
-        public String ReplacementString = null;
-        public Regex SubjectString;
+        public String ReplacementString = "";
+        public Regex SubjectString = new Regex("");
         public CommandType Style;
         public string ScannerFS = "\n";
         public int CountOfCapturesInSubjectString = 0;
@@ -48,7 +48,7 @@ namespace kgrep
                              replacementString);
                 AnchorString = RemoveEnclosingQuotesIfPresent(anchorString.Trim());
                 subjectString = RemoveEnclosingQuotesIfPresent(subjectString.Trim());
-                CountOfCapturesInSubjectString = CountMatchesInString(@"(\(\?<.+?>.+?\)|\(.*?\))", subjectString);
+                CountOfCapturesInSubjectString = CountMatchesInString(@"(\(\?<.+?>.+?\)|\(.*?\))", subjectString);  // count named and unnamed captures
                 CountOfPickupsInReplacementString = CountMatchesInString(@"\$\{.+?\}", replacementString);
                 CountOfPickupsInSubjectString = CountMatchesInString(@"\$\{.+?\}", subjectString);
                 SubjectString = new Regex(subjectString, RegexOptions.Compiled);

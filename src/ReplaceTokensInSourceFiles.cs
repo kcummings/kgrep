@@ -88,7 +88,7 @@ namespace kgrep {
             return line;
         }
 
-        // Values are in Named and unnamed Captures  are only in SubjectString.
+        // Values are in Named and unnamed Captures are only in SubjectString.
         // e.g. named capture syntax: (?<digit>[0-9]+)  yeilds pickup name ${digit} 
         //    unnamed capture syntax: ([0-9]+)    yeilds pickup name ${1}
         public void CollectPickupValues(string line, Command command) {

@@ -41,6 +41,7 @@ namespace kgrep
                 int i = line.IndexOf(_comment);
                 if (i >= 0)
                     line = line.Remove(i);
+              //  if (Regex.Match(line, "[ ~]+").Success) continue;
 
                 if (line.ToLower().StartsWith("comment=")) 
                     _comment = GetOption(line, "comment"); 
@@ -53,26 +54,36 @@ namespace kgrep
                 else if (line.ToLower().StartsWith("scannerfs=")) 
                     ScannerFS = GetOption(line, "FS");
                 else {
+                    Command command = null;
                     String[] parts = line.Split(_delim.ToCharArray(), 4);
-                    if (parts.Length == 1) { // just scan pattern
-                        commandList.Add(new Command(parts[0]) {ScannerFS = ScannerFS });
+                    if (parts.Length == 1) { 
+                        command = new Command(parts[0]) {ScannerFS = ScannerFS };
                         UseAsScanner = true;
                     }
                     if (parts.Length == 2) {
-                        // just a~b pattern
-                        commandList.Add(new Command(parts[0], parts[1]));
+                        command = new Command(parts[0], parts[1]);
                         UseAsScanner = false;
                     }
                     if (parts.Length == 3) {
-                        // anchorStringed a~b pattern
-                        commandList.Add(new Command(parts[0], parts[1], parts[2]));
+                        command = new Command(parts[0], parts[1], parts[2]);
                         UseAsScanner = false;
                     }
+                    if (IsValidCommand(command))
+                        commandList.Add(command);
                 }
             }
             sr.Close();
             logger.Debug("There are {0} commands in command file", commandList.Count);
             return commandList;
+        }
+
+        private bool IsValidCommand(Command command) {
+            if (command == null) return false;
+
+            if (string.IsNullOrEmpty(command.SubjectString.ToString())
+                && string.IsNullOrEmpty(command.ReplacementString))
+                return false;
+            return true;
         }
 
         // Get the provided value for the given Control Option.

@@ -24,19 +24,12 @@ namespace Tests {
         }
 
         [Test]
+        // If the same name is given to more than one capture in the SubjectString, the pickup's value will be the first match.
+        // e.g. given source line "ab cd ed" and SubjectString "(?<letter>[a-z]+)", ${letter} will be "ab", not "ed". 
         public void WhenTwoPickupsPresent_ExpectCountTwoResults() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) (?<title>[a-z]+)bye~hi");
             Assert.AreEqual(2, commands.CommandList[0].CountOfCapturesInSubjectString);
-        }
-
-        [Test]
-        public void WhenPickupPresentInMultipleLines_ExpectResults() {
-            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("(a)~b; my (?<title>[a-z]+) (?<title>[a-z]+)bye~hi; hi~bye");
-            Assert.AreEqual(1, commands.CommandList[0].CountOfCapturesInSubjectString);
-            Assert.AreEqual(2, commands.CommandList[1].CountOfCapturesInSubjectString);
-            Assert.AreEqual(0, commands.CommandList[2].CountOfCapturesInSubjectString);
         }
 
         [Test]
@@ -213,15 +206,6 @@ namespace Tests {
         }
 
         [Test]
-        // If the same name is given to more than one capture in the SubjectString, the pickup's value will be the first match.
-        // e.g. given source line "ab cd ed" and SubjectString "(?<letter>[a-z]+)", ${letter} will be "ab", not "ed". 
-        public void WhenTwoNamedCaptures_ExpectTwoValues() {
-            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
-            Command command = new Command(@"([a-z]+) .([a-z])$","a");
-            Assert.AreEqual(Command.CommandType.Normal,command.Style);
-        }
-
-        [Test]
         public void WhenVariousTokensGiven_ExpectAppropiateCommandTypes() {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"a~b; a; ~b; d~a~b");
@@ -237,6 +221,50 @@ namespace Tests {
             ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"b; a; c");
             Assert.AreEqual(true, commands.UseAsScanner);
+        }
+
+        [Test]
+        [TestCase("a~b")]
+        [TestCase("~a~")]
+        [TestCase("a~")]
+        [TestCase("~a  ")]
+        public void WhenValidFieldContent_ExpectValidCommand(string line) {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(line);
+            Assert.AreEqual(1, commands.CommandList.Count);
+        }
+
+        [Test]
+        [TestCase("~~~")]
+        [TestCase("~~~~")]
+        [TestCase("~")]
+        [TestCase("a~ ~")]  // only anchor supplied
+        [TestCase(@"a~b~c~d~e")]
+        [TestCase("delim=:::::")]
+        [TestCase("delim=:::")]
+        [TestCase("a~~#abc")]
+        public void WhenInvalidFieldContent_ExpectInvalidCommand(string line) {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(line);
+            Assert.AreEqual(0, commands.CommandList.Count);
+        }
+
+        [Test]
+        [ExpectedException(typeof(System.Exception))]
+        [TestCase("[~]")]
+        [TestCase("(~)")]
+        public void WhenInvalidCommandSyntax_ExpectException(string line) {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(line);
+        }
+
+        [Test]
+        public void WhenPickupPresentInMultipleLines_ExpectResults() {
+            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("(a)~b; my (?<title>[a-z]+) (?<title>[a-z]+)bye~hi; hi~bye");
+            Assert.AreEqual(1, commands.CommandList[0].CountOfCapturesInSubjectString);
+            Assert.AreEqual(2, commands.CommandList[1].CountOfCapturesInSubjectString);
+            Assert.AreEqual(0, commands.CommandList[2].CountOfCapturesInSubjectString);
         }
     }
 }
