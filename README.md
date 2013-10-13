@@ -27,22 +27,27 @@ Usage
 
         ScanToken =  a regex string that when found in input will print one match per line
 
-Kgrep runs in two modes: A Scanner or a Search and Replace tool. 
+![kgrep commands](support/kgrepcommands.jpg)
 
-It runs as a scanner if the replacement file (or replacements given on the command line) only contain *SearchTokens*. All (and only) found tokens are printed to stdout. 
+Kgrep runs in two modes: A Scanner and Print OR a Search and Replace tool. 
 
-If the file contains both *ReplacementCommands* and *SearchTokens*, it will search and replace the given tokens and print the results to stdout. This is the more powerful mode. Unlike grep, all named regular expression values are rememebered during the run and can be applied to locations other than just the immediate target string. 
+####Scan and Print Mode
+It runs as a scanner if the command file (or replacements given on the command line) only contain *Scan* commands, i.e. type 3 in the chart above. All matched commands are printed to stdout. Example: *kgrep "[0-9]+" test.txt* will print all numbers found in test.txt on a separate line.
+
+####Search and Replacement Mode
+It runs in search mode if the file contains commands other than just *Scan* commands. it will search and replace *Subject* with *Replacement* and print the results to stdout. Unlike grep, all named and unnamed captures are remembered during the run and can be applied to any field in a command (except *Anchor*). Such expressions are called Pickups. Example syntax for a named capture is *(?&lt;name&gt;[a-z]+)* to act and then hold the matched value in *name*. The value of this matched expression can be retrieved using syntax: ${name}. If no Commands match an input line, the input line will print to stdio unchanged.
 
 ---
+##kgrep commands explained
 
-### SearchToken
-A *SearchToken* is a regex string used to scan and print matching patterns. 
+### Normal
+Replace all occurrences of *Subject* with *Replacement*. *Subject* can contain  named matches, unnamed matches and Pickups. *Replacement* can contain Pickups.
 
-SearchToken syntax. (Anchor is optional. Do not include the ~ delimitor if anchor is omitted.)
+### Anchored 
+Anchored is the same as a Normal command except it is only applied to lines that match *Anchor*. *Anchor* can contain named and unnamed matches however the matched values are not held, i.e. value is not available for later Pickup use. *Anchor* cannot contain Pickups.
 
-    anchor ~ searchtoken   
-
-If anchor is given, only lines that match the anchor regex pattern are candidates for continued searching. Only the matching pattern is printed. Characters not matched are ignored. Before printing to stdout, all matches on a given line are concatinated together using the value in the ScannerFS string and printed on a separate line. *SearchTokens* can be placed in a file but are usually only given on the command line. Note: Currently you cannot scan a text string for the field delimiter. If found, the *SearchToken* is interpreted as a *ReplacementCommand*. Use the Control Option ScannerFS to control the characters that are placed between each matched token.
+### Pickup or Scan 
+If in scanner mode, all matched *Subject* are printed to stdout on separate lines. Only the matching pattern is printed. Characters not matched are ignored. Before printing to stdout, all matches on a given line are concatenated together using the value in the ScannerFS string and printed on a separate line. *Subject* can be placed in a file but usually it is given on the command line. Note: Currently you cannot scan a text string for the field delimiter. Use the Control Option ScannerFS to control the characters that are placed between each matched token.
 
 Example: 
 
@@ -51,18 +56,22 @@ Example:
 
     lo
     do
-- - -
 
-### ReplacementCommand
-The power of kgrep is the *ReplacementCommand*. 
+If in search mode, any matches are treated as Pickups for later reference. *Subject* can contain Pickups. See Pickup explanation below.
 
-ReplacementCommand syntax: 
+### Print
+The input line is replaced by *Replacement*. *Replacement* can contain Pickups references. This doesn't have a known use. This is subject to experimentation and possible enhancements.
 
-     anchor ~ searchtoken ~ targettoken     
 
-Anchor acts the same here as in scanner mode. Only *searchtoken* is required however if a replacement file only consists of searchtokens, kgrep will run as a scanner (see above). The field delimiter ~ can be overriden. The targettoken can't be a regex pattern. *ReplacementCommands* can be stacked into one string and supplied on the command line or stored in a file and given as the first argument on the command line. *ReplacementCommands* are stacked using the ";" stacking character, e.g. "dog~cat; h(..)~cold" contains two *ReplacementCommands*. The stacking character cannot be overridden. 
 
-There is no practical limit to the number of *ReplacementCommands* that can be in a replacement file or command line. *ReplacementCommands* are processed in the order given. See SampleReplacementFile.txt for examples of *ReplacementCommands* in a file. 
+## CommandFile
+The power of kgrep can be maximized by placing commands in a *CommandFile*. 
+
+Commands can be stacked into one string and supplied on the command line or stored in a file and given as the first argument on the command line. Commands are stacked using the ";" stacking character, e.g. "dog~cat; h(..)~cold" contains two Normal Commands. The stacking character cannot be overridden. 
+
+The *CommandFile* can contain any of the four commands in any order.  
+
+There is no practical limit to the number of Commands that can be in a CommandFile or command line. Commands are processed in the order given. See SampleReplacementFile.txt for examples of *ReplacementCommands* in a file. 
 
 Leading and trailing spaces are removed from these fields. If you want to include leading or trailing spaces, enclose the string in double quotes, i.e. " world ". The enclosing double quotes will not be included as part of the search field but the blanks will be included.
  
@@ -80,30 +89,28 @@ If supplied and is not found in a line, the "before~after" replacement will **no
     echo "comment='; 'ignored;"|kgrep "abc"   # prints ""  because no delim present so interpreted as a SearchToken
     echo "#~; comment='; 'ignored;"|kgrep "abc"   # prints "abc" because argument is now interpreted as a ReplacementCommand
 
-**ReplacementCommand Control Options**
+**CommandFile Control Options**
 
-The following controls can be embedded anywhere in the ReplacementFile or stacked *ReplacementCommands*. Control options are not case sensitive but must be at the beginning of a line. Control Options are no case sensitive but there values are case sensitive when applied to a line. There is no separate config file.
+The following controls can be embedded anywhere in the CommandFile. Control options are not case sensitive but must be at the beginning of a line. Control Options are no case sensitive but there values are case sensitive when applied to a line. There is no separate config file.
 
-- **delim=?** where ? represents a single or a series of character enclosed in optional quotes. Its value is the new delimiter. This value separates the ReplacementCommand fields. Default is "~".
+- **delim=?** where ? represents a single or a series of character enclosed in optional quotes. Its value is the new delimiter. This value separates the CommandFile fields. Default is "~".
 
 - **comment=?** This value designates the beginning of a comment. Default is "#".
 
 - **ScannerFS=?** Only used in Scanner mode. The scanned tokens are "glued" together with the value of this option. Default is "\n".
 
-- **scope=[first|all]** If set to **first**, the first time a *ReplacementCommand* is found on the line, no other replacements are applied to that line. If set to **all** , as many Replacements as possible will be applied to a line.
+- **scope=[first|all]** If set to **first**, the first time a Command is found on the line, no other Commands are applied to that line. If set to **all** , as many Commands as possible will be applied to a line.
 
-Caution: You can get unexpected results if you are not careful when using Control Options. For example, setting comment=~ still allows default delim=~ so the *ReplacementCommand* "comment=~; a~b" is interpreted as a *ReplacementCommand* but becomes just "a" since "~b" is now a comment and the expected replacement doesn't take effect. No change occurs to the source inputs.
+Caution: You can get unexpected results if you are not careful when using Control Options. For example, setting comment=~ still allows default delim=~ so the Command "comment=~; a~b" is interpreted as a Normal Command but becomes just "a" since "~b" is now a comment and the expected replacement doesn't take effect. No change occurs to the source inputs.
 
 
 **Pickups**
 
 Pickups add a lot of flexibility to kgrep.
 
-Kgrep considers all named regex groups, pickups. Example: The string "hello (?&lt;word&gt;[a-z]+)" contains a pickup named "word". Pickup values are kept for the duration of the run and can be used in any *targettoken*. To reference a pickup use ${pickupname} syntax. If the same pickup name is used more than once, the last pickup value is used (Previous pickup values are discarded when a pickup of the same name is used.)
+Kgrep holds the value all regex matches whether named or unnamed in a variable called a Pickup. Example: The string "hello (?&lt;word&gt;[a-z]+)" contains a pickup named "word". Pickup values are kept for the duration of the run and can be used anywhere except *Anchors*. To reference a pickup captured from a named capture, use ${pickupname} syntax. If the same pickup name is used more than once, the last pickup value is used. To reference a pickup captured from an unnamed capture, use ${d} where d is 1-9 of the corresponding original match.
 
-If *targettoken* is not given, no replacment will occur but any pickups will be gathered. If only *targettoken* is given (~ targettoken), it is a pseudo print statement. Pickup placeholders (e.g. ${pickupname} ) will be inserted and the result printed to stdout.
-
-Example of pickup, hold and print:
+Example of Pickup, hold and print:
   
     Given these ReplacementCommands:
     (?<lowerword>[a-z]+)
