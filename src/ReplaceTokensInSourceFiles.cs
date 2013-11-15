@@ -10,6 +10,8 @@ namespace kgrep {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         public IHandleOutput sw = new WriteStdout();
         public Dictionary<string, string> PickupList = new Dictionary<string, string>();
+        private int CountOfLinesChanged = 0;
+        private int CountOfTotalReplacements = 0;
 
         public string ApplyCommands(ParseCommandFile rf, List<string> inputFilenames) {
             try {
@@ -31,18 +33,21 @@ namespace kgrep {
             } catch (Exception e) {
                 Console.WriteLine("{0}", e.Message);
             }
+            logger.Info("{0} replacements applied to {1} input lines",CountOfTotalReplacements,CountOfLinesChanged);
             return sw.Close();
         }
 
         // "scope=First" in effect.
         public string ApplyCommandsFirstMatch(string line, List<Command> commandList) {
-            logger.Debug("ApplyCommandsFirstMatch before:{0}", line);
+            bool lineHasChanged = false;
+            logger.Trace("ApplyCommandsFirstMatch before:{0}", line);
             foreach (Command command in commandList) {
                 logger.Trace("   ApplyCommandsFirstMatch - ({0} --> {1})  AnchorString:{2}", command.SubjectString.ToString(), command.ReplacementString, command.AnchorString);
                 if (isCandidateForReplacement(line, command)) {
                     if (command.SubjectString.IsMatch(line)) {
                         CollectPickupValues(line, command);
                         if (command.Style != Command.CommandType.Pickup) {
+                            lineHasChanged = true;
                             line = ApplySingleCommand(line, command);
                             break;
                         }
@@ -50,24 +55,28 @@ namespace kgrep {
                 }
             }
             logger.Debug("ApplyCommandsFirstMatch  after:{0}", line);
+            if (lineHasChanged) CountOfLinesChanged++;
             return line;
         }
 
         // "scope=All" in effect.
         public string ApplyCommandsAllMatches(string line, List<Command> commandList) {
-            logger.Debug("ApplyCommandsAllMatches before:{0}", line);
+            bool lineHasChanged = false;
+            logger.Trace("ApplyCommandsAllMatches before:{0}", line);
             foreach (Command command in commandList) {
                 logger.Trace("   ApplyCommandsAllMatches - applying '{0}' --> '{1}'  AnchorString:'{2}'", command.SubjectString.ToString(), command.ReplacementString, command.AnchorString);
                 logger.Trace("   ApplyCommandsAllMatches - line before:'{0}'", line);
                 if (isCandidateForReplacement(line, command)) {
                     CollectPickupValues(line, command);
-                    if (command.Style != Command.CommandType.Pickup) { 
+                    if (command.Style != Command.CommandType.Pickup) {
+                        lineHasChanged = true;
                         line = ApplySingleCommand(line, command);
                     }
                 }
                 logger.Trace("   ApplyCommandsAllMatches - line  after:'{0}'",line);
             }
-            logger.Debug("ApplyCommandsAllMatches  after:'{0}'", line);
+            logger.Trace("ApplyCommandsAllMatches  after:'{0}'", line);
+            if (lineHasChanged) CountOfLinesChanged++;
             return line;
         }
 
@@ -78,14 +87,24 @@ namespace kgrep {
                 if (command.CountOfPickupsInSubjectString > 0) {
                     string subjectStringWithReplacedPickups = ReplacePickupsWithStoredValue(command.SubjectString.ToString());
                     Regex subjectString = new Regex(subjectStringWithReplacedPickups);
-                    line = subjectString.Replace(line, command.ReplacementString);
+                    line = ReplaceIt(subjectString, line, command.ReplacementString);
                 }
                 else {
-                    line = command.SubjectString.Replace(line, command.ReplacementString);   
+                    line = ReplaceIt(command.SubjectString, line, command.ReplacementString);
                 }
                 line = ReplacePickupsWithStoredValue(line);
             }
             return line;
+        }
+
+        private string ReplaceIt(Regex re, string source, string target) {
+            int count = re.Matches(source).Count;
+            if (count>0) {
+                logger.Debug("Found '{0}' in '{1}'", re.ToString(), source);
+                CountOfTotalReplacements += count;
+                return re.Replace(source, target);
+            }
+            return source;
         }
 
         // Values are in Named and unnamed Captures are only in SubjectString.

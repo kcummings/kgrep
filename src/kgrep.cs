@@ -34,7 +34,7 @@ namespace kgrep
         private static Logger logger = LogManager.GetCurrentClassLogger();
         static void Main(string[] args) {
 
-            logger.Debug("<<<<< Starting kgrep >>>>>");
+            logger.Info("<<<<< Starting kgrep >>>>>");
             ParseCommandLine commandLine = new ParseCommandLine(args);
             if (commandLine.InputSourceNames.Count == 0)
                 Usage("No input sources given/recognized.");
@@ -44,7 +44,7 @@ namespace kgrep
                 new PrintTokensInSourceFiles().ApplyScanner(commands, commandLine.InputSourceNames);
             else
                 new ReplaceTokensInSourceFiles().ApplyCommands(commands, commandLine.InputSourceNames);
-            logger.Debug("<<<<< Ending kgrep >>>>>");
+            logger.Info("<<<<< Ending kgrep >>>>>");
         }
 
         private static void Usage(string message) {
