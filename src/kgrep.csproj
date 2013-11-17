@@ -62,7 +62,11 @@
   <ItemGroup>
     <Compile Include="Command.cs" />
     <Compile Include="ParseCommandFile.cs" />
-    <Compile Include="ReplaceTokensInSourceFiles.cs" />
+    <Compile Include="PrintTokensInSourceFiles.cs" />
+    <Compile Include="ReadFileFactory.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ReplaceTokens.cs" />
     <Compile Include="IHandleOutput.cs" />
     <Compile Include="ReadCommandLineArgumentAsFile.cs" />
     <Compile Include="IHandleInput.cs" />
@@ -70,9 +74,10 @@
     <Compile Include="ParseCommandLine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadFile.cs" />
-    <Compile Include="ReadFileFactory.cs" />
     <Compile Include="ReadStdin.cs" />
-    <Compile Include="PrintTokensInSourceFiles.cs" />
+    <Compile Include="ReplaceTokensAllOccurrences.cs" />
+    <Compile Include="ReplaceTokensFactory.cs" />
+    <Compile Include="ReplaceTokensFirstOccurrence.cs" />
     <Compile Include="WriteStdout.cs" />
     <Compile Include="WriteToString.cs" />
   </ItemGroup>

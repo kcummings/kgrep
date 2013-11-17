@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using NLog;
 
@@ -42,8 +43,11 @@ namespace kgrep
             ParseCommandFile commands = new ParseCommandFile(commandLine.ReplacementFileName);
             if (commands.UseAsScanner)
                 new PrintTokensInSourceFiles().ApplyScanner(commands, commandLine.InputSourceNames);
-            else
-                new ReplaceTokensInSourceFiles().ApplyCommands(commands, commandLine.InputSourceNames);
+            else {
+                ReplaceTokens engine = (new ReplaceTokensFactory()).GetReplaceEngine(commands.ScopeAll);
+                engine.ApplyCommands(commands, commandLine.InputSourceNames); 
+            }
+
             logger.Info("<<<<< Ending kgrep >>>>>");
         }
 

@@ -75,7 +75,7 @@ namespace Tests {
             ParseCommandFile rf = new ParseCommandFile("comment=:; :ignored;");
             List<Command> reps = rf.CommandList;
 
-            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
+            ReplaceTokensAllOccurrences engine = new ReplaceTokensAllOccurrences();
             string result = engine.ApplyCommandsAllMatches("a b ca", reps);
             Assert.AreEqual("a b ca", result);
             Assert.IsTrue(reps.Count == 0);
@@ -86,7 +86,7 @@ namespace Tests {
             ParseCommandFile rf = new ParseCommandFile("a~");
             List<Command> reps = rf.CommandList;
 
-            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
+            ReplaceTokensAllOccurrences engine = new ReplaceTokensAllOccurrences();
             string result = engine.ApplyCommandsAllMatches("a b ca", reps);
             Assert.AreEqual(" b c", result);
         }
@@ -96,7 +96,7 @@ namespace Tests {
             ParseCommandFile rf = new ParseCommandFile(" \"a \" ~ b ");
             List<Command> reps = rf.CommandList;
 
-            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
+            ReplaceTokensAllOccurrences engine = new ReplaceTokensAllOccurrences();
             string result = engine.ApplyCommandsAllMatches("a b ca", reps);
             Assert.AreEqual("bb ca", result);
         }
@@ -109,7 +109,7 @@ namespace Tests {
             ParseCommandFile rf = new ParseCommandFile(repstring);
             List<Command> reps = rf.CommandList;
 
-            ReplaceTokensInSourceFiles engine = new ReplaceTokensInSourceFiles();
+            ReplaceTokensAllOccurrences engine = new ReplaceTokensAllOccurrences();
             string result = engine.ApplyCommandsAllMatches(input, reps);
             Assert.AreEqual(expect, result);
         }
