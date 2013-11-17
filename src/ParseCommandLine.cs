@@ -31,7 +31,7 @@ namespace kgrep
                 ReplacementFileName = args[0];
                 logger.Info("Reading from source files with command file {0}", ReplacementFileName);
                 for (int i = 1; i < args.Length; i = i + 1) {
-                    logger.Info("   adding source file:{0}",args[i]);
+                    logger.Debug("   adding source file:{0}",args[i]);
                     InputSourceNames.Add(args[i]);
                 }
             }

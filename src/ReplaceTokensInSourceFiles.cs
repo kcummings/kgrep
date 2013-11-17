@@ -6,12 +6,14 @@ using System.Linq;
 using NLog;
 
 namespace kgrep {
+
+    // TODO: This class has more than one responsibility. 
     public class ReplaceTokensInSourceFiles {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         public IHandleOutput sw = new WriteStdout();
         public Dictionary<string, string> PickupList = new Dictionary<string, string>();
-        private int CountOfLinesChanged = 0;
-        private int CountOfTotalReplacements = 0;
+        private int _countOfReplacementsInFile = 0;
+        private int _lineNumber = 0;
 
         public string ApplyCommands(ParseCommandFile rf, List<string> inputFilenames) {
             try {
@@ -19,9 +21,15 @@ namespace kgrep {
                 string alteredLine;
 
                 foreach (string filename in inputFilenames) {
-                    logger.Debug("ApplyCommands - Processing input file:{0}", filename);
+                    if (rf.ScopeAll)
+                        logger.Debug("ApplyCommandsAllMatches - Processing input file:{0}", filename);
+                    else
+                        logger.Debug("ApplyCommandsFirstMatch - Processing input file:{0}", filename);
                     IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
+                    _lineNumber = 0;
+                    _countOfReplacementsInFile = 0;
                     while ((line = sr.ReadLine()) != null) {
+                        _lineNumber++;
                         if (rf.ScopeAll)
                             alteredLine = ApplyCommandsAllMatches(line, rf.CommandList);
                         else
@@ -29,17 +37,16 @@ namespace kgrep {
                         if (!String.IsNullOrEmpty(alteredLine)) sw.Write(alteredLine);
                     }
                     sr.Close();
+                    logger.Info("File {0} found {1} matches on {2} input lines", filename, _countOfReplacementsInFile, _lineNumber);
                 }
             } catch (Exception e) {
                 Console.WriteLine("{0}", e.Message);
             }
-            logger.Info("{0} replacements applied to {1} input lines",CountOfTotalReplacements,CountOfLinesChanged);
-            return sw.Close();
+           return sw.Close();
         }
 
         // "scope=First" in effect.
         public string ApplyCommandsFirstMatch(string line, List<Command> commandList) {
-            bool lineHasChanged = false;
             logger.Trace("ApplyCommandsFirstMatch before:{0}", line);
             foreach (Command command in commandList) {
                 logger.Trace("   ApplyCommandsFirstMatch - ({0} --> {1})  AnchorString:{2}", command.SubjectString.ToString(), command.ReplacementString, command.AnchorString);
@@ -47,21 +54,18 @@ namespace kgrep {
                     if (command.SubjectString.IsMatch(line)) {
                         CollectPickupValues(line, command);
                         if (command.Style != Command.CommandType.Pickup) {
-                            lineHasChanged = true;
                             line = ApplySingleCommand(line, command);
                             break;
                         }
                     }
                 }
             }
-            logger.Debug("ApplyCommandsFirstMatch  after:{0}", line);
-            if (lineHasChanged) CountOfLinesChanged++;
+            logger.Trace("ApplyCommandsFirstMatch  after:{0}", line);
             return line;
         }
 
         // "scope=All" in effect.
         public string ApplyCommandsAllMatches(string line, List<Command> commandList) {
-            bool lineHasChanged = false;
             logger.Trace("ApplyCommandsAllMatches before:{0}", line);
             foreach (Command command in commandList) {
                 logger.Trace("   ApplyCommandsAllMatches - applying '{0}' --> '{1}'  AnchorString:'{2}'", command.SubjectString.ToString(), command.ReplacementString, command.AnchorString);
@@ -69,14 +73,12 @@ namespace kgrep {
                 if (isCandidateForReplacement(line, command)) {
                     CollectPickupValues(line, command);
                     if (command.Style != Command.CommandType.Pickup) {
-                        lineHasChanged = true;
                         line = ApplySingleCommand(line, command);
                     }
                 }
                 logger.Trace("   ApplyCommandsAllMatches - line  after:'{0}'",line);
             }
             logger.Trace("ApplyCommandsAllMatches  after:'{0}'", line);
-            if (lineHasChanged) CountOfLinesChanged++;
             return line;
         }
 
@@ -100,8 +102,8 @@ namespace kgrep {
         private string ReplaceIt(Regex re, string source, string target) {
             int count = re.Matches(source).Count;
             if (count>0) {
-                logger.Debug("Found '{0}' in '{1}'", re.ToString(), source);
-                CountOfTotalReplacements += count;
+                logger.Debug("   At line {0} found {1} occurances of '{2}' in '{3}'", _lineNumber, count, re.ToString(), source);
+                _countOfReplacementsInFile += count;
                 return re.Replace(source, target);
             }
             return source;
