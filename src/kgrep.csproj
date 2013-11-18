@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command.cs" />
+    <Compile Include="IFileAction.cs" />
     <Compile Include="ParseCommandFile.cs" />
     <Compile Include="PrintTokensInSourceFiles.cs" />
     <Compile Include="ReadFileFactory.cs">
@@ -76,7 +77,7 @@
     <Compile Include="ReadFile.cs" />
     <Compile Include="ReadStdin.cs" />
     <Compile Include="ReplaceAllMatches.cs" />
-    <Compile Include="ReplaceTokensFactory.cs" />
+    <Compile Include="FileActionFactory.cs" />
     <Compile Include="ReplaceFirstMatch.cs" />
     <Compile Include="WriteStdout.cs" />
     <Compile Include="WriteToString.cs" />

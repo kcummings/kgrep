@@ -15,7 +15,7 @@ namespace Tests {
                 ParseCommandLine cmd = new ParseCommandLine(args);
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
                 ParseCommandFile commands = new ParseCommandFile(cmd.ReplacementFileName);
-                string results = engine.ApplyScanner(commands, cmd.InputSourceNames);
+                string results = engine.ApplyCommands(commands, cmd.InputSourceNames);
                 Assert.AreEqual("a,a\nb\n", results);
             }
 
@@ -23,7 +23,7 @@ namespace Tests {
             public void WhenNoScanTokenGiven_ExpectNoChange() {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles { sw = new WriteToString() };
                 ParseCommandFile commands = new ParseCommandFile("bye");
-                string results = engine.ApplyScanner(commands, new List<string> { "today bye bye birdie" });
+                string results = engine.ApplyCommands(commands, new List<string> { "today bye bye birdie" });
                 Assert.AreEqual("bye\nbye\n", results);
             }
 
@@ -45,7 +45,7 @@ namespace Tests {
             public void WhenNoMatchFound_ExpectNoOutput() {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
                 ParseCommandFile commands = new ParseCommandFile("abc");
-                string results = engine.ApplyScanner(commands, new List<string> { "def" });
+                string results = engine.ApplyCommands(commands, new List<string> { "def" });
                 Assert.AreEqual("", results);
             }
 
@@ -53,7 +53,7 @@ namespace Tests {
             public void WhenInvalidTokenGiven_ExpectException() {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
                 ParseCommandFile commands = new ParseCommandFile("a[bc");
-                string results = engine.ApplyScanner(commands, new List<string> { "def" });
+                string results = engine.ApplyCommands(commands, new List<string> { "def" });
                 Assert.AreEqual("", results);
             }
 
@@ -64,7 +64,7 @@ namespace Tests {
             public void WhenGroupsGiven_ExpectSubsetOutput(string expected, string scantoken, string input) {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
                 ParseCommandFile commands = new ParseCommandFile(scantoken);
-                string results = engine.ApplyScanner(commands, new List<string> { input });
+                string results = engine.ApplyCommands(commands, new List<string> { input });
                 Assert.AreEqual(expected, results);
             }
 
@@ -74,7 +74,7 @@ namespace Tests {
             public void WhenNonRegexTokenGiven_ExpectSimpleOutput(string expected, string scantoken, string input) {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
                 ParseCommandFile commands = new ParseCommandFile(scantoken);
-                string results = engine.ApplyScanner(commands, new List<string> { input });
+                string results = engine.ApplyCommands(commands, new List<string> { input });
                 Assert.AreEqual(expected, results);
             }
 
@@ -84,7 +84,7 @@ namespace Tests {
             public void WhenRegexTokenGiven_ExpectFilteredOutput(string expected, string scantoken, string input) {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
                 ParseCommandFile commands = new ParseCommandFile(scantoken);
-                string results = engine.ApplyScanner(commands, new List<string> { input });
+                string results = engine.ApplyCommands(commands, new List<string> { input });
                 Assert.AreEqual(expected, results);
             }
 
@@ -93,7 +93,7 @@ namespace Tests {
             public void WhenScannerFSUsed_ExpectDelimitedOutput(string input, string pattern, string expected) {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
                 ParseCommandFile commands = new ParseCommandFile(pattern);
-                string result = engine.ApplyScanner(commands, new List<string> { input });
+                string result = engine.ApplyCommands(commands, new List<string> { input });
                 Assert.AreEqual(expected, result);
             }
 

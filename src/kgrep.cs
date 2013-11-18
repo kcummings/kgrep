@@ -41,12 +41,8 @@ namespace kgrep
                 Usage("No input sources given/recognized.");
 
             ParseCommandFile commands = new ParseCommandFile(commandLine.ReplacementFileName);
-            if (commands.RunAs == ParseCommandFile.RunMode.Scanner)
-                new PrintTokensInSourceFiles().ApplyScanner(commands, commandLine.InputSourceNames);
-            else {
-                ReplaceTokens engine = (new ReplaceTokensFactory()).GetReplaceEngine(commands.RunAs);
-                engine.ApplyCommands(commands, commandLine.InputSourceNames); 
-            }
+            IFileAction engine = (new FileActionFactory()).GetFileAction(commands.RunAs);
+            engine.ApplyCommands(commands, commandLine.InputSourceNames); 
 
             logger.Info("<<<<< Ending kgrep >>>>>");
         }

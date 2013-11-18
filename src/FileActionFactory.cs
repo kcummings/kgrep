@@ -5,17 +5,19 @@ using kgrep;
 namespace kgrep {
 
     // Return the appropiate IHandleInput to parse the input source.
-    public class ReplaceTokensFactory {
-        public ReplaceTokensFactory() { }
+    public class FileActionFactory {
+        public FileActionFactory() { }
 
-        public ReplaceTokens GetReplaceEngine(ParseCommandFile.RunMode runas) {
+        public IFileAction GetFileAction(ParseCommandFile.RunMode runas) {
             switch (runas) {
                 case ParseCommandFile.RunMode.ReplaceAll:   
                     return new ReplaceAllMatches();
                 case ParseCommandFile.RunMode.ReplaceFirst:
                     return new ReplaceFirstMatch();
+                case ParseCommandFile.RunMode.Scanner:
+                    return new PrintTokensInSourceFiles();
                 default:
-                    throw new Exception("No valid object for ReplaceTokensFactory");
+                    throw new Exception("No valid object for FileActionFactory");
             }
         }
     }

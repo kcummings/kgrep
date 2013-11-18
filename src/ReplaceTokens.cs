@@ -4,7 +4,7 @@ using NLog;
 
 namespace kgrep {
 
-    public class ReplaceTokens {
+    public class ReplaceTokens : IFileAction {
         protected static Logger logger = LogManager.GetCurrentClassLogger();
         public IHandleOutput sw = new WriteStdout();
         public Dictionary<string, string> PickupList = new Dictionary<string, string>();

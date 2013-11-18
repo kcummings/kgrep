@@ -4,13 +4,13 @@ using System.Text.RegularExpressions;
 using NLog;
 
 namespace kgrep {
-    public class PrintTokensInSourceFiles {
+    public class PrintTokensInSourceFiles : IFileAction {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         public IHandleOutput sw = new WriteStdout();
         private int _countOfMatchesInFile = 0;
         private int _lineNumber = 0;
 
-        public string ApplyScanner(ParseCommandFile rf, List<string> inputFilenames) {
+        public string ApplyCommands(ParseCommandFile rf, List<string> inputFilenames) {
             try {
                 string line;
 
