@@ -17,6 +17,13 @@ namespace kgrep
         private IHandleInput sr;
         public string ScannerFS = "\n";
         public bool UseAsScanner = false;
+        public enum RunMode {
+            Scanner,
+            ReplaceFirst,
+            ReplaceAll
+        }
+
+        public RunMode RunAs;
 
         public ParseCommandFile(String filename) {
             if (filename == null) return;
@@ -43,21 +50,21 @@ namespace kgrep
                     line = line.Remove(i);
               //  if (Regex.Match(line, "[ ~]+").Success) continue;
 
-                if (line.ToLower().StartsWith("comment=")) 
-                    _comment = GetOption(line, "comment"); 
+                if (line.ToLower().StartsWith("comment="))
+                    _comment = GetOption(line, "comment");
                 else if (line.ToLower().StartsWith("delim="))
                     _delim = GetOption(line, "delim");
                 else if (line.ToLower().StartsWith("scope=first"))  // Once true, it's true for the remaining commands.
-                    _scopeAll = false;
-                else if (line.ToLower().StartsWith("scope=all"))  
-                    _scopeAll = true;
-                else if (line.ToLower().StartsWith("scannerfs=")) 
+                    RunAs = RunMode.ReplaceFirst;
+                else if (line.ToLower().StartsWith("scope=all"))
+                    RunAs = RunMode.ReplaceAll;
+                else if (line.ToLower().StartsWith("scannerfs="))
                     ScannerFS = GetOption(line, "FS");
                 else {
                     Command command = null;
                     String[] parts = line.Split(_delim.ToCharArray(), 4);
-                    if (parts.Length == 1) { 
-                        command = new Command(parts[0]) {ScannerFS = ScannerFS };
+                    if (parts.Length == 1) {
+                        command = new Command(parts[0]) { ScannerFS = ScannerFS };
                         UseAsScanner = true;
                     }
                     if (parts.Length == 2) {
@@ -73,6 +80,7 @@ namespace kgrep
                 }
             }
             sr.Close();
+            if (UseAsScanner) RunAs = RunMode.Scanner;
             logger.Debug("There are {0} commands in command file", commandList.Count);
             return commandList;
         }
