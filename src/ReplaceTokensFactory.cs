@@ -9,9 +9,9 @@ namespace kgrep {
 
         public ReplaceTokens GetReplaceEngine(bool replaceAll) {
             if (replaceAll) 
-                return new ReplaceTokensAllOccurrences();
+                return new ReplaceAllMatches();
             else 
-                return new ReplaceTokensFirstOccurrence();
+                return new ReplaceFirstMatch();
         }
     }
 }
