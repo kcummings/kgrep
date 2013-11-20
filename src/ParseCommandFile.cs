@@ -34,6 +34,7 @@ namespace kgrep
  
         public List<Command> GetReplacementList() {
             List<Command> commandList = new List<Command>();
+            RunAs = RunMode.ReplaceAll;
             String line;
             while ((line = sr.ReadLine()) != null) {
                 logger.Trace("   command source line:{0}",line);
@@ -61,6 +62,7 @@ namespace kgrep
                 else if (line.ToLower().StartsWith("scannerfs="))
                     ScannerFS = GetOption(line, "FS");
                 else {
+                    // TODO: If command doesn't contain regex, to optimize use search or replace using index and replace() respectivily. 
                     Command command = null;
                     String[] parts = line.Split(_delim.ToCharArray(), 4);
                     if (parts.Length == 1) {

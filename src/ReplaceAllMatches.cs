@@ -17,10 +17,12 @@ namespace kgrep {
                     _countOfMatchesInFile = 0;
                     while ((line = sr.ReadLine()) != null) {
                         _lineNumber++;
+                        // TODO: Print Info after every 5000 lines, i.e. I'm still processing
                         alteredLine = ApplyCommandsAllMatches(line, rf.CommandList);
                         if (!String.IsNullOrEmpty(alteredLine)) sw.Write(alteredLine);
                     }
                     sr.Close();
+                    // TODO: Add time to process file to Info log
                     logger.Info("File {0} found {1} matches on {2} input lines", filename, _countOfMatchesInFile, _lineNumber);
                 }
             } catch (Exception e) {
