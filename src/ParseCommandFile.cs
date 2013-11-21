@@ -29,7 +29,11 @@ namespace kgrep
             if (filename == null) return;
             logger.Debug("Start reading commandfile:{0}",filename);
             sr = (new ReadFileFactory()).GetSource(filename);
+
+            DateTime startParse = DateTime.Now;
             CommandList = GetReplacementList();
+            TimeSpan ts = DateTime.Now - startParse;
+            logger.Info("There are {0} commands in command file. [{1:d} milliseconds to parse]", CommandList.Count, ts.Milliseconds);
         }
  
         public List<Command> GetReplacementList() {
@@ -83,7 +87,6 @@ namespace kgrep
             }
             sr.Close();
             if (UseAsScanner) RunAs = RunMode.Scanner;
-            logger.Debug("There are {0} commands in command file", commandList.Count);
             return commandList;
         }
 
@@ -96,6 +99,7 @@ namespace kgrep
             return true;
         }
 
+        // TODO: Let GetOption accept blanks around =
         // Get the provided value for the given Control Option.
         // allow optional enclosing in quotes
         private string GetOption(string line, string type) {

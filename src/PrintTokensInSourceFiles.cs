@@ -15,6 +15,7 @@ namespace kgrep {
                 string line;
 
                 foreach (string filename in inputFilenames) {
+                    DateTime startParse = DateTime.Now;
                     logger.Debug("Scanning - Processing input file:{0}", filename);
                     IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
                     _lineNumber = 0;
@@ -27,7 +28,9 @@ namespace kgrep {
                         }
                     }
                     sr.Close();
-                    logger.Info("File {0} found {1} matches on {2} input lines", filename, _countOfMatchesInFile, _lineNumber);
+                    TimeSpan ts = DateTime.Now - startParse;
+                    logger.Info("File {0} found {1} matches on {2} input lines [{3:d} miliseconds]"
+                            , filename, _countOfMatchesInFile, _lineNumber, ts.Milliseconds);
                 }
             } catch (Exception e) {
                 Console.WriteLine("{0}", e.Message);
