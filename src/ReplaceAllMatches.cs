@@ -24,7 +24,7 @@ namespace kgrep {
                     }
                     sr.Close();
                     TimeSpan ts = DateTime.Now - startParse;
-                    logger.Info("File {0} found {1} matches on {2} input lines [{3:d} miliseconds]"
+                    logger.Info("File {0} found {1} matches on {2} input lines [{3:d} ms]"
                                 , filename, _countOfMatchesInFile, _lineNumber, ts.Milliseconds);
                 }
             } catch (Exception e) {
