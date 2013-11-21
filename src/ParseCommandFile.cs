@@ -16,6 +16,7 @@ namespace kgrep
         private String _delim = "~";
         private IHandleInput sr;
         public string ScannerFS = "\n";
+        // TODO: Let UseAsScanner be private or remove
         public bool UseAsScanner = false;
         public enum RunMode {
             Scanner,
@@ -33,12 +34,15 @@ namespace kgrep
             DateTime startParse = DateTime.Now;
             CommandList = GetReplacementList();
             TimeSpan ts = DateTime.Now - startParse;
-            logger.Info("There are {0} commands in command file. [{1:d} milliseconds to parse]", CommandList.Count, ts.Milliseconds);
+            logger.Info("Parsed {0} commands in command file. [{1:d} ms]", CommandList.Count, ts.Milliseconds);
         }
- 
+
         public List<Command> GetReplacementList() {
             List<Command> commandList = new List<Command>();
+            // TODO: Replace RunMode enum with a class so can write: if (runningas.Scanner)
+            // TODO: Use Strategy pattern to only call regex.Replace when regex present, otherwise call String.Replace.
             RunAs = RunMode.ReplaceAll;
+            UseAsScanner = true;
             String line;
             while ((line = sr.ReadLine()) != null) {
                 logger.Trace("   command source line:{0}",line);
@@ -66,12 +70,11 @@ namespace kgrep
                 else if (line.ToLower().StartsWith("scannerfs="))
                     ScannerFS = GetOption(line, "FS");
                 else {
-                    // TODO: If command doesn't contain regex, to optimize use search or replace using index and replace() respectivily. 
+                    // TODO: Add tests for mixed settings, e.g. "scope=first;a;scope=all;a~b
                     Command command = null;
                     String[] parts = line.Split(_delim.ToCharArray(), 4);
                     if (parts.Length == 1) {
                         command = new Command(parts[0]) { ScannerFS = ScannerFS };
-                        UseAsScanner = true;
                     }
                     if (parts.Length == 2) {
                         command = new Command(parts[0], parts[1]);
