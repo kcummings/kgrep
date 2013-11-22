@@ -63,6 +63,68 @@ namespace Tests {
         }
 
         [Test]
+        public void WhenEndingScannerToken_ExpectAllReplacesMode() {
+            ParseCommandFile rf = new ParseCommandFile("a~b; b");
+            List<Command> reps = rf.CommandList;
+            Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceAll, rf.kgrepMode);
+        }
+
+        [Test]
+        public void WhenFirstDirectiveGiven_ExpectFirstReplaceMode() {
+            ParseCommandFile rf = new ParseCommandFile("scope=first; a~b; b");
+            List<Command> reps = rf.CommandList;
+            Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceFirst, rf.kgrepMode);
+        }
+
+        [Test]
+        public void WhenAllDirectiveGiven_ExpectAllReplaceMode() {
+            ParseCommandFile rf = new ParseCommandFile("scope=all; a~b");
+            List<Command> reps = rf.CommandList;
+            Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceAll, rf.kgrepMode);
+        }
+
+        [Test]
+        public void WhenOnlyScansGiven_ExpectScannerToOverrideAllMode() {
+            ParseCommandFile rf = new ParseCommandFile("scope=all; a; [0-9]+;scope=first");
+            List<Command> reps = rf.CommandList;
+            Assert.AreEqual(ParseCommandFile.RunningAs.Scanner, rf.kgrepMode);
+        }
+
+        [Test]
+        public void WhenEndsWithFirst_ExpectFirstReplaceMode() {
+            ParseCommandFile rf = new ParseCommandFile("scope=all; a; [0-9]+; scope=first; a~b");
+            List<Command> reps = rf.CommandList;
+            Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceFirst, rf.kgrepMode);
+        }
+
+        [Test]
+        public void WhenEndsWithAll_ExpectAllReplaceMode() {
+            ParseCommandFile rf = new ParseCommandFile("scope=first; a; [0-9]+; a~b; scope=all");
+            List<Command> reps = rf.CommandList;
+            Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceAll, rf.kgrepMode);
+        }
+        [Test]
+        public void WhenScopeDirectiveWIthScanCommands_ExpectScannerMode() {
+            ParseCommandFile rf = new ParseCommandFile("scope=all;a;b;c");
+            List<Command> reps = rf.CommandList;
+            Assert.AreEqual(ParseCommandFile.RunningAs.Scanner, rf.kgrepMode);
+        }
+
+        [Test]
+        public void WhenOnlyScanCommands_ExpectScannerMode() {
+            ParseCommandFile rf = new ParseCommandFile("a;b;c");
+            List<Command> reps = rf.CommandList;
+            Assert.AreEqual(ParseCommandFile.RunningAs.Scanner, rf.kgrepMode);
+        }
+
+        [Test]
+        public void WhenNoCommandsGiven_ExpectScannerMode() {
+            ParseCommandFile rf = new ParseCommandFile(";;;");
+            List<Command> reps = rf.CommandList;
+            Assert.AreEqual(ParseCommandFile.RunningAs.Scanner, rf.kgrepMode);
+        }
+
+        [Test]
         public void WhenEmbeddedComment_ExpectCommentIgnored() {
             ParseCommandFile rf = new ParseCommandFile("#comment; a~bc");
             List<Command> reps = rf.CommandList;

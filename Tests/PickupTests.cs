@@ -213,14 +213,14 @@ namespace Tests {
             Assert.AreEqual(Command.CommandType.Pickup, commands.CommandList[1].Style);
             Assert.AreEqual(Command.CommandType.Print, commands.CommandList[2].Style);
             Assert.AreEqual(Command.CommandType.Anchored, commands.CommandList[3].Style);
-            Assert.AreEqual(false, commands.UseAsScanner);
+            Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceAll, commands.kgrepMode);
         }
 
         [Test]
         public void WhenOnlyScanTokensGiven_ExpectScannerMode() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"b; a; c");
-            Assert.AreEqual(true, commands.UseAsScanner);
+            Assert.AreEqual(ParseCommandFile.RunningAs.Scanner, commands.kgrepMode);
         }
 
         [Test]

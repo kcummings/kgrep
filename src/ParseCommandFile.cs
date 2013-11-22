@@ -16,8 +16,10 @@ namespace kgrep
         private String _delim = "~";
         private IHandleInput sr;
         public string ScannerFS = "\n";
-        // TODO: Let UseAsScanner be private or remove
-        public bool UseAsScanner = false;
+    
+        // Kgrep is only in one state or mode.
+        // The mode is determined by the types and sequence of commands. 
+        // If only scan tokens are present, it runs in scaller mode even if a scope directive is supplied.
         public enum RunningAs {
             Scanner,
             ReplaceFirst,
@@ -28,7 +30,6 @@ namespace kgrep
 
         public ParseCommandFile(String filename) {
             if (filename == null) return;
-            kgrepMode = RunningAs.Scanner;
             logger.Debug("Start reading commandfile:{0}",filename);
             sr = (new ReadFileFactory()).GetSource(filename);
 
@@ -42,7 +43,7 @@ namespace kgrep
             List<Command> commandList = new List<Command>();
             // TODO: Use Strategy pattern to only call regex.Replace when regex present, otherwise call String.Replace.
             kgrepMode = RunningAs.ReplaceAll;
-            UseAsScanner = true;
+            int numberScannerCommands = 0;
             String line;
             while ((line = sr.ReadLine()) != null) {
                 logger.Trace("   command source line:{0}",line);
@@ -63,33 +64,31 @@ namespace kgrep
                     _comment = GetOption(line, "comment");
                 else if (line.ToLower().StartsWith("delim="))
                     _delim = GetOption(line, "delim");
-                else if (line.ToLower().StartsWith("scope=first"))  // Once true, it's true for the remaining commands.
+                else if (line.ToLower().StartsWith("scope=first"))  
                     kgrepMode = RunningAs.ReplaceFirst;
                 else if (line.ToLower().StartsWith("scope=all"))
                     kgrepMode = RunningAs.ReplaceAll;
                 else if (line.ToLower().StartsWith("scannerfs="))
                     ScannerFS = GetOption(line, "FS");
                 else {
-                    // TODO: Add tests for mixed settings, e.g. "scope=first;a;scope=all;a~b
                     Command command = null;
                     String[] parts = line.Split(_delim.ToCharArray(), 4);
                     if (parts.Length == 1) {
                         command = new Command(parts[0]) { ScannerFS = ScannerFS };
+                        numberScannerCommands += 1;
                     }
                     if (parts.Length == 2) {
                         command = new Command(parts[0], parts[1]);
-                        UseAsScanner = false;
                     }
                     if (parts.Length == 3) {
                         command = new Command(parts[0], parts[1], parts[2]);
-                        UseAsScanner = false;
                     }
                     if (IsValidCommand(command))
                         commandList.Add(command);
                 }
             }
             sr.Close();
-            if (UseAsScanner) kgrepMode = RunningAs.Scanner;
+            if (numberScannerCommands == commandList.Count) kgrepMode = RunningAs.Scanner;
             return commandList;
         }
 
