@@ -18,16 +18,17 @@ namespace kgrep
         public string ScannerFS = "\n";
         // TODO: Let UseAsScanner be private or remove
         public bool UseAsScanner = false;
-        public enum RunMode {
+        public enum RunningAs {
             Scanner,
             ReplaceFirst,
             ReplaceAll
         }
 
-        public RunMode RunAs;
+        public RunningAs kgrepMode;
 
         public ParseCommandFile(String filename) {
             if (filename == null) return;
+            kgrepMode = RunningAs.Scanner;
             logger.Debug("Start reading commandfile:{0}",filename);
             sr = (new ReadFileFactory()).GetSource(filename);
 
@@ -39,9 +40,8 @@ namespace kgrep
 
         public List<Command> GetReplacementList() {
             List<Command> commandList = new List<Command>();
-            // TODO: Replace RunMode enum with a class so can write: if (runningas.Scanner)
             // TODO: Use Strategy pattern to only call regex.Replace when regex present, otherwise call String.Replace.
-            RunAs = RunMode.ReplaceAll;
+            kgrepMode = RunningAs.ReplaceAll;
             UseAsScanner = true;
             String line;
             while ((line = sr.ReadLine()) != null) {
@@ -64,9 +64,9 @@ namespace kgrep
                 else if (line.ToLower().StartsWith("delim="))
                     _delim = GetOption(line, "delim");
                 else if (line.ToLower().StartsWith("scope=first"))  // Once true, it's true for the remaining commands.
-                    RunAs = RunMode.ReplaceFirst;
+                    kgrepMode = RunningAs.ReplaceFirst;
                 else if (line.ToLower().StartsWith("scope=all"))
-                    RunAs = RunMode.ReplaceAll;
+                    kgrepMode = RunningAs.ReplaceAll;
                 else if (line.ToLower().StartsWith("scannerfs="))
                     ScannerFS = GetOption(line, "FS");
                 else {
@@ -89,7 +89,7 @@ namespace kgrep
                 }
             }
             sr.Close();
-            if (UseAsScanner) RunAs = RunMode.Scanner;
+            if (UseAsScanner) kgrepMode = RunningAs.Scanner;
             return commandList;
         }
 

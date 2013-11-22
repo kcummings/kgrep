@@ -8,13 +8,13 @@ namespace kgrep {
     public class FileActionFactory {
         public FileActionFactory() { }
 
-        public IFileAction GetFileAction(ParseCommandFile.RunMode runas) {
+        public IFileAction GetFileAction(ParseCommandFile.RunningAs runas) {
             switch (runas) {
-                case ParseCommandFile.RunMode.ReplaceAll:   
+                case ParseCommandFile.RunningAs.ReplaceAll:   
                     return new ReplaceAllMatches();
-                case ParseCommandFile.RunMode.ReplaceFirst:
+                case ParseCommandFile.RunningAs.ReplaceFirst:
                     return new ReplaceFirstMatch();
-                case ParseCommandFile.RunMode.Scanner:
+                case ParseCommandFile.RunningAs.Scanner:
                     return new PrintTokensInSourceFiles();
                 default:
                     throw new Exception("No valid object for FileActionFactory");
