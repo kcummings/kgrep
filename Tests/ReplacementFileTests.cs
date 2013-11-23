@@ -118,6 +118,13 @@ namespace Tests {
         }
 
         [Test]
+        public void WhenBlanksAroundFirstDirective_ExpectIgnoreBlanks() {
+            ParseCommandFile rf = new ParseCommandFile("  scope = first; a~b; c");
+            List<Command> reps = rf.CommandList;
+            Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceFirst, rf.kgrepMode);
+        }
+
+        [Test]
         public void WhenNoCommandsGiven_ExpectScannerMode() {
             ParseCommandFile rf = new ParseCommandFile(";;;");
             List<Command> reps = rf.CommandList;

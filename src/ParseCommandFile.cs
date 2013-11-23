@@ -64,12 +64,12 @@ namespace kgrep
                     _comment = GetOption(line, "comment");
                 else if (line.ToLower().StartsWith("delim="))
                     _delim = GetOption(line, "delim");
-                else if (line.ToLower().StartsWith("scope=first"))  
-                    kgrepMode = RunningAs.ReplaceFirst;
-                else if (line.ToLower().StartsWith("scope=all"))
-                    kgrepMode = RunningAs.ReplaceAll;
                 else if (line.ToLower().StartsWith("scannerfs="))
                     ScannerFS = GetOption(line, "FS");
+                else if (Regex.IsMatch(line,@"^\s*scope\s*=\s*first",RegexOptions.IgnoreCase))  
+                    kgrepMode = RunningAs.ReplaceFirst;
+                else if (Regex.IsMatch(line, @"^\s*scope\s*=\s*all", RegexOptions.IgnoreCase))  
+                    kgrepMode = RunningAs.ReplaceAll;
                 else {
                     Command command = null;
                     String[] parts = line.Split(_delim.ToCharArray(), 4);
