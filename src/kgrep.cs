@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using NLog;
 
@@ -35,6 +36,9 @@ namespace kgrep
         private static Logger logger = LogManager.GetCurrentClassLogger();
         static void Main(string[] args) {
 
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+
             logger.Info("<<<<< Starting kgrep >>>>>");
             ParseCommandLine commandLine = new ParseCommandLine(args);
             if (commandLine.InputSourceNames.Count == 0)
@@ -44,7 +48,8 @@ namespace kgrep
             IFileAction engine = (new FileActionFactory()).GetFileAction(commands.kgrepMode);
             engine.ApplyCommands(commands, commandLine.InputSourceNames); 
 
-            logger.Info("<<<<< Ending kgrep >>>>>");
+            timer.Stop();
+            logger.Info("<<<<< Ending kgrep [{0}] >>>>>", timer.Elapsed);
         }
 
         private static void Usage(string message) {

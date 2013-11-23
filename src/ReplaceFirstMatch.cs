@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace kgrep {
 
@@ -9,9 +10,10 @@ namespace kgrep {
             try {
                 string line;
                 string alteredLine;
+                Stopwatch timer;
 
                 foreach (string filename in inputFilenames) {
-                    DateTime startParse = DateTime.Now;
+                    timer = Stopwatch.StartNew();
                     logger.Debug("Replace First Match - Processing input file:{0}", filename);
                     IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
                     _lineNumber = 0;
@@ -22,9 +24,9 @@ namespace kgrep {
                         if (!String.IsNullOrEmpty(alteredLine)) sw.Write(alteredLine);
                     }
                     sr.Close();
-                    TimeSpan ts = DateTime.Now - startParse;
+                    timer.Stop();
                     logger.Info("File {0} found {1} matches on {2} input lines [{3:d} ms]"
-                        ,filename, _countOfMatchesInFile, _lineNumber, ts.Milliseconds);
+                        ,filename, _countOfMatchesInFile, _lineNumber, timer.ElapsedMilliseconds);
                 }
             } catch (Exception e) {
                 Console.WriteLine("{0}", e.Message);

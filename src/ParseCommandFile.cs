@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 using NLog;
 
 namespace kgrep
@@ -30,13 +31,14 @@ namespace kgrep
 
         public ParseCommandFile(String filename) {
             if (filename == null) return;
+            Stopwatch sw;
+            sw = Stopwatch.StartNew();
             logger.Debug("Start reading commandfile:{0}",filename);
             sr = (new ReadFileFactory()).GetSource(filename);
 
-            DateTime startParse = DateTime.Now;
             CommandList = GetReplacementList();
-            TimeSpan ts = DateTime.Now - startParse;
-            logger.Info("Parsed {0} commands in command file. [{1:d} ms]", CommandList.Count, ts.Milliseconds);
+            sw.Stop();
+            logger.Info("Parsed {0} commands in command file. [{1:d} ms]", CommandList.Count, sw.ElapsedMilliseconds);
         }
 
         public List<Command> GetReplacementList() {
