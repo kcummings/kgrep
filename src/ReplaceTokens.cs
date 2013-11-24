@@ -9,30 +9,40 @@ namespace kgrep {
         public IHandleOutput sw = new WriteStdout();
         public Dictionary<string, string> PickupList = new Dictionary<string, string>();
         protected int _countOfMatchesInFile = 0;
-        protected int _lineNumber = 0;  
+        protected int _lineNumber = 0;
+        private Command _command;
 
         public virtual string ApplyCommands(ParseCommandFile rf, List<string> inputFilenames) {
             return "";
         }
 
+
         protected string ApplySingleCommand(string line, Command command) {
+            _command = command;
             if (command.Style == Command.CommandType.Print)
                 line = ReplacePickupsWithStoredValue(command.ReplacementString);   
             else {
-                if (command.CountOfPickupsInSubjectString > 0) {
-                    string subjectStringWithReplacedPickups = ReplacePickupsWithStoredValue(command.SubjectString.ToString());
-                    Regex subjectString = new Regex(subjectStringWithReplacedPickups);
-                    line = ReplaceIt(subjectString, line, command.ReplacementString);
-                }
-                else {
-                    line = ReplaceIt(command.SubjectString, line, command.ReplacementString);
-                }
-                line = ReplacePickupsWithStoredValue(line);
+                line = ReplaceIt(ReplacePickupsInSubjectString(command.SubjectString), line, ReplacePickupsInReplacementString(command.ReplacementString));
             }
             return line;
         }
 
-        protected string ReplaceIt(Regex re, string source, string target) {
+        private Regex ReplacePickupsInSubjectString(Regex reSubject) {
+            if (_command.CountOfPickupsInSubjectString > 0) {
+                string subjectStringWithReplacedPickups = ReplacePickupsWithStoredValue(reSubject.ToString());
+                return new Regex(subjectStringWithReplacedPickups);
+            }
+            return reSubject;
+        }
+
+        private string ReplacePickupsInReplacementString(string repString) {
+            if (_command.CountOfPickupsInReplacementString > 0) {
+                return ReplacePickupsWithStoredValue(repString);
+            }
+            return repString;
+        }
+
+        private string ReplaceIt(Regex re, string source, string target) {
             int count = re.Matches(source).Count;
             if (count>0) {
                 logger.Debug("   At line {0} found {1} occurances of '{2}' in '{3}'", _lineNumber, count, re.ToString(), source);
@@ -61,14 +71,14 @@ namespace kgrep {
         }
 
         protected string ReplacePickupsWithStoredValue(string line) {
-            Regex re = new Regex(@"\$\{(.+?)\}",RegexOptions.Compiled);
-            MatchCollection mc = re.Matches(line);
-            string PickupValue;
+                Regex re = new Regex(@"\$\{(.+?)\}", RegexOptions.Compiled);
+                MatchCollection mc = re.Matches(line);
+                string PickupValue;
 
-            foreach (Match m in mc) {
-                PickupValue = m.Groups[1].Value;
-                if (PickupList.ContainsKey(PickupValue))
-                    line = line.Replace("${" + PickupValue + "}", PickupList[PickupValue]);
+                foreach (Match m in mc) {
+                    PickupValue = m.Groups[1].Value;
+                    if (PickupList.ContainsKey(PickupValue))
+                        line = line.Replace("${" + PickupValue + "}", PickupList[PickupValue]);
             }
             return line;
         }

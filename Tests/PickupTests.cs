@@ -89,12 +89,29 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenCaptureRepeats_ExpectLastValue() {
+        public void WhenSameCaptureNameReused_ExpectLastValue() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+).*?(?<name>[0-9]+)~b");
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+).*?(?<name>[0-9]+)~b${name} done");
             string newline = engine.ApplyCommands(commands, new List<string> { "ab c 45" });
             var results = engine.PickupList["name"];
             Assert.AreEqual("45", results);
+            Assert.AreEqual("b45 done\n",newline);
+        }
+
+        [Test]
+        public void WhenTwoPickupsInReplacement_ExpectReplaced() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (art); (${1} of)~${1}; unit~${1}");
+            string newline = engine.ApplyCommands(commands, new List<string> { "the art of unit testing" });
+            Assert.AreEqual("the art art testing\n", newline);
+        }
+
+        [Test]
+        public void DontReplacePickupsOnSourceLine_ExpectNoChange() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (art); (${1} of)~${1}; unit~${1}");
+            string newline = engine.ApplyCommands(commands, new List<string> { "the art of unit testing ${1}" });
+            Assert.AreEqual("the art art testing ${1}\n", newline);
         }
 
         [Test]
