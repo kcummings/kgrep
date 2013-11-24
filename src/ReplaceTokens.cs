@@ -55,7 +55,7 @@ namespace kgrep {
         // Values are in Named and unnamed Captures are only in SubjectString.
         // e.g. named capture syntax: (?<digit>[0-9]+)  yeilds pickup name ${digit} 
         //    unnamed capture syntax: ([0-9]+)    yeilds pickup name ${1}
-        public void CollectPickupValues(string line, Command command) {
+        protected void CollectPickupValues(string line, Command command) {
             if (command.CountOfCapturesInSubjectString > 0) {
                 Match m = command.SubjectString.Match(line);
                 if (m.Success) {
