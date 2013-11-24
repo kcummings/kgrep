@@ -41,17 +41,33 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenOneCapturePresent_ExpectResults() {
+        public void WhenReplacementPickupPresent_ExpectResults() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) (?<title>[a-z]+)bye~${title}hi");
+            ParseCommandFile commands = new ParseCommandFile("my bye~hi ${title}");
             Assert.AreEqual(1, commands.CommandList[0].CountOfPickupsInReplacementString);
         }
 
         [Test]
-        public void WhenTwoCapturesPresent_ExpectCountTwoResults() {
+        public void WhenReplacementAndSubjectPickupPresent_ExpectResults() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) (?<title>[a-z]+)bye~${title}hi${title}");
-            Assert.AreEqual(2, commands.CommandList[0].CountOfPickupsInReplacementString);
+            ParseCommandFile commands = new ParseCommandFile("${1}my bye~hi ${title}");
+            Assert.AreEqual(1, commands.CommandList[0].CountOfPickupsInReplacementString);
+            Assert.AreEqual(1, commands.CommandList[0].CountOfPickupsInSubjectString);
+        }
+
+        [Test]
+        public void WhenInvalidReplacementPickupPresent_ExpectResults() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("my bye~hi {title}$");
+            Assert.AreEqual(0, commands.CommandList[0].CountOfPickupsInReplacementString);
+            Assert.AreEqual(0, commands.CommandList[0].CountOfPickupsInSubjectString);
+        }
+
+        [Test]
+        public void WhenOneCapturePresent_ExpectResults() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) (?<title>[a-z]+)bye~${title}hi");
+            Assert.AreEqual(1, commands.CommandList[0].CountOfPickupsInReplacementString);
         }
 
         [Test]
