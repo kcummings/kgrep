@@ -10,14 +10,14 @@ namespace Tests {
     public class PickupTests {
 
         [Test]
-        public void WhenNoPickupPresentInSubjectString_ExpectCountZeroResults() {
+        public void WhenNoCapturePresentInSubjectString_ExpectCountZeroResults() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my bye~hi(?<title>[a-z]+) ");
             Assert.AreEqual(0, commands.CommandList[0].CountOfCapturesInSubjectString);
         }
 
         [Test]
-        public void WhenOnePickupPresent_ExpectCountOneResults() {
+        public void WhenOneCapturePresent_ExpectCountOneResults() {
             ReplaceAllMatches engine = new ReplaceAllMatches() {sw = new WriteToString()};
             ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) bye~hi");
             Assert.AreEqual(1, commands.CommandList[0].CountOfCapturesInSubjectString);
@@ -26,7 +26,7 @@ namespace Tests {
         [Test]
         // If the same name is given to more than one capture in the SubjectString, the pickup's value will be the first match.
         // e.g. given source line "ab cd ed" and SubjectString "(?<letter>[a-z]+)", ${letter} will be "ab", not "ed". 
-        public void WhenTwoPickupsPresent_ExpectCountTwoResults() {
+        public void WhenTwoCapturesPresent_ExpectCountTwoResults() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) (?<title>[a-z]+)bye~hi");
             Assert.AreEqual(2, commands.CommandList[0].CountOfCapturesInSubjectString);
@@ -34,21 +34,21 @@ namespace Tests {
 
         [Test]
         [ExpectedException(typeof(System.Exception))]
-        public void WhenInvalidPickupPresent_ExpectException() {
+        public void WhenInvalidCapturePresent_ExpectException() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (?<title) bye~hi");
             Assert.AreEqual(0, commands.CommandList[0].CountOfCapturesInSubjectString);
         }
 
         [Test]
-        public void WhenOnePickupPresent_ExpectResults() {
+        public void WhenOneCapturePresent_ExpectResults() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) (?<title>[a-z]+)bye~${title}hi");
             Assert.AreEqual(1, commands.CommandList[0].CountOfPickupsInReplacementString);
         }
 
         [Test]
-        public void WhenTwoPickupPresent_ExpectCountTwoResults() {
+        public void WhenTwoCapturesPresent_ExpectCountTwoResults() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) (?<title>[a-z]+)bye~${title}hi${title}");
             Assert.AreEqual(2, commands.CommandList[0].CountOfPickupsInReplacementString);
@@ -62,7 +62,7 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenTwoPickupsGiven_ExpectTwo() {
+        public void WhenTwoCapturesGiven_ExpectTwo() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+).*?(?<second>[0-9]+)~b");
             string newline = engine.ApplyCommands(commands, new List<string> { "ab c 45" });
@@ -73,7 +73,7 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenPickupRepeats_ExpectLastValue() {
+        public void WhenCaptureRepeats_ExpectLastValue() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+).*?(?<name>[0-9]+)~b");
             string newline = engine.ApplyCommands(commands, new List<string> { "ab c 45" });
@@ -82,7 +82,7 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenFirstPickupRepeats_ExpectLastValue() {
+        public void WhenFirstCaptureRepeats_ExpectLastValue() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=first; ^(?<name>[a-z]+).*?(?<name>[0-9]+)~b");
             string newline = engine.ApplyCommands(commands, new List<string> { "ab c 45; ab 98" });
