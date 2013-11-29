@@ -48,19 +48,10 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenReplacementAndSubjectPickupPresent_ExpectResults() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("${1}my bye~hi ${title}");
-            Assert.AreEqual(1, commands.CommandList[0].CountOfPickupsInReplacementString);
-            Assert.AreEqual(1, commands.CommandList[0].CountOfPickupsInSubjectString);
-        }
-
-        [Test]
         public void WhenInvalidReplacementPickupPresent_ExpectResults() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my bye~hi {title}$");
             Assert.AreEqual(0, commands.CommandList[0].CountOfPickupsInReplacementString);
-            Assert.AreEqual(0, commands.CommandList[0].CountOfPickupsInSubjectString);
         }
 
         [Test]

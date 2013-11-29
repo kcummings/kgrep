@@ -15,7 +15,6 @@ namespace kgrep
         public string ScannerFS = "\n";
         public int CountOfCapturesInSubjectString = 0;
         public int CountOfPickupsInReplacementString = 0;   // pickup syntax: ${name}
-        public int CountOfPickupsInSubjectString = 0;
 
         public enum CommandType {
             Pickup,
@@ -50,7 +49,6 @@ namespace kgrep
                 subjectString = RemoveEnclosingQuotesIfPresent(subjectString.Trim());
                 CountOfCapturesInSubjectString = CountMatchesInString(@"(\(\?<.+?>.+?\)|\(.*?\))", subjectString);  // count named and unnamed captures
                 CountOfPickupsInReplacementString = CountMatchesInString(@"\$\{.+?\}", replacementString);
-                CountOfPickupsInSubjectString = CountMatchesInString(@"\$\{.+?\}", subjectString);
                 SubjectString = new Regex(subjectString, RegexOptions.Compiled);
                 ReplacementString = RemoveEnclosingQuotesIfPresent(replacementString.Trim());
 
