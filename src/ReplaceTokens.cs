@@ -22,17 +22,10 @@ namespace kgrep {
             if (command.Style == Command.CommandType.Print)
                 line = ReplacePickupsWithStoredValue(command.ReplacementString);   
             else {
-                line = ReplaceIt(ReplacePickupsInSubjectString(command.SubjectString), line, ReplacePickupsInReplacementString(command.ReplacementString));
+                CollectPickupValues(line, command);
+                line = ReplaceIt(command.SubjectString, line, ReplacePickupsInReplacementString(command.ReplacementString));
             }
             return line;
-        }
-
-        private Regex ReplacePickupsInSubjectString(Regex reSubject) {
-            if (_command.CountOfPickupsInSubjectString > 0) {
-                string subjectStringWithReplacedPickups = ReplacePickupsWithStoredValue(reSubject.ToString());
-                return new Regex(subjectStringWithReplacedPickups);
-            }
-            return reSubject;
         }
 
         private string ReplacePickupsInReplacementString(string repString) {

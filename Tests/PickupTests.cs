@@ -99,19 +99,14 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenTwoPickupsInReplacement_ExpectReplaced() {
+        // TODO: Possibly need to adopt ${one} syntax for unnamed matches rather thean ${1} to avoid collison with regex unnamed capture syntax
+        public void WhenUnnamedCaptureReused_ExpectLastValue() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (art); (${1} of)~${1}; unit~${1}");
-            string newline = engine.ApplyCommands(commands, new List<string> { "the art of unit testing" });
-            Assert.AreEqual("the art art testing\n", newline);
-        }
-
-        [Test]
-        public void DontReplacePickupsOnSourceLine_ExpectNoChange() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (art); (${1} of)~${1}; unit~${1}");
-            string newline = engine.ApplyCommands(commands, new List<string> { "the art of unit testing ${1}" });
-            Assert.AreEqual("the art art testing ${1}\n", newline);
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(\w+);(\w+)$; White~${1}");
+            string newline = engine.ApplyCommands(commands, new List<string> { "isolation and White box Unit testing" });
+            var results = engine.PickupList["1"];
+            Assert.AreEqual("testing", results);
+            Assert.AreEqual("isolation and testing box Unit testing\n", newline);
         }
 
         [Test]
@@ -132,7 +127,7 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenPickupRepeats_ExpectReplacedValue() {
+        public void WhenPickupRepeats_ExpectReplacedValues() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~c${name}${name}");
             string results = engine.ApplyCommands(commands, new List<string> { "a" });
@@ -145,6 +140,16 @@ namespace Tests {
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~blue ${name};blue ~${name}");
             string results = engine.ApplyCommands(commands, new List<string> { "word" });
             Assert.AreEqual("word word\n", results);
+        }
+
+        [Test]
+        public void WhenPickupAndRegexGiven_ExpectBothReplaced() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(\w)(.);..(.)~$1${2}");
+            string results = engine.ApplyCommands(commands, new List<string> { "abc" });
+            Assert.AreEqual("cb\n", results);
+            results = engine.PickupList["2"];
+            Assert.AreEqual("b", results);
         }
 
         [Test]
@@ -190,23 +195,6 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenPickupInSubjectString_ExpectReplacedValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~blue;(?<digit>[0-9]+)${name} ~x${name}x");
-            string results = engine.ApplyCommands(commands, new List<string> { "ab cd", "89ab cd" });
-            Assert.AreEqual("blue cd\nxabx cd\n", results);
-        }
-
-        [Test]
-        public void WhenTwoPickupInSubjectString_ExpectReplacedValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(
-                @"scope=all; ^(?<name1>[a-z]+) (?<name2>[a-z]+)~blue;${name2}(?<digit>[0-9]+)${name1} ~x${name2}${name1}x");
-            string results = engine.ApplyCommands(commands, new List<string> { "ab cd", "cd89ab cd" });
-            Assert.AreEqual("blue\nxcdabx cd\n", results);
-        }
-
-        [Test]
         public void WhenMatchedNamedAndUnnamedCaptures_ExpectReplacedValue() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+).*([0-9])$~blue;~${1}--${name}");
@@ -217,9 +205,9 @@ namespace Tests {
         [Test]
         public void WhenMatchedNamedAndUnnamedPickups_ExpectReplacedValue() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<letter>[a-z]+).*([0-9])$~blue;~${1}${letter}");
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<letter>[a-z]+).([0-9]);12~${1}${letter}");
             string results = engine.ApplyCommands(commands, new List<string> { "ab 12" });
-            Assert.AreEqual("2ab\n", results);
+            Assert.AreEqual("ab 1ab\n", results);
         }
 
         [Test]

@@ -41,10 +41,10 @@ namespace kgrep {
                 logger.Trace("   ApplyCommandsAllMatches - applying '{0}' --> '{1}'  AnchorString:'{2}'", command.SubjectString.ToString(), command.ReplacementString, command.AnchorString);
                 logger.Trace("   ApplyCommandsAllMatches - line before:'{0}'", line);
                 if (isCandidateForReplacement(line, command)) {
-                    CollectPickupValues(line, command);
-                    if (command.Style != Command.CommandType.Pickup) {
+                    if (command.Style == Command.CommandType.Pickup)
+                        CollectPickupValues(line, command);
+                    else 
                         line = ApplySingleCommand(line, command);
-                    }
                 }
                 logger.Trace("   ApplyCommandsAllMatches - line  after:'{0}'",line);
             }

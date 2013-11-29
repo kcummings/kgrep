@@ -108,14 +108,15 @@ Caution: You can get unexpected results if you are not careful when using Contro
 
 Pickups add a lot of flexibility to kgrep.
 
-Kgrep holds the value all regex matches whether named or unnamed in a variable called a Pickup. Example: The string "hello (?&lt;word&gt;[a-z]+)" contains a pickup named "word". Pickup values are kept for the duration of the run and can be used anywhere except *Anchors*. To reference a pickup captured from a named capture, use ${pickupname} syntax. If the same pickup name is used more than once, the last pickup value is used. To reference a pickup captured from an unnamed capture, use ${d} where d is 1-9 of the corresponding original match.
+Use ${name} syntax *where name is 1..9 to reference an unnamed capture or the name given to a named capture*, to retrieve the last value of a given capture whether the capture was from the current line or a prior line. Example: The string "hello (?&lt;word&gt;[a-z]+)" contains a pickup named "word". 
+
+Pickup values are kept for the duration of the run and can only be used in *ReplacementStrings*.  If the same pickup name is used more than once, the last pickup value is used. 
 
 Example of Pickup, hold and print:
   
     Given these ReplacementCommands:
     (?<lowerword>[a-z]+)
-    <tag id=(?<idpickup>[a-zA-Z]+)> 
-    ~ ${idpickup} ${lowerword}
+    <tag id=(?<idpickup>[a-zA-Z]+)> ~ ${idpickup} ${lowerword}
 
     And this input:
     <tag id=hi> today
