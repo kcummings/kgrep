@@ -9,27 +9,20 @@ namespace Tests {
     [TestFixture]
     public class PickupTests {
 
-        [Test]
-        public void WhenNoCapturePresentInSubjectString_ExpectCountZeroResults() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("my bye~hi(?<title>[a-z]+) ");
-            Assert.AreEqual(0, commands.CommandList[0].CountOfCapturesInSubjectString);
-        }
-
-        [Test]
-        public void WhenOneCapturePresent_ExpectCountOneResults() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() {sw = new WriteToString()};
-            ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) bye~hi");
-            Assert.AreEqual(1, commands.CommandList[0].CountOfCapturesInSubjectString);
-        }
-
-        [Test]
-        // If the same name is given to more than one capture in the SubjectString, the pickup's value will be the first match.
-        // e.g. given source line "ab cd ed" and SubjectString "(?<letter>[a-z]+)", ${letter} will be "ab", not "ed". 
-        public void WhenTwoCapturesPresent_ExpectCountTwoResults() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) (?<title>[a-z]+)bye~hi");
-            Assert.AreEqual(2, commands.CommandList[0].CountOfCapturesInSubjectString);
+        [TestCase(0, "nothing here")]   // no captures present
+        [TestCase(1,"one (?:and|or) (two)")]  // grouping-only parentheses
+        [TestCase(0, "one (?# comment)")]   // comment
+        [TestCase(0, @"(?<=NUM:)\d+|\w+")]  // if then/else
+        [TestCase(0, @"(?<!this)")]         // lookbehind
+        [TestCase(0, @"(?<=this)")]         // lookahead
+        [TestCase(0, @"(?>.*?)")]           // atomic grouping
+        [TestCase(0, @"(?i:very)")]         // mode modifier
+        [TestCase(2, @"(abc) the art (?<mytag>of) today is (?i:very) (?#new)")]         // mode modifier
+        public void WhenPatternGiven_OnlyCountCaptures(int expected, string cmd) {
+            ReplaceFirstMatch engine = new ReplaceFirstMatch();
+            List<Command> reps = new List<Command>();
+            reps.Add(new Command("", cmd, ""));
+            Assert.AreEqual(expected, reps[0].CountOfCapturesInSubjectString);
         }
 
         [Test]
@@ -55,20 +48,6 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenOneCapturePresent_ExpectResults() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("my (?<title>[a-z]+) (?<title>[a-z]+)bye~${title}hi");
-            Assert.AreEqual(1, commands.CommandList[0].CountOfPickupsInReplacementString);
-        }
-
-        [Test]
-        public void WhenNoPickupPresent_ExpectZeroResults() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("my bye~${titlehi");
-            Assert.AreEqual(0, commands.CommandList[0].CountOfPickupsInReplacementString);
-        }
-
-        [Test]
         public void WhenTwoCapturesGiven_ExpectTwo() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+).*?(?<second>[0-9]+)~b");
@@ -90,7 +69,6 @@ namespace Tests {
         }
 
         [Test]
-        // TODO: Possibly need to adopt ${one} syntax for unnamed matches rather thean ${1} to avoid collison with regex unnamed capture syntax
         public void WhenUnnamedCaptureReused_ExpectLastValue() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(\w+);(\w+)$; White~${1}");
@@ -268,15 +246,6 @@ namespace Tests {
         public void WhenInvalidCommandSyntax_ExpectException(string line) {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(line);
-        }
-
-        [Test]
-        public void WhenPickupPresentInMultipleLines_ExpectResults() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("(a)~b; my (?<title>[a-z]+) (?<title>[a-z]+)bye~hi; hi~bye");
-            Assert.AreEqual(1, commands.CommandList[0].CountOfCapturesInSubjectString);
-            Assert.AreEqual(2, commands.CommandList[1].CountOfCapturesInSubjectString);
-            Assert.AreEqual(0, commands.CommandList[2].CountOfCapturesInSubjectString);
         }
     }
 }

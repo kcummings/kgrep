@@ -47,8 +47,9 @@ namespace kgrep
                              replacementString);
                 AnchorString = RemoveEnclosingQuotesIfPresent(anchorString.Trim());
                 subjectString = RemoveEnclosingQuotesIfPresent(subjectString.Trim());
-                CountOfCapturesInSubjectString = CountMatchesInString(@"(\(\?<.+?>.+?\)|\(.*?\))", subjectString);  // count named and unnamed captures
-                CountOfPickupsInReplacementString = CountMatchesInString(@"\$\{.+?\}", replacementString);
+                CountOfCapturesInSubjectString = CountMatches(@"(\(\?<.+?>.+?\)|\(.*?\))", subjectString) -
+                                                 CountMatches(@"\(\?(?:[^<=]|<=|<!).*?\)", subjectString);  // ignore non capturing parentheses patterns
+                CountOfPickupsInReplacementString = CountMatches(@"\$\{.+?\}", replacementString);
                 SubjectString = new Regex(subjectString, RegexOptions.Compiled);
                 ReplacementString = RemoveEnclosingQuotesIfPresent(replacementString.Trim());
 
@@ -73,14 +74,13 @@ namespace kgrep
             return pattern; // return the original string untouched
         }
 
-        private static int CountMatchesInString(string pattern, string line) {
+        private static int CountMatches(string pattern, string line) {
             try {
-               Regex regex = new Regex(pattern);
-               return regex.Matches(line).Count;
+               return Regex.Matches(line,pattern).Count;
             }
             catch(Exception e)
             {
-                logger.Debug(String.Format("CountMatchesInString - Looking for '{0}' in '{1}' \n{2}",pattern,line,e.Message));
+                logger.Debug(String.Format("CountMatches - Looking for '{0}' in '{1}' \n{2}",pattern,line,e.Message));
                 return 0;
             }
         }
