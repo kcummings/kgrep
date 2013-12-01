@@ -64,14 +64,13 @@ namespace kgrep {
         }
 
         protected string ReplacePickupsWithStoredValue(string line) {
-                Regex re = new Regex(@"\$\{(.+?)\}", RegexOptions.Compiled);
-                MatchCollection mc = re.Matches(line);
-                string PickupValue;
+            string PickupValue;
 
-                foreach (Match m in mc) {
-                    PickupValue = m.Groups[1].Value;
-                    if (PickupList.ContainsKey(PickupValue))
-                        line = line.Replace("${" + PickupValue + "}", PickupList[PickupValue]);
+            MatchCollection mc = Command.PickupPattern.Matches(line);
+            foreach (Match m in mc) {
+                PickupValue = m.Groups[1].Value;
+                if (PickupList.ContainsKey(PickupValue))
+                    line = line.Replace("${" + PickupValue + "}", PickupList[PickupValue]);
             }
             return line;
         }

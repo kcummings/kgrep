@@ -15,6 +15,9 @@ namespace kgrep
         public string ScannerFS = "\n";
         public int CountOfCapturesInSubjectString = 0;
         public int CountOfPickupsInReplacementString = 0;   // pickup syntax: ${name}
+        private static Regex allParensPattern = new Regex(@"(\(\?<.+?>.+?\)|\(.*?\))",RegexOptions.Compiled);
+        private static Regex nonCapturingPattern = new Regex(@"\(\?(?:[^<=]|<=|<!).*?\)", RegexOptions.Compiled);
+        public static Regex PickupPattern = new Regex(@"\$\{(.+?)\}", RegexOptions.Compiled);
 
         public enum CommandType {
             Pickup,
@@ -47,9 +50,8 @@ namespace kgrep
                              replacementString);
                 AnchorString = RemoveEnclosingQuotesIfPresent(anchorString.Trim());
                 subjectString = RemoveEnclosingQuotesIfPresent(subjectString.Trim());
-                CountOfCapturesInSubjectString = CountMatches(@"(\(\?<.+?>.+?\)|\(.*?\))", subjectString) -
-                                                 CountMatches(@"\(\?(?:[^<=]|<=|<!).*?\)", subjectString);  // ignore non capturing parentheses patterns
-                CountOfPickupsInReplacementString = CountMatches(@"\$\{.+?\}", replacementString);
+                CountOfCapturesInSubjectString =  allParensPattern.Matches(subjectString).Count - nonCapturingPattern.Matches(subjectString).Count;  // ignore non capturing parentheses patterns
+                CountOfPickupsInReplacementString = PickupPattern.Matches(replacementString).Count;
                 SubjectString = new Regex(subjectString, RegexOptions.Compiled);
                 ReplacementString = RemoveEnclosingQuotesIfPresent(replacementString.Trim());
 
@@ -72,17 +74,6 @@ namespace kgrep
                 return patternWithoutQuotes;
             }
             return pattern; // return the original string untouched
-        }
-
-        private static int CountMatches(string pattern, string line) {
-            try {
-               return Regex.Matches(line,pattern).Count;
-            }
-            catch(Exception e)
-            {
-                logger.Debug(String.Format("CountMatches - Looking for '{0}' in '{1}' \n{2}",pattern,line,e.Message));
-                return 0;
-            }
         }
     }
 }

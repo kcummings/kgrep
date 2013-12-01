@@ -21,7 +21,7 @@ namespace Tests {
         public void WhenPatternGiven_OnlyCountCaptures(int expected, string cmd) {
             ReplaceFirstMatch engine = new ReplaceFirstMatch();
             List<Command> reps = new List<Command>();
-            reps.Add(new Command("", cmd, ""));
+            reps.Add(new Command(cmd));
             Assert.AreEqual(expected, reps[0].CountOfCapturesInSubjectString);
         }
 
