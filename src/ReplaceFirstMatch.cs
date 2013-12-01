@@ -41,12 +41,11 @@ namespace kgrep {
                 logger.Trace("   ApplyCommandsFirstMatch - ({0} --> {1})  AnchorString:{2}", command.SubjectString.ToString(), command.ReplacementString, command.AnchorString);
                 if (isCandidateForReplacement(line, command)) {
                     if (command.SubjectString.IsMatch(line)) {
-                        if (command.Style != Command.CommandType.Pickup) {
+                        if (command.Style == Command.CommandType.Normal || command.Style == Command.CommandType.Anchored) {
                             line = ApplySingleCommand(line, command);
                             break;
                         }
-                        else
-                            CollectPickupValues(line, command);
+                        CollectPickupValues(line, command);
                     }
                 }
             }
