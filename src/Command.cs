@@ -28,7 +28,6 @@ namespace kgrep
 
         public Command() {
         }
-
         public Command(string anchorString, string subjectString, string replacementString) {
             _command(anchorString, subjectString, replacementString);
             Style = CommandType.Anchored;

@@ -1,50 +1,41 @@
-2013-11-17 07:50:16.6250 INFO <<<<< Starting kgrep >>>>>
-2013-11-17 07:50:16.6406 INFO Reading from source files with command file a
-2013-11-17 07:50:16.6406 DEBUG    adding source file:test.txt
-2013-11-17 07:50:16.6406 DEBUG    adding source file:testfile.txt
-2013-11-17 07:50:16.6562 DEBUG Start reading commandfile:a
-2013-11-17 07:50:16.6562 DEBUG There are 1 commands in command file
-2013-11-17 07:50:16.6718 DEBUG Scanning - Processing input file:test.txt
-2013-11-17 07:50:16.6718 DEBUG At line 1 found 2 occurances of 'a' in 'abca'
-2013-11-17 07:50:16.6718 DEBUG At line 3 found 4 occurances of 'a' in 'hello worlda aa(a)'
-2013-11-17 07:50:16.6718 DEBUG At line 4 found 1 occurances of 'a' in 'hi world and hi Joe.'
-2013-11-17 07:50:16.6718 INFO File test.txt found 7 matches on 5 input lines
-2013-11-17 07:50:16.6718 DEBUG Scanning - Processing input file:testfile.txt
-2013-11-17 07:50:16.6718 DEBUG At line 1 found 2 occurances of 'a' in 'awakening to hello'
-2013-11-17 07:50:16.6875 DEBUG At line 2 found 2 occurances of 'a' in 'is harder than '
-2013-11-17 07:50:16.6875 INFO File testfile.txt found 4 matches on 3 input lines
-2013-11-17 07:50:16.6875 INFO <<<<< Ending kgrep >>>>>
-2013-11-17 07:51:03.2343 INFO <<<<< Starting kgrep >>>>>
-2013-11-17 07:51:03.2656 INFO Reading from source files with command file scope=all;a~b;i~c
-2013-11-17 07:51:03.2656 DEBUG    adding source file:test.txt
-2013-11-17 07:51:03.2656 DEBUG    adding source file:testfile.txt
-2013-11-17 07:51:03.2656 DEBUG Start reading commandfile:scope=all;a~b;i~c
-2013-11-17 07:51:03.2812 DEBUG There are 2 commands in command file
-2013-11-17 07:51:03.2812 DEBUG ApplyCommandsAllMatches - Processing input file:test.txt
-2013-11-17 07:51:03.2968 DEBUG    At line 1 found 2 occurances of 'a' in 'abca'
-2013-11-17 07:51:03.2968 DEBUG    At line 3 found 4 occurances of 'a' in 'hello worlda aa(a)'
-2013-11-17 07:51:03.3125 DEBUG    At line 4 found 1 occurances of 'a' in 'hi world and hi Joe.'
-2013-11-17 07:51:03.3125 DEBUG    At line 4 found 2 occurances of 'i' in 'hi world bnd hi Joe.'
-2013-11-17 07:51:03.3125 DEBUG    At line 5 found 3 occurances of 'i' in 'This is it.'
-2013-11-17 07:51:03.3125 INFO File test.txt found 12 matches on 5 input lines
-2013-11-17 07:51:03.3125 DEBUG ApplyCommandsAllMatches - Processing input file:testfile.txt
-2013-11-17 07:51:03.3125 DEBUG    At line 1 found 2 occurances of 'a' in 'awakening to hello'
-2013-11-17 07:51:03.3125 DEBUG    At line 1 found 1 occurances of 'i' in 'bwbkening to hello'
-2013-11-17 07:51:03.3281 DEBUG    At line 2 found 2 occurances of 'a' in 'is harder than '
-2013-11-17 07:51:03.3281 DEBUG    At line 2 found 1 occurances of 'i' in 'is hbrder thbn '
-2013-11-17 07:51:03.3281 DEBUG    At line 3 found 1 occurances of 'i' in 'first thought'
-2013-11-17 07:51:03.3281 INFO File testfile.txt found 7 matches on 3 input lines
-2013-11-17 07:51:03.3281 INFO <<<<< Ending kgrep >>>>>
-2013-11-17 07:51:19.2343 INFO <<<<< Starting kgrep >>>>>
-2013-11-17 07:51:19.2656 INFO Reading from source files with command file scope=all;a~b;i~c
-2013-11-17 07:51:19.2656 DEBUG    adding source file:test.txt
-2013-11-17 07:51:19.2812 DEBUG Start reading commandfile:scope=all;a~b;i~c
-2013-11-17 07:51:19.2812 DEBUG There are 2 commands in command file
-2013-11-17 07:51:19.2968 DEBUG ApplyCommandsAllMatches - Processing input file:test.txt
-2013-11-17 07:51:19.2968 DEBUG    At line 1 found 2 occurances of 'a' in 'abca'
-2013-11-17 07:51:19.3125 DEBUG    At line 3 found 4 occurances of 'a' in 'hello worlda aa(a)'
-2013-11-17 07:51:19.3125 DEBUG    At line 4 found 1 occurances of 'a' in 'hi world and hi Joe.'
-2013-11-17 07:51:19.3125 DEBUG    At line 4 found 2 occurances of 'i' in 'hi world bnd hi Joe.'
-2013-11-17 07:51:19.3125 DEBUG    At line 5 found 3 occurances of 'i' in 'This is it.'
-2013-11-17 07:51:19.3281 INFO File test.txt found 12 matches on 5 input lines
-2013-11-17 07:51:19.3281 INFO <<<<< Ending kgrep >>>>>
+2013-12-01 12:23:13.9531 INFO <<<<< Starting kgrep >>>>>
+2013-12-01 12:23:13.9687 INFO Reading from source files with command file simple.rep
+2013-12-01 12:23:13.9843 INFO Parsed 4 commands in command file. [12 ms]
+2013-12-01 12:23:14.0000 INFO File test.txt found 41 matches on 13 input lines [9 ms]
+2013-12-01 12:23:14.0000 INFO File testfile.txt found 2 matches on 3 input lines [0 ms]
+2013-12-01 12:23:14.0156 INFO <<<<< Ending kgrep [00:00:00.0625864] >>>>>
+2013-12-01 12:24:16.0468 INFO <<<<< Starting kgrep >>>>>
+2013-12-01 12:24:16.0781 INFO Reading from source files with command file simple.rep
+2013-12-01 12:24:16.0781 DEBUG    adding source file:test.txt
+2013-12-01 12:24:16.0937 DEBUG    adding source file:testfile.txt
+2013-12-01 12:24:16.0937 DEBUG Start reading commandfile:simple.rep
+2013-12-01 12:24:16.1093 INFO Parsed 4 commands in command file. [16 ms]
+2013-12-01 12:24:16.1093 DEBUG Replace All Matches - Processing input file:test.txt
+2013-12-01 12:24:16.1250 DEBUG    At line 1 found 2 occurances of 'is' in 'Of course this was not the original assertion, nor is the new'
+2013-12-01 12:24:16.1250 DEBUG    At line 1 found 2 occurances of 'he' in 'Of course thbye was not the original assertion, nor bye the new'
+2013-12-01 12:24:16.1250 DEBUG    At line 2 found 1 occurances of 'is' in 'interpretation accepted by Thrasymachus himself. But Socrates is not'
+2013-12-01 12:24:16.1250 DEBUG    At line 3 found 1 occurances of 'is' in 'disposed to quarrel about words, if, as he significantly insinuates,'
+2013-12-01 12:24:16.1250 DEBUG    At line 3 found 1 occurances of 'he' in 'dbyeposed to quarrel about words, if, as he significantly insinuates,'
+2013-12-01 12:24:16.1250 DEBUG    At line 4 found 2 occurances of 'is' in 'his adversary has changed his mind. In what follows Thrasymachus does'
+2013-12-01 12:24:16.1406 DEBUG    At line 5 found 3 occurances of 'is' in 'in fact withdraw his admission that the ruler may make a mistake, for he'
+2013-12-01 12:24:16.1406 DEBUG    At line 5 found 2 occurances of 'he' in 'in fact withdraw hbye admbyesion that the ruler may make a mbyetake, for he'
+2013-12-01 12:24:16.1406 DEBUG    At line 6 found 2 occurances of 'is' in 'affirms that the ruler as a ruler is infallible. Socrates is quite ready'
+2013-12-01 12:24:16.1406 DEBUG    At line 6 found 1 occurances of 'he' in 'affirms that the ruler as a ruler bye infallible. Socrates bye quite ready'
+2013-12-01 12:24:16.1406 DEBUG    At line 7 found 2 occurances of 'he' in 'to accept the new position, which he equally turns against Thrasymachus'
+2013-12-01 12:24:16.1406 DEBUG    At line 8 found 4 occurances of 'he' in 'by the help of the analogy of the arts. Every art or science has an'
+2013-12-01 12:24:16.1406 DEBUG    At line 9 found 4 occurances of 'is' in 'interest, but this interest is to be distinguished from the accidental'
+2013-12-01 12:24:16.1406 DEBUG    At line 9 found 2 occurances of 'he' in 'interest, but thbye interest bye to be dbyetingubyehed from the accidental'
+2013-12-01 12:24:16.1406 DEBUG    At line 10 found 2 occurances of 'is' in 'interest of the artist, and is only concerned with the good of the'
+2013-12-01 12:24:16.1406 DEBUG    At line 10 found 1 occurances of 'only' in 'interest of the artbyet, and bye only concerned with the good of the'
+2013-12-01 12:24:16.1406 DEBUG    At line 10 found 3 occurances of 'he' in 'interest of the artbyet, and bye class concerned with the good of the'
+2013-12-01 12:24:16.1406 DEBUG    At line 11 found 1 occurances of 'he' in 'things or persons which come under the art. And justice has an interest'
+2013-12-01 12:24:16.1562 DEBUG    At line 11 found 1 occurances of 'justice' in 'things or persons which come under tshe art. And justice has an interest'
+2013-12-01 12:24:16.1562 DEBUG    At line 12 found 1 occurances of 'is' in 'which is the interest not of the ruler or judge, but of those who come'
+2013-12-01 12:24:16.1562 DEBUG    At line 12 found 2 occurances of 'he' in 'which bye the interest not of the ruler or judge, but of those who come'
+2013-12-01 12:24:16.1562 DEBUG    At line 13 found 1 occurances of 'is' in 'under his sway.'
+2013-12-01 12:24:16.1562 INFO File test.txt found 41 matches on 13 input lines [38 ms]
+2013-12-01 12:24:16.1562 DEBUG Replace All Matches - Processing input file:testfile.txt
+2013-12-01 12:24:16.1562 DEBUG    At line 1 found 1 occurances of 'he' in 'awakening to hello'
+2013-12-01 12:24:16.1562 DEBUG    At line 2 found 1 occurances of 'is' in 'is harder than '
+2013-12-01 12:24:16.1562 INFO File testfile.txt found 2 matches on 3 input lines [3 ms]
+2013-12-01 12:24:16.1562 INFO <<<<< Ending kgrep [00:00:00.1124879] >>>>>
