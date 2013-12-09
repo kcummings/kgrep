@@ -29,7 +29,7 @@ namespace kgrep {
         }
 
         private string ReplacePickupsInReplacementString(string repString) {
-            if (_command.CountOfPickupsInReplacementString > 0) {
+            if (_command.IsPickupInReplacementString) {
                 return ReplacePickupsWithStoredValue(repString);
             }
             return repString;
@@ -49,7 +49,7 @@ namespace kgrep {
         // e.g. named capture syntax: (?<digit>[0-9]+)  yeilds pickup name ${digit} 
         //    unnamed capture syntax: ([0-9]+)    yeilds pickup name ${1}
         protected void CollectPickupValues(string line, Command command) {
-            if (command.CountOfCapturesInSubjectString > 0) {
+            if (command.IsCaptureInSubjectString) {
                 Match m = command.SubjectString.Match(line);
                 if (m.Success) {
                     foreach (int groupNumber in command.SubjectString.GetGroupNumbers()) {

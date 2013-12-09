@@ -13,8 +13,8 @@ namespace kgrep
         public Regex SubjectString = new Regex("");
         public CommandType Style;
         public string ScannerFS = "\n";
-        public int CountOfCapturesInSubjectString = 0;
-        public int CountOfPickupsInReplacementString = 0;   // pickup syntax: ${name}
+        public bool IsCaptureInSubjectString = false;
+        public bool IsPickupInReplacementString = false;   // pickup syntax: ${name}
         private static Regex allParensPattern = new Regex(@"(\(\?<.+?>.+?\)|\(.*?\))",RegexOptions.Compiled);
         private static Regex nonCapturingPattern = new Regex(@"\(\?(?:[^<=]|<=|<!).*?\)", RegexOptions.Compiled);
         public static Regex PickupPattern = new Regex(@"\$\{(.+?)\}", RegexOptions.Compiled);
@@ -49,8 +49,8 @@ namespace kgrep
                              replacementString);
                 AnchorString = RemoveEnclosingQuotesIfPresent(anchorString.Trim());
                 subjectString = RemoveEnclosingQuotesIfPresent(subjectString.Trim());
-                CountOfCapturesInSubjectString =  allParensPattern.Matches(subjectString).Count - nonCapturingPattern.Matches(subjectString).Count;  // ignore non capturing parentheses patterns
-                CountOfPickupsInReplacementString = PickupPattern.Matches(replacementString).Count;
+                IsCaptureInSubjectString = allParensPattern.Match(subjectString).Success;
+                IsPickupInReplacementString = PickupPattern.Match(replacementString).Success;
                 SubjectString = new Regex(subjectString, RegexOptions.Compiled);
                 ReplacementString = RemoveEnclosingQuotesIfPresent(replacementString.Trim());
 

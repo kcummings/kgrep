@@ -9,20 +9,27 @@ namespace Tests {
     [TestFixture]
     public class PickupTests {
 
-        [TestCase(0, "nothing here")]   // no captures present
-        [TestCase(1,"one (?:and|or) (two)")]  // grouping-only parentheses
-        [TestCase(0, "one (?# comment)")]   // comment
-        [TestCase(0, @"(?<=NUM:)\d+|\w+")]  // if then/else
-        [TestCase(0, @"(?<!this)")]         // lookbehind
-        [TestCase(0, @"(?<=this)")]         // lookahead
-        [TestCase(0, @"(?>.*?)")]           // atomic grouping
-        [TestCase(0, @"(?i:very)")]         // mode modifier
-        [TestCase(2, @"(abc) the art (?<mytag>of) today is (?i:very) (?#new)")]         // mode modifier
-        public void WhenPatternGiven_OnlyCountCaptures(int expected, string cmd) {
+        [TestCase(false, "nothing here")]   // no captures present
+        //[TestCase(false, "one (?# comment)")]   // comment
+        //[TestCase(false, @"(?<=NUM:)\d+|\w+")]  // if then/else
+        //[TestCase(false, @"(?<!this)")]         // lookbehind
+        //[TestCase(false, @"(?<=this)")]         // lookahead
+        //[TestCase(false, @"(?>.*?)")]           // atomic grouping
+        //[TestCase(false, @"(?i:very)")]         // mode modifier
+        public void WhenPatternGiven_DoNotFindCaptures(bool expected, string cmd) {
             ReplaceFirstMatch engine = new ReplaceFirstMatch();
             List<Command> reps = new List<Command>();
             reps.Add(new Command(cmd));
-            Assert.AreEqual(expected, reps[0].CountOfCapturesInSubjectString);
+            Assert.IsFalse(reps[0].IsCaptureInSubjectString);
+        }
+
+        [TestCase(true, "one (?:and|or) (two)")]  // grouping-only parentheses
+        [TestCase(true, @"(abc) the art (?<mytag>of) today is (?i:very) (?#new)")]         // mode modifier
+        public void WhenPatternGiven_FindCaptures(bool expected, string cmd) {
+            ReplaceFirstMatch engine = new ReplaceFirstMatch();
+            List<Command> reps = new List<Command>();
+            reps.Add(new Command(cmd));
+            Assert.IsTrue(reps[0].IsCaptureInSubjectString);
         }
 
         [Test]
@@ -30,21 +37,21 @@ namespace Tests {
         public void WhenInvalidCapturePresent_ExpectException() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (?<title) bye~hi");
-            Assert.AreEqual(0, commands.CommandList[0].CountOfCapturesInSubjectString);
+            Assert.IsFalse(commands.CommandList[0].IsCaptureInSubjectString);
         }
 
         [Test]
         public void WhenReplacementPickupPresent_ExpectResults() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my bye~hi ${title}");
-            Assert.AreEqual(1, commands.CommandList[0].CountOfPickupsInReplacementString);
+            Assert.IsTrue(commands.CommandList[0].IsPickupInReplacementString);
         }
 
         [Test]
         public void WhenInvalidReplacementPickupPresent_ExpectResults() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my bye~hi {title}$");
-            Assert.AreEqual(0, commands.CommandList[0].CountOfPickupsInReplacementString);
+            Assert.IsFalse(commands.CommandList[0].IsPickupInReplacementString);
         }
 
         [Test]
