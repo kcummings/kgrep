@@ -8,7 +8,7 @@ namespace kgrep
     public class Command {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        [XmlIgnore] public String AnchorString = "";
+        public String AnchorString = "";
         public String ReplacementString = "";
         public Regex SubjectString = new Regex("");
         public CommandType Style;
@@ -22,12 +22,12 @@ namespace kgrep
         public enum CommandType {
             Pickup,
             Anchored,
-            Normal,
-            Print
+            Normal
         }
 
         public Command() {
         }
+
         public Command(string anchorString, string subjectString, string replacementString) {
             _command(anchorString, subjectString, replacementString);
             Style = CommandType.Anchored;
@@ -35,7 +35,7 @@ namespace kgrep
 
         public Command(string subjectString, string replacementString) {
             _command("", subjectString, replacementString);
-            Style = subjectString.Length > 0 ? CommandType.Normal : CommandType.Print;
+            Style = CommandType.Normal;
         }
 
         public Command(string scanPattern) {
@@ -45,6 +45,10 @@ namespace kgrep
 
         private void _command(string anchorString, string subjectString, string replacementString) {
             try {
+                if (String.IsNullOrEmpty(subjectString)) {
+                    logger.Debug("Subjectstring cannot be empty - command ignored\nanchor:{0} replacementString:{1}",anchorString,replacementString);
+                    return;
+                }
                 logger.Trace("   _command - AnchorString:'{0}' SubjectString:'{1}' ReplacementString:'{2}'", anchorString, subjectString,
                              replacementString);
                 AnchorString = RemoveEnclosingQuotesIfPresent(anchorString.Trim());

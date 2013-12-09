@@ -19,12 +19,8 @@ namespace kgrep {
 
         protected string ApplySingleCommand(string line, Command command) {
             _command = command;
-            if (command.Style == Command.CommandType.Print)
-                line = ReplacePickupsWithStoredValue(command.ReplacementString);   
-            else {
-                CollectPickupValues(line, command);
-                line = ReplaceIt(command.SubjectString, line, ReplacePickupsInReplacementString(command.ReplacementString));
-            }
+            CollectPickupValues(line, command);
+            line = ReplaceIt(command.SubjectString, line, ReplacePickupsInReplacementString(command.ReplacementString));
             return line;
         }
 

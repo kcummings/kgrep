@@ -145,37 +145,11 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenOverlappingPickups_ExpectOverlappedResults() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands =
-                new ParseCommandFile(@"scope=all; ^(?<firstname>[a-z]+)\.; \.(?<lastname>[a-z]+)@; @(?<company>[a-z.]+); ~${company}@${lastname}.${firstname}");
-            string results = engine.ApplyCommands(commands, new List<string> { "john.doe@linux.org" });
-            Assert.AreEqual("linux.org@doe.john\n", results);
-        }
-
-        [Test]
-        public void WhenOverlappingPickupsFirst_ExpectOverlappedResults() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands =
-                new ParseCommandFile(@"scope=first; ^(?<firstname>[a-z]+)\.; \.(?<lastname>[a-z]+)@; @(?<company>[a-z.]+); ~${company}@${lastname}.${firstname}");
-            string results = engine.ApplyCommands(commands, new List<string> { "john.doe@linux.org" });
-            Assert.AreEqual("linux.org@doe.john\n", results);
-        }
-
-        [Test]
         public void WhenTwoPickupSpansLinesFirst_ExpectFirstReplacedValue() {
             ReplaceFirstMatch engine = new ReplaceFirstMatch() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=first; ^(?<name>[a-z]+)~blue ${name};(?<digit>[0-9]+) ~${name}; blue~ ${name}${digit}");
             string results = engine.ApplyCommands(commands, new List<string> { "ab 89 cd", "ab 89 cd" });
             Assert.AreEqual("blue ab 89 cd\nblue ab 89 cd\n", results);
-        }
-
-        [Test]
-        public void WhenMatchedNamedAndUnnamedCaptures_ExpectReplacedValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+).*([0-9])$~blue;~${1}--${name}");
-            string results = engine.ApplyCommands(commands, new List<string> { "ab 12" });
-            Assert.AreEqual("2--ab\n", results);
         }
 
         [Test]
@@ -208,8 +182,7 @@ namespace Tests {
             ParseCommandFile commands = new ParseCommandFile(@"a~b; a; ~b; d~a~b");
             Assert.AreEqual(Command.CommandType.Normal, commands.CommandList[0].Style);
             Assert.AreEqual(Command.CommandType.Pickup, commands.CommandList[1].Style);
-            Assert.AreEqual(Command.CommandType.Print, commands.CommandList[2].Style);
-            Assert.AreEqual(Command.CommandType.Anchored, commands.CommandList[3].Style);
+            Assert.AreEqual(Command.CommandType.Anchored, commands.CommandList[2].Style);
             Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceAll, commands.kgrepMode);
         }
 
@@ -224,7 +197,6 @@ namespace Tests {
         [TestCase("a~b")]
         [TestCase("~a~")]
         [TestCase("a~")]
-        [TestCase("~a  ")]
         public void WhenValidFieldContent_ExpectValidCommand(string line) {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(line);
@@ -240,6 +212,7 @@ namespace Tests {
         [TestCase("delim=:::::")]
         [TestCase("delim=:::")]
         [TestCase("a~~#abc")]
+        [TestCase("~a  ")]
         public void WhenInvalidFieldContent_ExpectInvalidCommand(string line) {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(line);

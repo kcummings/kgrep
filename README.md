@@ -31,7 +31,7 @@ Usage
 
 Kgrep runs in two modes: A Scanner and Print OR a Search and Replace tool. 
 
-####Scan and Print Mode
+####Scan Mode
 It runs as a scanner if the command file (or replacements given on the command line) only contain *Scan* commands, i.e. type 3 in the chart above. All matched commands are printed to stdout. Example: *kgrep "[0-9]+" test.txt* will print all numbers found in test.txt on a separate line.
 
 ####Search and Replacement Mode
@@ -58,11 +58,6 @@ Example:
     do
 
 If in search mode, any matches are treated as Pickups for later reference. *Subject* can contain Pickups. See Pickup explanation below.
-
-### Print
-The input line is replaced by *Replacement*. *Replacement* can contain Pickups references. This doesn't have a known use. This is subject to experimentation and possible enhancements.
-
-
 
 ## CommandFile
 The power of kgrep can be maximized by placing commands in a *CommandFile*. 
