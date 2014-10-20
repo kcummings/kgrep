@@ -18,6 +18,7 @@ namespace kgrep
         private static Regex allParensPattern = new Regex(@"(\(\?<.+?>.+?\)|\(.*?\))",RegexOptions.Compiled);
         private static Regex nonCapturingPattern = new Regex(@"\(\?(?:[^<=]|<=|<!).*?\)", RegexOptions.Compiled);
         public static Regex PickupPattern = new Regex(@"\$\{(.+?)\}", RegexOptions.Compiled);
+        private static Regex GlobPickupPattern = new Regex(@"\{([a-zA-Z]\w+?)\}");  // glob pickup syntax: {{name}} where name must begin with a letter
 
         public enum CommandType {
             Pickup,
@@ -53,6 +54,13 @@ namespace kgrep
                              replacementString);
                 AnchorString = RemoveEnclosingQuotesIfPresent(anchorString.Trim());
                 subjectString = RemoveEnclosingQuotesIfPresent(subjectString.Trim());
+
+                MatchCollection mc = GlobPickupPattern.Matches(subjectString);
+                foreach (Match m in mc) {
+                    string globPickupName = m.Groups[1].Value;
+                    subjectString = subjectString.Replace("{"+globPickupName+"}", String.Format(@"(?<{0}>.+?)",globPickupName));
+                }
+
                 IsCaptureInSubjectString = allParensPattern.Match(subjectString).Success;
                 IsPickupInReplacementString = PickupPattern.Match(replacementString).Success;
                 SubjectString = new Regex(subjectString, RegexOptions.Compiled);

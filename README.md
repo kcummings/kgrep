@@ -7,7 +7,7 @@ Project Goals
 -------------
 
 * Refactor a working but untestable program into a "modern" application with Unit Tests, small methods, classes, etc. In other words, a sandbox to play, experiment and have a useful tool at the end of the day.
-* OS independence. Developed using VS2010, Nunit 2.6.1, NLog 2.0.1.2 & .NET 4.0. Should be compatible with Mono however it has not be compiled or tested under Mono. A sample log file is *SampleLog.log*.
+* OS independence. Developed using VS2012, Nunit 2.6.1, NLog 2.0.1.2 & .NET 4.5. Should be compatible with Mono however it has not be compiled or tested under Mono. A sample log file is *SampleLog.log*.
 
 Binaries
 -----
@@ -35,7 +35,7 @@ Kgrep runs in two modes: A Scanner and Print OR a Search and Replace tool.
 It runs as a scanner if the command file (or replacements given on the command line) only contain *Scan* commands, i.e. type 3 in the chart above. All matched commands are printed to stdout. Example: *kgrep "[0-9]+" test.txt* will print all numbers found in test.txt on a separate line.
 
 ####Search and Replacement Mode
-It runs in search mode if the file contains commands other than just *Scan* commands. it will search and replace *Subject* with *Replacement* and print the results to stdout. Unlike grep, all named and unnamed captures are remembered during the run and can be applied to any field in a command (except *Anchor*). Such expressions are called Pickups. Example syntax for a named capture is *(?&lt;name&gt;[a-z]+)* to act and then hold the matched value in *name*. The value of this matched expression can be retrieved using syntax: ${name}. If no Commands match an input line, the input line will print to stdio unchanged.
+It runs in search mode if the file contains commands other than just *Scan* commands. it will search and replace *Subject* with *Replacement* and print the results to stdout. Unlike grep, all named and unnamed captures are remembered during the run and can be applied to any field in a command (except *Anchor*). Such expressions are called Pickups. Syntax for a named capture is normal regex *(?&lt;name&gt;[a-z]+)* OR the special {name} syntax where *name* is the pickup's name that holds the matched value. {name} matches anything where it has been placed. The value of this matched expression can be retrieved using ${name} syntax. If no Commands match an input line, the input line will print to stdio unchanged.
 
 ---
 ##kgrep commands explained
@@ -129,8 +129,8 @@ Example of replacing with repeating pickup:
     And this input:
     a
 
-    While send to stdout:
-    caa       # mame='a'
+    Will send to stdout:
+    caa      
 
 
 

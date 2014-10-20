@@ -227,6 +227,69 @@ namespace Tests {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(line);
         }
+
+        [Test]
+        public void WhenGlobPickup_ExpectHeldValue() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"a{name}d");
+            string newline = engine.ApplyCommands(commands, new List<string> { "ab cd" });
+            var results = engine.PickupList["name"];
+            Assert.AreEqual("b c", results);
+        }
+
+        [Test]
+        public void WhenTwoGlobPickups_ExpectHeldValue() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"a{name}d <{name2}>");
+            string newline = engine.ApplyCommands(commands, new List<string> { "ab cd <hello>" });
+            var results = engine.PickupList["name"];
+            Assert.AreEqual("b c", results);
+            results = engine.PickupList["name2"];
+            Assert.AreEqual("hello", results);
+        }
+
+        [Test]
+        [ExpectedException(typeof(System.Collections.Generic.KeyNotFoundException))]
+        public void WhenGlobPickupMissing_ExpectError() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"a {name}d");
+            string newline = engine.ApplyCommands(commands, new List<string> { "ab cd" });
+            Assert.AreEqual("ab cd\n", newline);
+            var results = engine.PickupList["name"];
+        }
+
+        [Test]
+        public void WhenGlobPickup_ExpectMatch() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"a.{name}d");
+            string newline = engine.ApplyCommands(commands, new List<string> { "ab cd" });
+            var results = engine.PickupList["name"];
+            Assert.AreEqual(" c", results);
+        }
+
+        [Test]
+        public void WhenGlobPickupIsTooShort_ExpectNoValue() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; <{opentag}>;abc~${opentag}");
+            string results = engine.ApplyCommands(commands, new List<string> { "<>def", "abc here" });
+            Assert.AreEqual("<>def\n${opentag} here\n", results);
+        }
+
+        [Test]
+        public void WhenGlobPickupsSpanLines_ExpectReplacedValue() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; <{opentag}>;abc~${opentag}");
+            string results = engine.ApplyCommands(commands, new List<string> { "<tag>def", "abc here" });
+            Assert.AreEqual("<tag>def\ntag here\n", results);
+        }
+
+        [Test]
+        public void WhenGlobPickupsSpanThreeLines_ExpectReplacedValue() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; <title>{title}</title>; <isbn>{isbn}$; report ~ ${isbn} ${title}");
+            string results = engine.ApplyCommands(commands, new List<string> { "<isbn>97809", "<title>Answers</title>", "report" });
+            Assert.AreEqual("<isbn>97809\n<title>Answers</title>\n97809 Answers\n", results);
+        }
     }
 }
 
