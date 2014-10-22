@@ -290,6 +290,22 @@ namespace Tests {
             string results = engine.ApplyCommands(commands, new List<string> { "<isbn>97809", "<title>Answers</title>", "report" });
             Assert.AreEqual("<isbn>97809\n<title>Answers</title>\n97809 Answers\n", results);
         }
+
+        [Test]
+        public void WhenGlobPickupsWithPattern_ExpectReplacedValue() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; <isbn>{isbn=[0-9]+}$; report ~ ${isbn}");
+            string results = engine.ApplyCommands(commands, new List<string> { "<isbn>97809", "report" });
+            Assert.AreEqual("<isbn>97809\n97809\n", results);
+        }
+
+        [Test]
+        public void WhenGlobPickupsWithNoMatch_ExpectNoChange() {
+            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"scope=all; <isbn>{isbn=[A-Z]+}$; report ~ ${isbn}");
+            string results = engine.ApplyCommands(commands, new List<string> { "<isbn>97809", "report" });
+            Assert.AreEqual("<isbn>97809\n${isbn}\n", results);
+        }
     }
 }
 
