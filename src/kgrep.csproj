@@ -79,6 +79,7 @@
     <Compile Include="ReplaceAllMatches.cs" />
     <Compile Include="FileActionFactory.cs" />
     <Compile Include="ReplaceFirstMatch.cs" />
+    <Compile Include="ShorthandRegex.cs" />
     <Compile Include="WriteStdout.cs" />
     <Compile Include="WriteToString.cs" />
   </ItemGroup>

@@ -14,3 +14,4 @@ todo.txt
 Tests/StdioTests/kgrep.exe
 src/packages.config
 src/NLog.dll
+kgrep.v11.suo

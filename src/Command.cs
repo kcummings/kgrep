@@ -18,7 +18,7 @@ namespace kgrep
         private static Regex allParensPattern = new Regex(@"(\(\?<.+?>.+?\)|\(.*?\))",RegexOptions.Compiled);
         private static Regex nonCapturingPattern = new Regex(@"\(\?(?:[^<=]|<=|<!).*?\)", RegexOptions.Compiled);
         public static Regex PickupPattern = new Regex(@"\$\{(.+?)\}", RegexOptions.Compiled);
-        private static Regex GlobPickupPattern = new Regex(@"\{([a-zA-Z]\w+?)(=.*?)?\}");  // glob pickup syntax: {{name}} where name must begin with a letter
+        private ShorthandRegex _shorthandRegex = new ShorthandRegex();
 
         public enum CommandType {
             Pickup,
@@ -54,20 +54,7 @@ namespace kgrep
                              replacementString);
                 AnchorString = RemoveEnclosingQuotesIfPresent(anchorString.Trim());
                 subjectString = RemoveEnclosingQuotesIfPresent(subjectString.Trim());
-
-                MatchCollection mc = GlobPickupPattern.Matches(subjectString);
-                foreach (Match m in mc) {
-                    string globPickupName = m.Groups[1].Value;
-                    string globPickupPattern = m.Groups[2].Value;
-                    if (string.IsNullOrEmpty(globPickupPattern)) {
-                        globPickupPattern = ".+?";
-                        subjectString = subjectString.Replace("{" + globPickupName + "}", String.Format(@"(?<{0}>{1})", globPickupName, globPickupPattern));
-                    }
-                    else {
-                        globPickupPattern = globPickupPattern.Substring(1);  // ignore the '=' delimiter
-                        subjectString = subjectString.Replace("{" + globPickupName + "=" + globPickupPattern  + "}", String.Format(@"(?<{0}>{1})", globPickupName, globPickupPattern));
-                    }
-                }
+                subjectString = _shorthandRegex.ReplaceShorthandPatternWithFormalRegex(subjectString);
 
                 IsCaptureInSubjectString = allParensPattern.Match(subjectString).Success;
                 IsPickupInReplacementString = PickupPattern.Match(replacementString).Success;

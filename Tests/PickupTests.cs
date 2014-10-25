@@ -259,15 +259,6 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenGlobPickup_ExpectMatch() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"a.{name}d");
-            string newline = engine.ApplyCommands(commands, new List<string> { "ab cd" });
-            var results = engine.PickupList["name"];
-            Assert.AreEqual(" c", results);
-        }
-
-        [Test]
         public void WhenGlobPickupIsTooShort_ExpectNoValue() {
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; <{opentag}>;abc~${opentag}");
@@ -300,11 +291,21 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenGlobPickupsWithNoMatch_ExpectNoChange() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; <isbn>{isbn=[A-Z]+}$; report ~ ${isbn}");
-            string results = engine.ApplyCommands(commands, new List<string> { "<isbn>97809", "report" });
-            Assert.AreEqual("<isbn>97809\n${isbn}\n", results);
+        public void ExpandPickupWithOutAnExplicitPattern() {
+            ShorthandRegex sh = new ShorthandRegex();
+            string results = sh.ReplaceShorthandPatternWithFormalRegex("ab{test} d");
+            Assert.AreEqual("ab(?<test>.+) d",results);
+        }
+
+        [TestCase("ab{test=[0-9]+} d", "ab(?<test>[0-9]+) d")]
+        [TestCase("ab{test=[a-c]+}", "ab(?<test>[a-c]+)")]
+        [TestCase("ab{test=[0-9+} d", "ab(?<test>[0-9+) d")]
+        [TestCase("ab{test a", "ab{test a")]
+        [Test]
+        public void ExpandPickupWithAnExplicitPattern(string line, string expectedResults) {
+            ShorthandRegex sh = new ShorthandRegex();
+            string results = sh.ReplaceShorthandPatternWithFormalRegex(line);
+            Assert.AreEqual(expectedResults, results);
         }
     }
 }
