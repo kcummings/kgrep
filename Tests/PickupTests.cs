@@ -9,6 +9,13 @@ namespace Tests {
     [TestFixture]
     public class PickupTests {
 
+        [TearDown]
+        public void ClearPickupList() {
+            Pickup pickup = new Pickup();
+            pickup.ClearPickupList();
+        }
+
+
         [TestCase(false, "nothing here")]   // no captures present
         //[TestCase(false, "one (?# comment)")]   // comment
         //[TestCase(false, @"(?<=NUM:)\d+|\w+")]  // if then/else
@@ -56,41 +63,21 @@ namespace Tests {
 
         [Test]
         public void WhenTwoCapturesGiven_ExpectTwo() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+).*?(?<second>[0-9]+)~b");
-            string newline = engine.ApplyCommands(commands, new List<string> { "ab c 45" });
-            var results = engine.PickupList["name"];
+            Command command = new Command("^(?<name>[a-z]+).*?(?<second>[0-9]+)");
+            Pickup pickup = new Pickup();
+            pickup.CollectAllPickupsInLine("ab c 45", command);
+            var results = pickup.ReplacePickupsWithStoredValue("${name}");
             Assert.AreEqual("ab", results);
-            results = engine.PickupList["second"];
+            results = pickup.ReplacePickupsWithStoredValue("${second}");
             Assert.AreEqual("45",results);
         }
 
         [Test]
         public void WhenSameCaptureNameReused_ExpectLastValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+).*?(?<name>[0-9]+)~b${name} done");
-            string newline = engine.ApplyCommands(commands, new List<string> { "ab c 45" });
-            var results = engine.PickupList["name"];
-            Assert.AreEqual("45", results);
-            Assert.AreEqual("b45 done\n",newline);
-        }
-
-        [Test]
-        public void WhenUnnamedCaptureReused_ExpectLastValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(\w+);(\w+)$; White~${1}");
-            string newline = engine.ApplyCommands(commands, new List<string> { "isolation and White box Unit testing" });
-            var results = engine.PickupList["1"];
-            Assert.AreEqual("testing", results);
-            Assert.AreEqual("isolation and testing box Unit testing\n", newline);
-        }
-
-        [Test]
-        public void WhenFirstCaptureRepeats_ExpectLastValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=first; ^(?<name>[a-z]+).*?(?<name>[0-9]+)~b");
-            string newline = engine.ApplyCommands(commands, new List<string> { "ab c 45; ab 98" });
-            var results = engine.PickupList["name"];
+            Command command = new Command(@"^(?<name>[a-z]+).*?(?<name>[0-9]+)");
+            Pickup pickup = new Pickup();
+            pickup.CollectAllPickupsInLine("ab c 45", command);
+            var results = pickup.ReplacePickupsWithStoredValue("${name}");
             Assert.AreEqual("45", results);
         }
 
@@ -124,8 +111,6 @@ namespace Tests {
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(\w)(.);..(.)~$1${2}");
             string results = engine.ApplyCommands(commands, new List<string> { "abc" });
             Assert.AreEqual("cb\n", results);
-            results = engine.PickupList["2"];
-            Assert.AreEqual("b", results);
         }
 
         [Test]
@@ -230,32 +215,11 @@ namespace Tests {
 
         [Test]
         public void WhenGlobPickup_ExpectHeldValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"a{name}d");
-            string newline = engine.ApplyCommands(commands, new List<string> { "ab cd" });
-            var results = engine.PickupList["name"];
-            Assert.AreEqual("b c", results);
-        }
-
-        [Test]
-        public void WhenTwoGlobPickups_ExpectHeldValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"a{name}d <{name2}>");
-            string newline = engine.ApplyCommands(commands, new List<string> { "ab cd <hello>" });
-            var results = engine.PickupList["name"];
-            Assert.AreEqual("b c", results);
-            results = engine.PickupList["name2"];
-            Assert.AreEqual("hello", results);
-        }
-
-        [Test]
-        [ExpectedException(typeof(System.Collections.Generic.KeyNotFoundException))]
-        public void WhenGlobPickupMissing_ExpectError() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"a {name}d");
-            string newline = engine.ApplyCommands(commands, new List<string> { "ab cd" });
-            Assert.AreEqual("ab cd\n", newline);
-            var results = engine.PickupList["name"];
+            Command command = new Command(@"a{name}d");
+            Pickup pickup = new Pickup();
+            pickup.CollectAllPickupsInLine("ab cd",command);
+            string results = pickup.ReplacePickupsWithStoredValue("ab${name}");
+            Assert.AreEqual("abb c", results);
         }
 
         [Test]
@@ -294,7 +258,7 @@ namespace Tests {
         public void ExpandPickupWithOutAnExplicitPattern() {
             ShorthandRegex sh = new ShorthandRegex();
             string results = sh.ReplaceShorthandPatternWithFormalRegex("ab{test} d");
-            Assert.AreEqual("ab(?<test>.+) d",results);
+            Assert.AreEqual("ab(?<test>.+?) d",results);
         }
 
         [TestCase("ab{test=[0-9]+} d", "ab(?<test>[0-9]+) d")]

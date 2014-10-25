@@ -63,6 +63,7 @@
     <Compile Include="Command.cs" />
     <Compile Include="IFileAction.cs" />
     <Compile Include="ParseCommandFile.cs" />
+    <Compile Include="Pickup.cs" />
     <Compile Include="PrintTokensInSourceFiles.cs" />
     <Compile Include="ReadFileFactory.cs">
       <SubType>Code</SubType>

@@ -7,11 +7,10 @@
 /Tests/StdioTests/suite/actual
 /Tests/TestResult.xml
 /Tests/kgrep.VisualState.xml
-kgrep.suo
+*.suo
 *.user
 todo.txt
 
 Tests/StdioTests/kgrep.exe
 src/packages.config
 src/NLog.dll
-kgrep.v11.suo

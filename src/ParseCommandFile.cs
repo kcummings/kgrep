@@ -20,7 +20,7 @@ namespace kgrep
     
         // Kgrep is only in one state or mode.
         // The mode is determined by the types and sequence of commands. 
-        // If only scan tokens are present, it runs in scaller mode even if a scope directive is supplied.
+        // If only scan tokens are present, it runs in scanner mode even if a scope directive is supplied.
         public enum RunningAs {
             Scanner,
             ReplaceFirst,

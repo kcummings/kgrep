@@ -7,10 +7,14 @@ namespace kgrep {
     public class ReplaceTokens : IFileAction {
         protected static Logger logger = LogManager.GetCurrentClassLogger();
         public IHandleOutput sw = new WriteStdout();
-        public Dictionary<string, string> PickupList = new Dictionary<string, string>();
         protected int _countOfMatchesInFile = 0;
         protected int _lineNumber = 0;
         private Command _command;
+        private readonly Pickup _pickup;
+
+        public ReplaceTokens() {
+            _pickup = new Pickup();
+        }
 
         public virtual string ApplyCommands(ParseCommandFile rf, List<string> inputFilenames) {
             return "";
@@ -19,14 +23,14 @@ namespace kgrep {
 
         protected string ApplySingleCommand(string line, Command command) {
             _command = command;
-            CollectPickupValues(line, command);
-            line = ReplaceIt(command.SubjectString, line, ReplacePickupsInReplacementString(command.ReplacementString));
+            _pickup.CollectAllPickupsInLine(line, command);
+            line = ReplaceIt(command.SubjectString, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));
             return line;
         }
 
         private string ReplacePickupsInReplacementString(string repString) {
             if (_command.IsPickupInReplacementString) {
-                return ReplacePickupsWithStoredValue(repString);
+                return _pickup.ReplacePickupsWithStoredValue(repString);
             }
             return repString;
         }
@@ -39,36 +43,6 @@ namespace kgrep {
                 return re.Replace(source, target);
             }
             return source;
-        }
-
-        // Values are in Named and unnamed Captures are only in SubjectString.
-        // e.g. named capture syntax: (?<digit>[0-9]+)  yeilds pickup name ${digit} 
-        //    unnamed capture syntax: ([0-9]+)    yeilds pickup name ${1}
-        protected void CollectPickupValues(string line, Command command) {
-            if (command.IsCaptureInSubjectString) {
-                Match m = command.SubjectString.Match(line);
-                if (m.Success) {
-                    foreach (int groupNumber in command.SubjectString.GetGroupNumbers()) {
-                        string name = command.SubjectString.GroupNameFromNumber(groupNumber);
-                        if (PickupList.ContainsKey(name))
-                            PickupList[name] = m.Groups[groupNumber].Value;
-                        else
-                            PickupList.Add(name, m.Groups[groupNumber].Value);
-                    }
-                }
-            }
-        }
-
-        protected string ReplacePickupsWithStoredValue(string line) {
-            string PickupValue;
-
-            MatchCollection mc = Command.PickupPattern.Matches(line);
-            foreach (Match m in mc) {
-                PickupValue = m.Groups[1].Value;
-                if (PickupList.ContainsKey(PickupValue))
-                    line = line.Replace("${" + PickupValue + "}", PickupList[PickupValue]);
-            }
-            return line;
         }
 
         protected bool isCandidateForReplacement(string line, Command command) {

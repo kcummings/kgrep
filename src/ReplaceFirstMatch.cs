@@ -5,6 +5,11 @@ using System.Diagnostics;
 namespace kgrep {
 
     public class ReplaceFirstMatch : ReplaceTokens {
+        private readonly Pickup _pickup;
+
+        public ReplaceFirstMatch() {
+            _pickup = new Pickup();
+        }
 
         override public string ApplyCommands(ParseCommandFile rf, List<string> inputFilenames) {
             try {
@@ -45,7 +50,7 @@ namespace kgrep {
                             line = ApplySingleCommand(line, command);
                             break;
                         }
-                        CollectPickupValues(line, command);
+                        _pickup.CollectAllPickupsInLine(line, command);
                     }
                 }
             }

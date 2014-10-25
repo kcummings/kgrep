@@ -15,7 +15,7 @@ namespace kgrep {
                 string shorthandName = m.Groups[1].Value;
                 string pattern = m.Groups[2].Value;
                 if (string.IsNullOrEmpty(pattern)) {
-                    pattern = ".+";
+                    pattern = ".+?";
                     field = field.Replace("{" + shorthandName + "}",
                                                           String.Format(@"(?<{0}>{1})", shorthandName, pattern));
                 }
