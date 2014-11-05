@@ -18,7 +18,7 @@ namespace kgrep
         private static Regex allParensPattern = new Regex(@"(\(\?<.+?>.+?\)|\(.*?\))",RegexOptions.Compiled);
         private static Regex nonCapturingPattern = new Regex(@"\(\?(?:[^<=]|<=|<!).*?\)", RegexOptions.Compiled);
         public static Regex PickupPattern = new Regex(@"\$\{(.+?)\}", RegexOptions.Compiled);
-        private ShorthandRegex _shorthandRegex = new ShorthandRegex();
+        private Pickup _pickup = new Pickup();
 
         public enum CommandType {
             Pickup,
@@ -54,7 +54,7 @@ namespace kgrep
                              replacementString);
                 AnchorString = RemoveEnclosingQuotesIfPresent(anchorString.Trim());
                 subjectString = RemoveEnclosingQuotesIfPresent(subjectString.Trim());
-                subjectString = _shorthandRegex.ReplaceShorthandPatternWithFormalRegex(subjectString);
+                subjectString = _pickup.ReplaceShorthandPatternWithFormalRegex(subjectString);
 
                 IsCaptureInSubjectString = allParensPattern.Match(subjectString).Success;
                 IsPickupInReplacementString = PickupPattern.Match(replacementString).Success;

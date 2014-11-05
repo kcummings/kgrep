@@ -256,7 +256,7 @@ namespace Tests {
 
         [Test]
         public void ExpandPickupWithOutAnExplicitPattern() {
-            ShorthandRegex sh = new ShorthandRegex();
+            Pickup sh = new Pickup();
             string results = sh.ReplaceShorthandPatternWithFormalRegex("ab{test} d");
             Assert.AreEqual("ab(?<test>.+?) d",results);
         }
@@ -267,7 +267,7 @@ namespace Tests {
         [TestCase("ab{test a", "ab{test a")]
         [Test]
         public void ExpandPickupWithAnExplicitPattern(string line, string expectedResults) {
-            ShorthandRegex sh = new ShorthandRegex();
+            Pickup sh = new Pickup();
             string results = sh.ReplaceShorthandPatternWithFormalRegex(line);
             Assert.AreEqual(expectedResults, results);
         }
