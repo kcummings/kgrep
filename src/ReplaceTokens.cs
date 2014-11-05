@@ -28,13 +28,6 @@ namespace kgrep {
             return line;
         }
 
-        private string ReplacePickupsInReplacementString(string repString) {
-            if (_command.IsPickupInReplacementString) {
-                return _pickup.ReplacePickupsWithStoredValue(repString);
-            }
-            return repString;
-        }
-
         private string ReplaceIt(Regex re, string source, string target) {
             int count = re.Matches(source).Count;
             if (count>0) {
