@@ -13,7 +13,7 @@ namespace Tests {
             string[] args = new String[] { token, repfile };
             ParseCommandLine cmd = new ParseCommandLine(args);
             Assert.AreEqual(expected, cmd.ReplacementFileName);
-            Assert.AreEqual(1, cmd.InputSourceNames.Count);
+            Assert.AreEqual(1, cmd.InputSourceList.Count);
         }
 
         [Test]
@@ -21,8 +21,8 @@ namespace Tests {
         public void WhenTwoArguments_ExpectReplacementFileAndSourceFile() {
             string[] args = new String[] { "abc", "file1.txt" };
             ParseCommandLine cmd = new ParseCommandLine(args);
-            Assert.AreEqual(1, cmd.InputSourceNames.Count);
-            Assert.AreEqual("file1.txt", cmd.InputSourceNames[0]);
+            Assert.AreEqual(1, cmd.InputSourceList.Count);
+            Assert.AreEqual("file1.txt", cmd.InputSourceList[0]);
         }
 
         [TestCase("abc","file1.txt","file2.txt", "file1.txt", "file2.txt")]
@@ -32,9 +32,9 @@ namespace Tests {
         public void WhenManyArguments_ExpectReplacementFileAndManySourceFiles(string token, string file1, string file2, string expected1, string expected2) {
             string[] args = new String[] { token, file1, file2 };
             ParseCommandLine cmd = new ParseCommandLine(args);
-            Assert.AreEqual(2, cmd.InputSourceNames.Count);
-            Assert.AreEqual(expected1, cmd.InputSourceNames[0]);
-            Assert.AreEqual(expected2, cmd.InputSourceNames[1]);
+            Assert.AreEqual(2, cmd.InputSourceList.Count);
+            Assert.AreEqual(expected1, cmd.InputSourceList[0]);
+            Assert.AreEqual(expected2, cmd.InputSourceList[1]);
         }
 
         [Test]
@@ -43,8 +43,8 @@ namespace Tests {
             string[] args = new String[] { "hi~bye" };
             ParseCommandLine cmd = new ParseCommandLine(args);
             Assert.AreEqual("hi~bye", cmd.ReplacementFileName);
-            Assert.AreEqual(1, cmd.InputSourceNames.Count);
-            Assert.AreEqual(cmd.STDIN, cmd.InputSourceNames[0]);
+            Assert.AreEqual(1, cmd.InputSourceList.Count);
+            Assert.AreEqual(cmd.STDIN, cmd.InputSourceList[0]);
         }
 
         [Test]
@@ -52,8 +52,8 @@ namespace Tests {
             string[] args = new String[] { "" };
             ParseCommandLine cmd = new ParseCommandLine(args);
             Assert.AreEqual("", cmd.ReplacementFileName);
-            Assert.AreEqual(1, cmd.InputSourceNames.Count);  // empty string
-            Assert.AreEqual(cmd.STDIN, cmd.InputSourceNames[0]);
+            Assert.AreEqual(1, cmd.InputSourceList.Count);  // empty string
+            Assert.AreEqual(cmd.STDIN, cmd.InputSourceList[0]);
         }
     }
 }

@@ -41,12 +41,12 @@ namespace kgrep
 
             logger.Info("<<<<< Starting kgrep >>>>>");
             ParseCommandLine commandLine = new ParseCommandLine(args);
-            if (commandLine.InputSourceNames.Count == 0)
+            if (commandLine.InputSourceList.Count == 0)
                 Usage("No input sources given/recognized.");
 
             ParseCommandFile commands = new ParseCommandFile(commandLine.ReplacementFileName);
             IFileAction engine = (new FileActionFactory()).GetFileAction(commands.kgrepMode);
-            engine.ApplyCommands(commands, commandLine.InputSourceNames); 
+            engine.ApplyCommands(commands, commandLine.InputSourceList); 
 
             timer.Stop();
             logger.Info("<<<<< Ending kgrep [{0}] >>>>>", timer.Elapsed);

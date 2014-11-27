@@ -15,7 +15,7 @@ namespace Tests {
                 ParseCommandLine cmd = new ParseCommandLine(args);
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
                 ParseCommandFile commands = new ParseCommandFile(cmd.ReplacementFileName);
-                string results = engine.ApplyCommands(commands, cmd.InputSourceNames);
+                string results = engine.ApplyCommands(commands, cmd.InputSourceList);
                 Assert.AreEqual("a,a\nb\n", results);
             }
 

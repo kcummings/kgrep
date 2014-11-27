@@ -31,7 +31,7 @@ namespace Tests {
             ParseCommandLine cmd = new ParseCommandLine(args);
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(cmd.ReplacementFileName);
-            string results = engine.ApplyCommands(commands, cmd.InputSourceNames);
+            string results = engine.ApplyCommands(commands, cmd.InputSourceList);
             Assert.AreEqual("", results);
         }
 
@@ -49,7 +49,7 @@ namespace Tests {
             ParseCommandLine cmd = new ParseCommandLine(args);
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(cmd.ReplacementFileName);
-            string results = engine.ApplyCommands(commands, cmd.InputSourceNames);
+            string results = engine.ApplyCommands(commands, cmd.InputSourceList);
             Assert.AreEqual("cbc\n", results);
         }
 
