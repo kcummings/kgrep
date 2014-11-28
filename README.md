@@ -6,12 +6,12 @@ A command line tool to search, replace, extract and/or print text based on regul
 Project Goals
 -------------
 
-* Refactor a working but untestable program into a "modern" application with Unit Tests, small methods, classes, etc. In other words, a sandbox to play, experiment and have a useful tool at the end of the day.
-* OS independence. Developed using VS2012, Nunit 2.6.1, NLog 2.0.1.2 & .NET 4.5. Should be compatible with Mono however it has not be compiled or tested under Mono. A sample log file is *SampleLog.log*.
+* Refactor a working but untestable program into a testable program with unit tests, small methods, classes, etc. In other words, a sandbox to play, experiment and have a useful tool at the end of the day.
+* Developed using VS2012 & .NET 4.5, Nunit for testing, NLog for logging and NSubstitute for mocking. 
 
 Binaries
 -----
-If you are anxious to try kgrep, the binaries are in the *deploy* folder. You must also have .net 4.0 installed.
+To try kgrep, the binaries are in the *deploy* folder. You must also have .net 4.0 installed.
 
 
 Usage
@@ -26,6 +26,7 @@ Usage
            ReplacementFilename is a file containing a ReplacementCommand per line.
 
         ScanToken =  a regex string that when found in input will print one match per line
+		filenames are expanded using normal wild card notation
 
 ![kgrep commands](support/kgrepcommands.jpg)
 
@@ -35,7 +36,7 @@ Kgrep runs in two modes: A Scanner and Print OR a Search and Replace tool.
 It runs as a scanner if the command file (or replacements given on the command line) only contain *Scan* commands, i.e. type 3 in the chart above. All matched commands are printed to stdout. Example: *kgrep "[0-9]+" test.txt* will print all numbers found in test.txt on a separate line.
 
 ####Search and Replacement Mode
-It runs in search mode if the file contains commands other than just *Scan* commands. it will search and replace *Subject* with *Replacement* and print the results to stdout. Unlike grep, all named and unnamed captures are remembered during the run and can be applied to any field in a command (except *Anchor*). Such expressions are called Pickups. Syntax for a named capture is normal regex *(?&lt;name&gt;[a-z]+)* OR the special {name} syntax where *name* is the pickup's name that holds the matched value. {name} matches anything where it has been placed. The value of this matched expression can be retrieved using ${name} syntax. If no Commands match an input line, the input line will print to stdio unchanged.
+It runs in search mode if the file contains commands other than just *Scan* commands. it will search and replace *Subject* with *Replacement* and print the results to stdout. Unlike grep, all named and unnamed captures are remembered during the run and can be applied to any field in a command (except *Anchor*). Such expressions are called Pickups. Syntax for a named capture is normal regex *(?&lt;name&gt;[a-z]+)* OR the special {name} syntax where *name* is the pickup's name that holds the matched value. {name} matches anything where it has been placed. The value of this matched expression can be retrieved using ${name} syntax. If no Commands match an input line, the input line will print to stdout unchanged.
 
 ---
 ##kgrep commands explained
@@ -60,13 +61,13 @@ Example:
 If in search mode, any matches are treated as Pickups for later reference. *Subject* can contain Pickups. See Pickup explanation below.
 
 ## CommandFile
-The power of kgrep can be maximized by placing commands in a *CommandFile*. 
+Commands can be consolidated into a *CommandFile*. 
 
-Commands can be stacked into one string and supplied on the command line or stored in a file and given as the first argument on the command line. Commands are stacked using the ";" stacking character, e.g. "dog~cat; h(..)~cold" contains two Normal Commands. The stacking character cannot be overridden. 
+Commands can be stacked as one string and supplied on the command line or stored in a file and given as the first argument on the command line. Commands are stacked using the ";" stacking character, e.g. "dog~cat; h(..)~cold" contains two Normal Commands. The stacking character cannot be overridden. 
 
-The *CommandFile* can contain any of the four commands in any order.  
+The *CommandFile* can contain any of the kgrep commands in any order.  
 
-There is no practical limit to the number of Commands that can be in a CommandFile or command line. Commands are processed in the order given. See SampleReplacementFile.txt for examples of *ReplacementCommands* in a file. 
+Other than memory, there is no limit to the number of Commands that can be in a CommandFile or command line. Commands are processed in the order given. See SampleReplacementFile.txt for examples of *ReplacementCommands* in a file. 
 
 Leading and trailing spaces are removed from these fields. If you want to include leading or trailing spaces, enclose the string in double quotes, i.e. " world ". The enclosing double quotes will not be included as part of the search field but the blanks will be included.
  
@@ -103,9 +104,9 @@ Caution: You can get unexpected results if you are not careful when using Contro
 
 Pickups add a lot of flexibility to kgrep.
 
-Use ${name} syntax *where name is 1..9 to reference an unnamed capture or the name given to a named capture*, to retrieve the last value of a given capture whether the capture was from the current line or a prior line. Example: The string "hello (?&lt;word&gt;[a-z]+)" contains a pickup named "word". 
+Use ${name} syntax *where name is 1..9 to reference an unnamed capture or the name given to a named capture*, to retrieve the last value of a given capture whether the capture was from the current line or a prior line. Example: The string "hello (?&lt;word&gt;[a-z]+)" contains a pickup named "word". {pickup} is a alternate and simpler syntax.
 
-Pickup values are kept for the duration of the run and can only be used in *ReplacementStrings*.  If the same pickup name is used more than once, the last pickup value is used. 
+Pickup values are kept for the duration of the run and can only be used in *ReplacementStrings*.  A named pickup's value is the value of the last capture. 
 
 Example of Pickup, hold and print:
   
@@ -123,7 +124,7 @@ Example of Pickup, hold and print:
 Example of replacing with repeating pickup:
    
     Given these ReplacementCommands:
-    ^(?<name>[a-z]+)~c${name}${name}
+    ^{name}~c${name}${name}
 
 
     And this input:
