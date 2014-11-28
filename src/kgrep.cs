@@ -40,7 +40,8 @@ namespace kgrep
             timer.Start();
 
             logger.Info("<<<<< Starting kgrep >>>>>");
-            ParseCommandLine commandLine = new ParseCommandLine(args);
+            ParseCommandLine commandLine = new ParseCommandLine();
+            commandLine.Init(args);
             if (commandLine.InputSourceList.Count == 0)
                 Usage("No input sources given/recognized.");
 

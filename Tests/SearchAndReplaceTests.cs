@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using NSubstitute;
 using NUnit.Framework;
 using kgrep;
 
@@ -27,8 +28,13 @@ namespace Tests {
 
         [Test]
         public void WhenFullCycleReplaceNoArguments_ExpectNothing() {
+            IUtilities util = Substitute.For<IUtilities>();
+            util.ExpandFileNameWildCards("abc").Returns(new List<string> { "abc" });
+
             string[] args = new String[0];
-            ParseCommandLine cmd = new ParseCommandLine(args);
+            ParseCommandLine cmd = new ParseCommandLine();
+            cmd.utilities = util;
+            cmd.Init(args);
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(cmd.ReplacementFileName);
             string results = engine.ApplyCommands(commands, cmd.InputSourceList);
@@ -45,8 +51,13 @@ namespace Tests {
 
         [Test]
         public void WhenFullCycleReplace_ExpectChanges() {
+            IUtilities util = Substitute.For<IUtilities>();
+            util.ExpandFileNameWildCards("abc").Returns(new List<string> { "abc" });
+
             string[] args = new String[] { "a~c", "abc" };
-            ParseCommandLine cmd = new ParseCommandLine(args);
+            ParseCommandLine cmd = new ParseCommandLine();
+            cmd.utilities = util;
+            cmd.Init(args);
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(cmd.ReplacementFileName);
             string results = engine.ApplyCommands(commands, cmd.InputSourceList);

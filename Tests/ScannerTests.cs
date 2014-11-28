@@ -8,17 +8,6 @@ namespace Tests {
         [TestFixture]
         public class ScannerTests {
 
-
-            [Test]
-            public void WhenFullCycleWithScannerFS_ExpectDelimitedResults() {
-                string[] args = new String[] { "ScannerFS=,; a;b", "a b ca" };
-                ParseCommandLine cmd = new ParseCommandLine(args);
-                PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
-                ParseCommandFile commands = new ParseCommandFile(cmd.ReplacementFileName);
-                string results = engine.ApplyCommands(commands, cmd.InputSourceList);
-                Assert.AreEqual("a,a\nb\n", results);
-            }
-
             [Test]
             public void WhenNoScanTokenGiven_ExpectNoChange() {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles { sw = new WriteToString() };

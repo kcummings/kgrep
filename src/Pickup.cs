@@ -15,14 +15,14 @@ namespace kgrep {
         public void CollectAllPickupsInLine(string line, Command command) {
             if (command.IsCaptureInSubjectString) {
                 Match m = command.SubjectString.Match(line);
-                if (m.Success) {
-                    foreach (int groupNumber in command.SubjectString.GetGroupNumbers()) {
-                        string name = command.SubjectString.GroupNameFromNumber(groupNumber);
-                        if (PickupList.ContainsKey(name))
-                            PickupList[name] = m.Groups[groupNumber].Value;
-                        else
-                            PickupList.Add(name, m.Groups[groupNumber].Value);
-                    }
+                if ( ! m.Success) return;
+
+                foreach (int groupNumber in command.SubjectString.GetGroupNumbers()) {
+                    string name = command.SubjectString.GroupNameFromNumber(groupNumber);
+                    if (PickupList.ContainsKey(name))
+                        PickupList[name] = m.Groups[groupNumber].Value;
+                    else
+                        PickupList.Add(name, m.Groups[groupNumber].Value);
                 }
             }
         }

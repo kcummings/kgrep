@@ -55,6 +55,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NLog.2.0.1.2\lib\net40\NLog.dll</HintPath>
     </Reference>
+    <Reference Include="NSubstitute">
+      <HintPath>..\packages\NSubstitute.1.8.0.0\lib\net40\NSubstitute.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
@@ -63,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Command.cs" />
     <Compile Include="IFileAction.cs" />
+    <Compile Include="IUtilities.cs" />
     <Compile Include="ParseCommandFile.cs" />
     <Compile Include="Pickup.cs" />
     <Compile Include="PrintTokensInSourceFiles.cs" />
@@ -81,6 +85,7 @@
     <Compile Include="ReplaceAllMatches.cs" />
     <Compile Include="FileActionFactory.cs" />
     <Compile Include="ReplaceFirstMatch.cs" />
+    <Compile Include="Utilities.cs" />
     <Compile Include="WriteStdout.cs" />
     <Compile Include="WriteToString.cs" />
   </ItemGroup>
