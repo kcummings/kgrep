@@ -14,8 +14,7 @@ namespace Tests {
             IUtilities util = Substitute.For<IUtilities>();
             util.ExpandFileNameWildCards("file.txt").Returns(new List<string> { "file.txt" });
 
-            ParseCommandLine commandLine = new ParseCommandLine();
-            commandLine.utilities = util;
+            ParseCommandLine commandLine = new ParseCommandLine() {utilities = util};
             commandLine.Init(new String[] { token, repfile });
             Assert.AreEqual(expected, commandLine.ReplacementFileName);
             Assert.AreEqual(1, commandLine.InputSourceList.Count);
@@ -27,8 +26,7 @@ namespace Tests {
             IUtilities util = Substitute.For<IUtilities>();
             util.ExpandFileNameWildCards("*.txt").Returns(new List<string>{"file1.txt", "file2.txt"});
 
-            ParseCommandLine commandLine = new ParseCommandLine();
-            commandLine.utilities = util;
+            ParseCommandLine commandLine = new ParseCommandLine() {utilities = util};
             commandLine.Init(new string[] { "a", "*.txt" });
             Assert.AreEqual(new List<string>{"file1.txt","file2.txt"}, commandLine.InputSourceList);
         }

@@ -32,8 +32,7 @@ namespace Tests {
             util.ExpandFileNameWildCards("abc").Returns(new List<string> { "abc" });
 
             string[] args = new String[0];
-            ParseCommandLine cmd = new ParseCommandLine();
-            cmd.utilities = util;
+            ParseCommandLine cmd = new ParseCommandLine(){utilities = util};
             cmd.Init(args);
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(cmd.ReplacementFileName);
@@ -55,8 +54,7 @@ namespace Tests {
             util.ExpandFileNameWildCards("abc").Returns(new List<string> { "abc" });
 
             string[] args = new String[] { "a~c", "abc" };
-            ParseCommandLine cmd = new ParseCommandLine();
-            cmd.utilities = util;
+            ParseCommandLine cmd = new ParseCommandLine() {utilities = util};
             cmd.Init(args);
             ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(cmd.ReplacementFileName);
