@@ -82,9 +82,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadFile.cs" />
     <Compile Include="ReadStdin.cs" />
-    <Compile Include="ReplaceAllMatches.cs" />
     <Compile Include="FileActionFactory.cs" />
-    <Compile Include="ReplaceFirstMatch.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="WriteStdout.cs" />
     <Compile Include="WriteToString.cs" />

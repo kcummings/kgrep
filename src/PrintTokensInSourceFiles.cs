@@ -11,7 +11,7 @@ namespace kgrep {
         private int _countOfMatchesInFile = 0;
         private int _lineNumber = 0;
 
-        public string ApplyCommands(ParseCommandFile rf, List<string> inputFilenames) {
+        public string ApplyCommandsToInputFiles(ParseCommandFile rf, List<string> inputFilenames) {
             try {
                 string line;
 

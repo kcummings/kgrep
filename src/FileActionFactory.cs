@@ -10,14 +10,10 @@ namespace kgrep {
 
         public IFileAction GetFileAction(ParseCommandFile.RunningAs runas) {
             switch (runas) {
-                case ParseCommandFile.RunningAs.ReplaceAll:   
-                    return new ReplaceAllMatches();
-                case ParseCommandFile.RunningAs.ReplaceFirst:
-                    return new ReplaceFirstMatch();
                 case ParseCommandFile.RunningAs.Scanner:
                     return new PrintTokensInSourceFiles();
                 default:
-                    throw new Exception("No valid object for FileActionFactory");
+                    return new ReplaceTokens();
             }
         }
     }

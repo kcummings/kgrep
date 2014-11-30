@@ -5,6 +5,6 @@ using System.Text;
 
 namespace kgrep {
     public interface IFileAction {
-        string ApplyCommands(ParseCommandFile rf, List<string> inputFilenames);
+        string ApplyCommandsToInputFiles(ParseCommandFile rf, List<string> inputFilenames);
     }
 }

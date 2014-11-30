@@ -24,7 +24,7 @@ namespace Tests {
         //[TestCase(false, @"(?>.*?)")]           // atomic grouping
         //[TestCase(false, @"(?i:very)")]         // mode modifier
         public void WhenPatternGiven_DoNotFindCaptures(bool expected, string cmd) {
-            ReplaceFirstMatch engine = new ReplaceFirstMatch();
+            ReplaceTokens engine = new ReplaceTokens();
             List<Command> reps = new List<Command>();
             reps.Add(new Command(cmd));
             Assert.IsFalse(reps[0].IsCaptureInSubjectString);
@@ -33,7 +33,7 @@ namespace Tests {
         [TestCase(true, "one (?:and|or) (two)")]  // grouping-only parentheses
         [TestCase(true, @"(abc) the art (?<mytag>of) today is (?i:very) (?#new)")]         // mode modifier
         public void WhenPatternGiven_FindCaptures(bool expected, string cmd) {
-            ReplaceFirstMatch engine = new ReplaceFirstMatch();
+            ReplaceTokens engine = new ReplaceTokens();
             List<Command> reps = new List<Command>();
             reps.Add(new Command(cmd));
             Assert.IsTrue(reps[0].IsCaptureInSubjectString);
@@ -42,21 +42,21 @@ namespace Tests {
         [Test]
         [ExpectedException(typeof(System.Exception))]
         public void WhenInvalidCapturePresent_ExpectException() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my (?<title) bye~hi");
             Assert.IsFalse(commands.CommandList[0].IsCaptureInSubjectString);
         }
 
         [Test]
         public void WhenReplacementPickupPresent_ExpectResults() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my bye~hi ${title}");
             Assert.IsTrue(commands.CommandList[0].IsPickupInReplacementString);
         }
 
         [Test]
         public void WhenInvalidReplacementPickupPresent_ExpectResults() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my bye~hi {title}$");
             Assert.IsFalse(commands.CommandList[0].IsPickupInReplacementString);
         }
@@ -83,87 +83,87 @@ namespace Tests {
 
         [Test]
         public void WhenPickupPresent_ExpectReplacedValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~c${name}");
-            string results = engine.ApplyCommands(commands, new List<string> { "a" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> { "a" });
             Assert.AreEqual("ca\n", results);
         }
 
         [Test]
         public void WhenPickupRepeats_ExpectReplacedValues() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~c${name}${name}");
-            string results = engine.ApplyCommands(commands, new List<string> { "a" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> { "a" });
             Assert.AreEqual("caa\n", results);
         }
 
         [Test]
         public void WhenPickupSpansLines_ExpectReplacedValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~blue ${name};blue ~${name}");
-            string results = engine.ApplyCommands(commands, new List<string> { "word" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> { "word" });
             Assert.AreEqual("word word\n", results);
         }
 
         [Test]
         public void WhenPickupAndRegexGiven_ExpectBothReplaced() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(\w)(.);..(.)~$1${2}");
-            string results = engine.ApplyCommands(commands, new List<string> { "abc" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> { "abc" });
             Assert.AreEqual("cb\n", results);
         }
 
         [Test]
         public void WhenTwoPickupSpansLines_ExpectReplacedValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~blue ${name};(?<digit>[0-9]+) ~${name}; blue~ ${name}${digit}");
-            string results = engine.ApplyCommands(commands, new List<string> {  "ab 89 cd" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> {  "ab 89 cd" });
             Assert.AreEqual("ab89 ab ab cd\n", results);
         }
 
         [Test]
         public void WhenTwoPickupSpansLinesWithMultipleReferences_ExpectReplacedValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^<chap=(?<tag>[a-z]+?)>~; end~chapter=${tag}");
-            string results = engine.ApplyCommands(commands, new List<string> { "<chap=a><last=z> end" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> { "<chap=a><last=z> end" });
             Assert.AreEqual("<last=z> chapter=a\n", results);
         }
 
         [Test]
         public void WhenTwoPickupSpansLinesFirst_ExpectFirstReplacedValue() {
-            ReplaceFirstMatch engine = new ReplaceFirstMatch() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=first; ^(?<name>[a-z]+)~blue ${name};(?<digit>[0-9]+) ~${name}; blue~ ${name}${digit}");
-            string results = engine.ApplyCommands(commands, new List<string> { "ab 89 cd", "ab 89 cd" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> { "ab 89 cd", "ab 89 cd" });
             Assert.AreEqual("blue ab 89 cd\nblue ab 89 cd\n", results);
         }
 
         [Test]
         public void WhenMatchedNamedAndUnnamedPickups_ExpectReplacedValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<letter>[a-z]+).([0-9]);12~${1}${letter}");
-            string results = engine.ApplyCommands(commands, new List<string> { "ab 12" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> { "ab 12" });
             Assert.AreEqual("ab 1ab\n", results);
         }
 
         [Test]
         public void WhenDifferentNamedPickups_ExpectReplacedValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+) (?<name2>[a-z]+);(?<digit>[0-9]+)~${name}");
-            string results = engine.ApplyCommands(commands, new List<string> { "ab cd", "89ab" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> { "ab cd", "89ab" });
             Assert.AreEqual("ab cd\nabab\n", results);
         }
 
         [Test]
         public void WhenNamedPickupChanged_ExpectReplacedValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~blue;(?<digit>[0-9]+)~${name}");
-            string results = engine.ApplyCommands(commands, new List<string> { "ab cd", "89ab" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> { "ab cd", "89ab" });
             Assert.AreEqual("blue cd\nabab\n", results);
         }
 
         [Test]
         public void WhenVariousTokensGiven_ExpectAppropiateCommandTypes() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"a~b; a; ~b; d~a~b");
             Assert.AreEqual(Command.CommandType.Normal, commands.CommandList[0].Style);
             Assert.AreEqual(Command.CommandType.Pickup, commands.CommandList[1].Style);
@@ -173,7 +173,7 @@ namespace Tests {
 
         [Test]
         public void WhenOnlyScanTokensGiven_ExpectScannerMode() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"b; a; c");
             Assert.AreEqual(ParseCommandFile.RunningAs.Scanner, commands.kgrepMode);
         }
@@ -183,7 +183,7 @@ namespace Tests {
         [TestCase("~a~")]
         [TestCase("a~")]
         public void WhenValidFieldContent_ExpectValidCommand(string line) {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(line);
             Assert.AreEqual(1, commands.CommandList.Count);
         }
@@ -199,7 +199,7 @@ namespace Tests {
         [TestCase("a~~#abc")]
         [TestCase("~a  ")]
         public void WhenInvalidFieldContent_ExpectInvalidCommand(string line) {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(line);
             Assert.AreEqual(0, commands.CommandList.Count);
         }
@@ -209,7 +209,7 @@ namespace Tests {
         [TestCase("[~]")]
         [TestCase("(~)")]
         public void WhenInvalidCommandSyntax_ExpectException(string line) {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(line);
         }
 
@@ -224,33 +224,33 @@ namespace Tests {
 
         [Test]
         public void WhenGlobPickupIsTooShort_ExpectNoValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; <{opentag}>;abc~${opentag}");
-            string results = engine.ApplyCommands(commands, new List<string> { "<>def", "abc here" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> { "<>def", "abc here" });
             Assert.AreEqual("<>def\n${opentag} here\n", results);
         }
 
         [Test]
         public void WhenGlobPickupsSpanLines_ExpectReplacedValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; <{opentag}>;abc~${opentag}");
-            string results = engine.ApplyCommands(commands, new List<string> { "<tag>def", "abc here" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> { "<tag>def", "abc here" });
             Assert.AreEqual("<tag>def\ntag here\n", results);
         }
 
         [Test]
         public void WhenGlobPickupsSpanThreeLines_ExpectReplacedValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; <title>{title}</title>; <isbn>{isbn}$; report ~ ${isbn} ${title}");
-            string results = engine.ApplyCommands(commands, new List<string> { "<isbn>97809", "<title>Answers</title>", "report" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> { "<isbn>97809", "<title>Answers</title>", "report" });
             Assert.AreEqual("<isbn>97809\n<title>Answers</title>\n97809 Answers\n", results);
         }
 
         [Test]
         public void WhenGlobPickupsWithPattern_ExpectReplacedValue() {
-            ReplaceAllMatches engine = new ReplaceAllMatches() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=all; <isbn>{isbn=[0-9]+}$; report ~ ${isbn}");
-            string results = engine.ApplyCommands(commands, new List<string> { "<isbn>97809", "report" });
+            string results = engine.ApplyCommandsToInputFiles(commands, new List<string> { "<isbn>97809", "report" });
             Assert.AreEqual("<isbn>97809\n97809\n", results);
         }
 

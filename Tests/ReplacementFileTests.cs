@@ -14,17 +14,17 @@ namespace Tests {
             ParseCommandFile rf = new ParseCommandFile("a~bc");
             List<Command> reps = rf.CommandList;
             Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].SubjectString.ToString());
-            Assert.AreEqual( "bc", reps[0].ReplacementString);
+            Assert.AreEqual("bc", reps[0].ReplacementString);
         }
 
         [Test]
         public void WhenTwoArguments_ExpectTwoReplacements() {
             ParseCommandFile rf = new ParseCommandFile("a~bc; g~jk");
             List<Command> reps = rf.CommandList;
-            Assert.AreEqual(2,reps.Count);
-            Assert.AreEqual("bc",reps[0].ReplacementString);
+            Assert.AreEqual(2, reps.Count);
+            Assert.AreEqual("bc", reps[0].ReplacementString);
             Assert.AreEqual((new Regex("g".Trim(), RegexOptions.Compiled)).ToString(), reps[1].SubjectString.ToString());
-            Assert.AreEqual("jk",  reps[1].ReplacementString);
+            Assert.AreEqual("jk", reps[1].ReplacementString);
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace Tests {
             List<Command> reps = rf.CommandList;
             Assert.AreEqual(3, reps.Count);
             Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].SubjectString.ToString());
-            Assert.AreEqual( "fourth", reps[2].ReplacementString);
+            Assert.AreEqual("fourth", reps[2].ReplacementString);
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace Tests {
             List<Command> reps = rf.CommandList;
             Assert.IsTrue(reps.Count == 2);
             Assert.AreEqual((new Regex("b".Trim(), RegexOptions.Compiled)).ToString(), reps[1].SubjectString.ToString());
-            Assert.AreEqual( "c", reps[1].ReplacementString);
+            Assert.AreEqual("c", reps[1].ReplacementString);
         }
 
         [Test]
@@ -136,17 +136,13 @@ namespace Tests {
             ParseCommandFile rf = new ParseCommandFile("#comment; a~bc");
             List<Command> reps = rf.CommandList;
             Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].SubjectString.ToString());
-            Assert.AreEqual( "bc", reps[0].ReplacementString);
+            Assert.AreEqual("bc", reps[0].ReplacementString);
         }
 
         [Test]
         public void WhenEmbeddedComment_ExpectNoChange() {
             ParseCommandFile rf = new ParseCommandFile("comment=:; :ignored;");
             List<Command> reps = rf.CommandList;
-
-            ReplaceAllMatches engine = new ReplaceAllMatches();
-            string result = engine.ApplyCommandsAllMatches("a b ca", reps);
-            Assert.AreEqual("a b ca", result);
             Assert.IsTrue(reps.Count == 0);
         }
 
@@ -155,9 +151,8 @@ namespace Tests {
             ParseCommandFile rf = new ParseCommandFile("a~");
             List<Command> reps = rf.CommandList;
 
-            ReplaceAllMatches engine = new ReplaceAllMatches();
-            string result = engine.ApplyCommandsAllMatches("a b ca", reps);
-            Assert.AreEqual(" b c", result);
+            Assert.AreEqual("a", rf.CommandList[0].SubjectString.ToString());
+            Assert.AreEqual("", rf.CommandList[0].ReplacementString);
         }
 
         [Test]
@@ -165,23 +160,21 @@ namespace Tests {
             ParseCommandFile rf = new ParseCommandFile(" \"a \" ~ b ");
             List<Command> reps = rf.CommandList;
 
-            ReplaceAllMatches engine = new ReplaceAllMatches();
-            string result = engine.ApplyCommandsAllMatches("a b ca", reps);
-            Assert.AreEqual("bb ca", result);
+            string result = reps[0].SubjectString.ToString();
+            Assert.AreEqual("a ", result);
         }
 
-        [TestCase("d a b ca", @" \sa ~ b ", "db b ca")]  // single leading
-        [TestCase(" ab  c", @" \s\sc~", " ab")]          // two leading spaces and remove it
-        [TestCase("abc d", @" bc\s~bc", "abcd")]         // single trailing
-        [TestCase("abc  d", @" bc\s\s~bc", "abcd")]      // two trailng spaces and remove it
-        public void WhenRegexSpaceInFrompattern_ExpectSpaces(string input, string repstring, string expect) {
-            ParseCommandFile rf = new ParseCommandFile(repstring);
-            List<Command> reps = rf.CommandList;
+        //[TestCase("d a b ca", @" \sa ~ b ", "db b ca")]  // single leading
+        //[TestCase(" ab  c", @" \s\sc~", " ab")]          // two leading spaces and remove it
+        //[TestCase("abc d", @" bc\s~bc", "abcd")]         // single trailing
+        //[TestCase("abc  d", @" bc\s\s~bc", "abcd")]      // two trailng spaces and remove it
+        //public void WhenRegexSpaceInFrompattern_ExpectSpaces(string input, string repstring, string expect) {
+        //    ParseCommandFile rf = new ParseCommandFile(repstring);
+        //    List<Command> reps = rf.CommandList;
 
-            ReplaceAllMatches engine = new ReplaceAllMatches();
-            string result = engine.ApplyCommandsAllMatches(input, reps);
-            Assert.AreEqual(expect, result);
-        }
+        //    string result = reps[0].SubjectString.ToString();
+        //    Assert.AreEqual(expect, result);
+        //}
 
         [TestCase("[.a~c~b")] // invalid AnchorString
         [TestCase("a[.~b")]   // invalid from pattern

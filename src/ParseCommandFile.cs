@@ -85,8 +85,10 @@ namespace kgrep
                     if (parts.Length == 3) {
                         command = new Command(parts[0], parts[1], parts[2]);
                     }
-                    if (IsValidCommand(command))
+                    if (IsValidCommand(command)) {
+                        command.IsReplaceFirstMatchCommand = kgrepMode == RunningAs.ReplaceFirst;
                         commandList.Add(command);
+                    }
                 }
             }
             sr.Close();
