@@ -8,10 +8,10 @@ using NLog;
 namespace kgrep {
 
     public class ReplaceTokens : IFileAction {
-        protected static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         public IHandleOutput sw = new WriteStdout();
-        protected int _countOfMatchesInFile = 0;
-        protected int _lineNumber = 0;
+        private int _countOfMatchesInFile = 0;
+        private int _lineNumber = 0;
         private Command _command;
         private readonly Pickup _pickup;
 
@@ -51,8 +51,9 @@ namespace kgrep {
         public string ApplyCommandsToLine(string argline, List<Command> commandList) {
             string line = argline;
             foreach (Command command in commandList) {
+                if ( ! isCandidateForReplacement(line, command)) break;
                 if (command.IsReplaceFirstMatchCommand) {
-                   line = (ApplyCommandsFirstMatch(line, command));
+                   line = ApplyCommandsFirstMatch(line, command);
                    if (command.SubjectString.IsMatch(argline)) break;
                 }
                 else 
@@ -62,25 +63,21 @@ namespace kgrep {
         }
 
         public string ApplyCommandsAllMatches(string line, Command command) {
-            if (isCandidateForReplacement(line, command)) {
-                if (command.Style == Command.CommandType.Pickup)
-                    _pickup.CollectAllPickupsInLine(line, command);
-                else
-                    line = ApplySingleCommand(line, command);
-            }
+            if (command.Style == Command.CommandType.Pickup)
+                _pickup.CollectAllPickupsInLine(line, command);
+            else
+                line = ApplySingleCommand(line, command);
             return line;
         }
 
         public string ApplyCommandsFirstMatch(string line, Command command) {
-            if (isCandidateForReplacement(line, command)) {
-                if (command.SubjectString.IsMatch(line)) {
-                    if (command.Style == Command.CommandType.Normal || command.Style == Command.CommandType.Anchored) {
-                        _pickup.CollectAllPickupsInLine(line, command);
-                        line = command.SubjectString.Replace(line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString)); //,1);
-                    }
-                    _pickup.CollectAllPickupsInLine(line, command);
-                }
+            if ( ! command.SubjectString.IsMatch(line))
+                return line;
+
+            if (command.Style == Command.CommandType.Normal || command.Style == Command.CommandType.Anchored) {
+                line = ApplySingleCommand(line, command);
             }
+            _pickup.CollectAllPickupsInLine(line, command);
             return line;
         }
 
@@ -102,14 +99,13 @@ namespace kgrep {
         }
 
         private bool isCandidateForReplacement(string line, Command command) {
-            // Has a matching AnchorString?
-            if (command.AnchorString.Length > 0) {
-                if (Regex.IsMatch(line, command.AnchorString))
-                    return true;
-                logger.Trace("   is not a Command candidate");
-                return false;
-            }
-            return true;
+            if (command.AnchorString.Length == 0)   // no anchor present
+                return true;
+
+            if (Regex.IsMatch(line, command.AnchorString))
+                return true;
+            logger.Trace("   is not a Command candidate");
+            return false;
         }
     }
 }
