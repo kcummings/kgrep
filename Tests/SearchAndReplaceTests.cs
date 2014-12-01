@@ -17,7 +17,7 @@ namespace Tests {
         public void WhenReplacementWithOneLine_ExpectChanges() {
             ReplaceTokens engine = new ReplaceTokens() {sw = new WriteToString()};
             ParseCommandFile commands = new ParseCommandFile("a~b");
-            string newline = engine.ApplyCommandsToInputFiles(commands, new List<string> {"abc"});
+            string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> {"abc"});
             Assert.AreEqual("bbc\n", newline);
         }
 
@@ -25,7 +25,7 @@ namespace Tests {
         public void WhenReplacementWithTwoInputLines_ExpectChanges() {
             ReplaceTokens engine = new ReplaceTokens() {sw = new WriteToString()};
             ParseCommandFile commands = new ParseCommandFile("a~b");
-            string newline = engine.ApplyCommandsToInputFiles(commands, new List<string> {"abc", "daf"});
+            string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> {"abc", "daf"});
             Assert.AreEqual("bbc\ndbf\n", newline);
         }
 
@@ -39,7 +39,7 @@ namespace Tests {
             cmd.Init(args);
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(cmd.ReplacementFileName);
-            string results = engine.ApplyCommandsToInputFiles(commands, cmd.InputSourceList);
+            string results = engine.ApplyCommandsToInputFileList(commands, cmd.InputSourceList);
             Assert.AreEqual("", results);
         }
 
@@ -47,7 +47,7 @@ namespace Tests {
         public void WhenScopeAllGiven_ExpectAllReplaced() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("scope=all; a~b; b~c");
-            string newline = engine.ApplyCommandsToInputFiles(commands, new List<string> { "a b c", "a b c", "earth" });
+            string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> { "a b c", "a b c", "earth" });
             Assert.AreEqual("c c c\nc c c\necrth\n", newline);
         }
 
@@ -61,7 +61,7 @@ namespace Tests {
             cmd.Init(args);
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(cmd.ReplacementFileName);
-            string results = engine.ApplyCommandsToInputFiles(commands, cmd.InputSourceList);
+            string results = engine.ApplyCommandsToInputFileList(commands, cmd.InputSourceList);
             Assert.AreEqual("cbc\n", results);
         }
 
@@ -69,7 +69,7 @@ namespace Tests {
         public void WhenScopeFirstGiven_ExpectFirstReplace() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("scope=first; a~b; b~c");
-            string newline = engine.ApplyCommandsToInputFiles(commands, new List<string> { "a b c;a b c;earth" });
+            string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> { "a b c;a b c;earth" });
             Assert.AreEqual("b b c\nb b c\nebrth\n", newline);
         }
 
@@ -77,7 +77,7 @@ namespace Tests {
         public void ReplaceFirstThenSkipToNextLine() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=first;a~b;scope=all;c~d");
-            string newline = engine.ApplyCommandsToInputFiles(commands, new List<string> { "abac;aabcc" });
+            string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> { "abac;aabcc" });
             Assert.AreEqual("bbbc\nbbbcc\n", newline);
         }
 
@@ -85,7 +85,7 @@ namespace Tests {
         public void ReplaceFirstThenNoOtherFirsts() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"scope=first;a~b;c~d");
-            string newline = engine.ApplyCommandsToInputFiles(commands, new List<string> { "aba;dec" });
+            string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> { "aba;dec" });
             Assert.AreEqual("bbb\nded\n", newline);
         }
 
@@ -93,7 +93,7 @@ namespace Tests {
         public void WhenReplacementGiven_ExpectRemoveSpaces() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"\s~");
-            string newline = engine.ApplyCommandsToInputFiles(commands, new List<string> { "a b c", "the   dog  ran. " });
+            string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> { "a b c", "the   dog  ran. " });
             Assert.AreEqual("abc\nthedogran.\n", newline);
         }
 
@@ -101,7 +101,7 @@ namespace Tests {
         public void WhenReplacementGiven_ExpectExpandEveryThirdLetter() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"([a-z]{3})~$1-");
-            string newline = engine.ApplyCommandsToInputFiles(commands, new List<string> { "kgrep works today by" });
+            string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> { "kgrep works today by" });
             Assert.AreEqual("kgr-ep wor-ks tod-ay by\n", newline);
         }
 
@@ -109,7 +109,7 @@ namespace Tests {
         public void WhenReplacementGiven_ExpectEveryOtherLetterSwapped() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"([a-z])([a-z])~$2$1");
-            string newline = engine.ApplyCommandsToInputFiles(commands, new List<string> { "kgrep works today by" });
+            string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> { "kgrep works today by" });
             Assert.AreEqual("gkerp owkrs otady yb\n", newline);
         }
 
@@ -117,7 +117,7 @@ namespace Tests {
         public void WhenDelimIsChanged_ExpectChangeWithNewDelim() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("delim=,; hi,bye; here,there");
-            string newline = engine.ApplyCommandsToInputFiles(commands, new List<string> { "hi world", "go home today", "here is it" });
+            string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> { "hi world", "go home today", "here is it" });
             Assert.AreEqual("bye world\ngo home today\nthere is it\n", newline);
         }
 
@@ -125,7 +125,7 @@ namespace Tests {
         public void WhenDelimChangesTwice_ExpectTwoChanges() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("delim=,; hi,bye; delim=-; here-there");
-            string newline = engine.ApplyCommandsToInputFiles(commands, new List<string> { "hi world", "go home today", "here is it" });
+            string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> { "hi world", "go home today", "here is it" });
             Assert.AreEqual("bye world\ngo home today\nthere is it\n", newline);
         }
 
@@ -134,7 +134,7 @@ namespace Tests {
         public void WhenAnchorMatchesFirstLineOnly_ExpectChanges() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my~hi~bye; all~gone");
-            string newline = engine.ApplyCommandsToInputFiles(commands, new List<string> { "Now is my hi world;go hi today" });
+            string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> { "Now is my hi world;go hi today" });
             Assert.AreEqual("Now is my bye world\ngo hi today\n", newline);
         }
 
@@ -142,7 +142,7 @@ namespace Tests {
         public void WhenAnchorNotMatched_ExpectNoChange() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my~hi~bye; all~gone");
-            string newline = engine.ApplyCommandsToInputFiles(commands,
+            string newline = engine.ApplyCommandsToInputFileList(commands,
                                         new List<string> { "Now is your hi world", "go hi today" });
             Assert.AreEqual("Now is your hi world\ngo hi today\n", newline);
         }
@@ -151,7 +151,7 @@ namespace Tests {
         public void WhenReplacementHasAnchorThatMatchesManySameLine_ExpectMultipleChangesLine() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my~hi~bye; all~gone");
-            string newline = engine.ApplyCommandsToInputFiles(commands,
+            string newline = engine.ApplyCommandsToInputFileList(commands,
                                         new List<string> { "This is my hi world", "go hi today" });
             Assert.AreEqual("Tbyes is my bye world\ngo hi today\n", newline);
         }
@@ -160,7 +160,7 @@ namespace Tests {
         public void WhenReplacementHasAnchorThatMatchesOnTwoLines_ExpectChanges() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("my~hi~bye; all~gone");
-            string newline = engine.ApplyCommandsToInputFiles(commands,
+            string newline = engine.ApplyCommandsToInputFileList(commands,
                                         new List<string> { "my is my hi world", "go hi mytoday" });
             Assert.AreEqual("my is my bye world\ngo bye mytoday\n", newline);
         }
@@ -169,7 +169,7 @@ namespace Tests {
         public void WhenReplacementHasAnchorThatMatches_ExpectChange() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("^Th~hi~bye; all~gone");
-            string newline = engine.ApplyCommandsToInputFiles(commands,
+            string newline = engine.ApplyCommandsToInputFileList(commands,
                                         new List<string> { "mTh my hi world", "Thgo hi mytoday" });
             Assert.AreEqual("mTh my hi world\nThgo bye mytoday\n", newline);
         }
@@ -178,7 +178,7 @@ namespace Tests {
         public void WhenEmptyReplacement_ExpectNoChange() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("");
-            string newline = engine.ApplyCommandsToInputFiles(commands,
+            string newline = engine.ApplyCommandsToInputFileList(commands,
                                         new List<string> { "Hello World", "See you later." });
             Assert.AreEqual("Hello World\nSee you later.\n", newline);
         }
@@ -187,7 +187,7 @@ namespace Tests {
         public void WhenNoReplacementGiven_ExpectNoChange() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("scope=first");
-            string newline = engine.ApplyCommandsToInputFiles(commands,
+            string newline = engine.ApplyCommandsToInputFileList(commands,
                                         new List<string> { "Hello World;See you later." });
             Assert.AreEqual("Hello World\nSee you later.\n", newline);
         }
@@ -199,7 +199,7 @@ namespace Tests {
         public void WhenRegexSpaceInFrompattern_ExpectSpaces(string input, string repstring, string expect) {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(repstring);
-            string newline = engine.ApplyCommandsToInputFiles(commands, new List<string> { input });
+            string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> { input });
             Assert.AreEqual(expect, newline);
         }
     }

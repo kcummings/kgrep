@@ -19,25 +19,19 @@ namespace kgrep {
             _pickup = new Pickup();
         }
 
-        public virtual string ApplyCommandsToInputFiles(ParseCommandFile rf, List<string> inputFilenames) {
+        public virtual string ApplyCommandsToInputFileList(ParseCommandFile rf, List<string> inputFilenames) {
             try {
                 string line;
-                string alteredLine;
                 Stopwatch timer;
 
                 foreach (string filename in inputFilenames) {
                     timer = Stopwatch.StartNew();
+
                     logger.Debug("Replace Matches - Processing input file:{0}", filename);
                     IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
-                    _lineNumber = 0;
-                    _countOfMatchesInFile = 0;
-                    while ((line = sr.ReadLine()) != null) {
-                        _lineNumber++;
-                        // TODO: Print Info after every 5000 lines, i.e. I'm still processing
-                        alteredLine = ApplyCommandsToLine(line, rf.CommandList);
-                        if (!String.IsNullOrEmpty(alteredLine)) sw.Write(alteredLine);
-                    }
+                    ApplyAllCommandsToFile(rf, sr);
                     sr.Close();
+
                     timer.Stop();
                     logger.Info("File {0} found {1} matches on {2} input lines [{3:d} ms]"
                                 , filename, _countOfMatchesInFile, _lineNumber, timer.ElapsedMilliseconds);
@@ -48,10 +42,23 @@ namespace kgrep {
             return sw.Close();
         }
 
+        private void ApplyAllCommandsToFile(ParseCommandFile commandFile, IHandleInput file) {
+            _countOfMatchesInFile = 0;
+            _lineNumber = 0;
+            string line;
+            string alteredLine;
+            while ((line = file.ReadLine()) != null) {
+                _lineNumber++;
+                alteredLine = ApplyCommandsToLine(line, commandFile.CommandList);
+                if (!String.IsNullOrEmpty(alteredLine)) sw.Write(alteredLine);
+            }
+        }
+
         public string ApplyCommandsToLine(string argline, List<Command> commandList) {
             string line = argline;
             foreach (Command command in commandList) {
                 if ( ! isCandidateForReplacement(line, command)) break;
+
                 if (command.IsReplaceFirstMatchCommand) {
                    line = ApplyCommandsFirstMatch(line, command);
                    if (command.SubjectString.IsMatch(argline)) break;

@@ -47,7 +47,7 @@ namespace kgrep
 
             ParseCommandFile commands = new ParseCommandFile(commandLine.ReplacementFileName);
             IFileAction engine = (new FileActionFactory()).GetFileAction(commands.kgrepMode);
-            engine.ApplyCommandsToInputFiles(commands, commandLine.InputSourceList); 
+            engine.ApplyCommandsToInputFileList(commands, commandLine.InputSourceList); 
 
             timer.Stop();
             logger.Info("<<<<< Ending kgrep [{0}] >>>>>", timer.Elapsed);
