@@ -21,20 +21,8 @@ namespace kgrep {
 
         public virtual string ApplyCommandsToInputFileList(ParseCommandFile rf, List<string> inputFilenames) {
             try {
-                string line;
-                Stopwatch timer;
-
                 foreach (string filename in inputFilenames) {
-                    timer = Stopwatch.StartNew();
-
-                    logger.Debug("Replace Matches - Processing input file:{0}", filename);
-                    IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
-                    ApplyAllCommandsToFile(rf, sr);
-                    sr.Close();
-
-                    timer.Stop();
-                    logger.Info("File {0} found {1} matches on {2} input lines [{3:d} ms]"
-                                , filename, _countOfMatchesInFile, _lineNumber, timer.ElapsedMilliseconds);
+                    ApplyAllCommandsToFile(rf, filename);
                 }
             } catch (Exception e) {
                 Console.WriteLine("{0}", e.Message);
@@ -42,16 +30,23 @@ namespace kgrep {
             return sw.Close();
         }
 
-        private void ApplyAllCommandsToFile(ParseCommandFile commandFile, IHandleInput file) {
+        private void ApplyAllCommandsToFile(ParseCommandFile commandFile, string filename) {
+            Stopwatch timer;
+            timer = Stopwatch.StartNew();
+
+            logger.Debug("Replace Matches - Processing input file:{0}", filename);
             _countOfMatchesInFile = 0;
             _lineNumber = 0;
+            IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
             string line;
-            string alteredLine;
-            while ((line = file.ReadLine()) != null) {
+            while ((line = sr.ReadLine()) != null) {
                 _lineNumber++;
-                alteredLine = ApplyCommandsToLine(line, commandFile.CommandList);
+                string alteredLine = ApplyCommandsToLine(line, commandFile.CommandList);
                 if (!String.IsNullOrEmpty(alteredLine)) sw.Write(alteredLine);
             }
+            sr.Close();
+            logger.Info("File {0} found {1} matches on {2} input lines [{3:d} ms]", filename, _countOfMatchesInFile, _lineNumber, timer.ElapsedMilliseconds);
+            timer.Stop();
         }
 
         public string ApplyCommandsToLine(string argline, List<Command> commandList) {
