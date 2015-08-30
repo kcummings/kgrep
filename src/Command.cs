@@ -21,7 +21,7 @@ namespace kgrep
         private static Regex nonCapturingPattern = new Regex(@"\(\?(?:[^<=]|<=|<!).*?\)", RegexOptions.Compiled);
         public static Regex PickupPattern = new Regex(@"\$\{(.+?)\}", RegexOptions.Compiled);
         private Pickup _pickup = new Pickup();
-        private String[] parts;
+        private String[] _parts;
 
         public enum CommandType {
             Pickup,
@@ -54,14 +54,14 @@ namespace kgrep
                     Style = CommandType.Anchored;
                 }
 
-                parts = rawcommand.Split(delim.ToCharArray(), 4);
-                SubjectString = RemoveEnclosingQuotesIfPresent(parts[0].Trim());
+                _parts = rawcommand.Split(delim.ToCharArray(), 4);
+                SubjectString = RemoveEnclosingQuotesIfPresent(_parts[0].Trim());
                 SubjectString = _pickup.ReplaceShorthandPatternWithFormalRegex(SubjectString);
                 SubjectRegex = new Regex(SubjectString, RegexOptions.Compiled);
-                if (parts.Length == 2)
-                    ReplacementString = RemoveEnclosingQuotesIfPresent(parts[1].Trim());
+                if (_parts.Length == 2)
+                    ReplacementString = RemoveEnclosingQuotesIfPresent(_parts[1].Trim());
                 SetType();
-                if (parts.Length == 1)
+                if (_parts.Length == 1)
                     Style = CommandType.Pickup;
             } catch (Exception e) {
                 Console.WriteLine("Regex error Command, from '{0}'  to '{1}'  AnchorString '{2}'", SubjectString,
@@ -98,7 +98,7 @@ namespace kgrep
                 logger.Debug("Subjectstring cannot be empty - command ignored\nanchor:{0} replacementString:{1}", AnchorString, ReplacementString);
                 return false;
             }
-            if (parts.Length > 2)
+            if (_parts.Length > 2)
                 return false;
             return true;
         }
