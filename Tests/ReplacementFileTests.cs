@@ -13,7 +13,7 @@ namespace Tests {
         public void WhenOneArgument_ExpectOneReplacement() {
             ParseCommandFile rf = new ParseCommandFile("a~bc");
             List<Command> reps = rf.CommandList;
-            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].SubjectString.ToString());
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].SubjectRegex.ToString());
             Assert.AreEqual("bc", reps[0].ReplacementString);
         }
 
@@ -23,7 +23,7 @@ namespace Tests {
             List<Command> reps = rf.CommandList;
             Assert.AreEqual(2, reps.Count);
             Assert.AreEqual("bc", reps[0].ReplacementString);
-            Assert.AreEqual((new Regex("g".Trim(), RegexOptions.Compiled)).ToString(), reps[1].SubjectString.ToString());
+            Assert.AreEqual((new Regex("g".Trim(), RegexOptions.Compiled)).ToString(), reps[1].SubjectRegex.ToString());
             Assert.AreEqual("jk", reps[1].ReplacementString);
         }
 
@@ -32,7 +32,7 @@ namespace Tests {
             ParseCommandFile rf = new ParseCommandFile("a~bc;   hello~world  ;  third ~ fourth ");
             List<Command> reps = rf.CommandList;
             Assert.AreEqual(3, reps.Count);
-            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].SubjectString.ToString());
+            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].SubjectRegex.ToString());
             Assert.AreEqual("fourth", reps[2].ReplacementString);
         }
 
@@ -40,7 +40,7 @@ namespace Tests {
         public void WhenEmbeddedDelim_ExpectChangedDelim() {
             ParseCommandFile rf = new ParseCommandFile("delim=,; a,bc;   hello,world  ;  third , fourth ");
             List<Command> reps = rf.CommandList;
-            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].SubjectString.ToString());
+            Assert.AreEqual((new Regex("third".Trim(), RegexOptions.Compiled)).ToString(), reps[2].SubjectRegex.ToString());
             Assert.AreEqual("fourth", reps[2].ReplacementString);
         }
 
@@ -49,7 +49,7 @@ namespace Tests {
             ParseCommandFile rf = new ParseCommandFile("scope=first;delim=,; a,b; b,c");
             List<Command> reps = rf.CommandList;
             Assert.IsTrue(reps.Count == 2);
-            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].SubjectString.ToString());
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].SubjectRegex.ToString());
             Assert.AreEqual("b", reps[0].ReplacementString);
         }
 
@@ -58,7 +58,7 @@ namespace Tests {
             ParseCommandFile rf = new ParseCommandFile("scope=all;delim=,; a,b; b,c");
             List<Command> reps = rf.CommandList;
             Assert.IsTrue(reps.Count == 2);
-            Assert.AreEqual((new Regex("b".Trim(), RegexOptions.Compiled)).ToString(), reps[1].SubjectString.ToString());
+            Assert.AreEqual((new Regex("b".Trim(), RegexOptions.Compiled)).ToString(), reps[1].SubjectRegex.ToString());
             Assert.AreEqual("c", reps[1].ReplacementString);
         }
 
@@ -135,7 +135,7 @@ namespace Tests {
         public void WhenEmbeddedComment_ExpectCommentIgnored() {
             ParseCommandFile rf = new ParseCommandFile("#comment; a~bc");
             List<Command> reps = rf.CommandList;
-            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].SubjectString.ToString());
+            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].SubjectRegex.ToString());
             Assert.AreEqual("bc", reps[0].ReplacementString);
         }
 
@@ -151,7 +151,7 @@ namespace Tests {
             ParseCommandFile rf = new ParseCommandFile("a~");
             List<Command> reps = rf.CommandList;
 
-            Assert.AreEqual("a", rf.CommandList[0].SubjectString.ToString());
+            Assert.AreEqual("a", rf.CommandList[0].SubjectRegex.ToString());
             Assert.AreEqual("", rf.CommandList[0].ReplacementString);
         }
 
@@ -160,7 +160,7 @@ namespace Tests {
             ParseCommandFile rf = new ParseCommandFile(" \"a \" ~ b ");
             List<Command> reps = rf.CommandList;
 
-            string result = reps[0].SubjectString.ToString();
+            string result = reps[0].SubjectRegex.ToString();
             Assert.AreEqual("a ", result);
         }
 
@@ -172,7 +172,7 @@ namespace Tests {
         //    ParseCommandFile rf = new ParseCommandFile(repstring);
         //    List<Command> reps = rf.CommandList;
 
-        //    string result = reps[0].SubjectString.ToString();
+        //    string result = reps[0].SubjectRegex.ToString();
         //    Assert.AreEqual(expect, result);
         //}
 

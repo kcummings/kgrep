@@ -28,19 +28,19 @@ namespace Tests {
         [Test]
         public void WhenAnchorAndSubjectInPattern() {
             Command command = new Command("/ hello/ a~b");
-            Assert.AreEqual("a", command.test);
+            Assert.AreEqual("a", command.SubjectString);
         }
 
         [Test]
         public void WhenOnlySubjectInPattern() {
             Command command = new Command(" a");
-            Assert.AreEqual("a", command.test);
+            Assert.AreEqual("a", command.SubjectString);
         }
 
         [Test]
         public void WhenSubjectInPatternWIthSpaces() {
             Command command = new Command(" a ~b");
-            Assert.AreEqual("a", command.test);
+            Assert.AreEqual("a", command.SubjectString);
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace Tests {
         [Test]
         public void WhenEnclosedQuotesInFrompattern_ExpectQuotesRemoved() {
             Command command = new Command("\" from  \" ~ to");
-            Assert.AreEqual(" from  ", command.SubjectString.ToString());
+            Assert.AreEqual(" from  ", command.SubjectRegex.ToString());
         }
 
         [Test]

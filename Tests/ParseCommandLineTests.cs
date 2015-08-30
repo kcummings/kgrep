@@ -21,7 +21,7 @@ namespace Tests {
         }
 
         [Test]
-        // kgrep SubjectString filename1
+        // kgrep SubjectRegex filename1
         public void WhenTwoArguments_ExpectReplacementFileAndSourceFile() {
             IUtilities util = Substitute.For<IUtilities>();
             util.ExpandFileNameWildCards("*.txt").Returns(new List<string>{"file1.txt", "file2.txt"});

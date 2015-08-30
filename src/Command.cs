@@ -10,9 +10,8 @@ namespace kgrep
 
         public String AnchorString = "";
         public String ReplacementString = "";
-        public Regex SubjectString = new Regex("");
-        public Regex SubjectRegex = new Regex(""); // TODO: to hold regex version of SubjectString
-        public String test = "";
+        public Regex SubjectRegex;
+        public String SubjectString =""; 
         public CommandType Style;
         public string ScannerFS = "\n";
         public bool IsReplaceFirstMatchCommand = false;
@@ -43,8 +42,8 @@ namespace kgrep
         }
 
         //  Sample: "/word/ a~b"
-        //          "/AnchorString/ SubjectString ~ ReplacementString
-        //     Only SubjectString is required.
+        //          "/AnchorString/ SubjectRegex ~ ReplacementString
+        //     Only SubjectRegex is required.
         //     Parse line and init parameters.
         public void ParseLine(string rawcommand, string delim) {
             try {
@@ -56,16 +55,16 @@ namespace kgrep
                 }
 
                 parts = rawcommand.Split(delim.ToCharArray(), 4);
-                test = RemoveEnclosingQuotesIfPresent(parts[0].Trim());
-                test = _pickup.ReplaceShorthandPatternWithFormalRegex(test);
-                SubjectString = new Regex(test, RegexOptions.Compiled);
+                SubjectString = RemoveEnclosingQuotesIfPresent(parts[0].Trim());
+                SubjectString = _pickup.ReplaceShorthandPatternWithFormalRegex(SubjectString);
+                SubjectRegex = new Regex(SubjectString, RegexOptions.Compiled);
                 if (parts.Length == 2)
                     ReplacementString = RemoveEnclosingQuotesIfPresent(parts[1].Trim());
                 SetType();
                 if (parts.Length == 1)
                     Style = CommandType.Pickup;
             } catch (Exception e) {
-                Console.WriteLine("Regex error Command, from '{0}'  to '{1}'  AnchorString '{2}'", test,
+                Console.WriteLine("Regex error Command, from '{0}'  to '{1}'  AnchorString '{2}'", SubjectString,
                                   ReplacementString, AnchorString);
                 throw new Exception(e.Message);
             }
@@ -79,7 +78,7 @@ namespace kgrep
             else 
                 Style = CommandType.Normal;
 
-            IsCaptureInSubjectString = allParensPattern.Match(test).Success;
+            IsCaptureInSubjectString = allParensPattern.Match(SubjectString).Success;
             IsPickupInReplacementString = PickupPattern.Match(ReplacementString).Success;
             return;
         }
@@ -95,7 +94,7 @@ namespace kgrep
         }
 
         public bool IsValid() {
-            if (String.IsNullOrEmpty(test)) {
+            if (String.IsNullOrEmpty(SubjectString)) {
                 logger.Debug("Subjectstring cannot be empty - command ignored\nanchor:{0} replacementString:{1}", AnchorString, ReplacementString);
                 return false;
             }

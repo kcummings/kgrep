@@ -56,7 +56,7 @@ namespace kgrep {
 
                 if (command.IsReplaceFirstMatchCommand) {
                    line = ApplyCommandsFirstMatch(line, command);
-                   if (command.SubjectString.IsMatch(argline)) break;
+                   if (command.SubjectRegex.IsMatch(argline)) break;
                 }
                 else 
                    line = ApplyCommandsAllMatches(line, command);
@@ -73,7 +73,7 @@ namespace kgrep {
         }
 
         public string ApplyCommandsFirstMatch(string line, Command command) {
-            if ( ! command.SubjectString.IsMatch(line))
+            if ( ! command.SubjectRegex.IsMatch(line))
                 return line;
 
             if (command.Style == Command.CommandType.Normal || command.Style == Command.CommandType.Anchored) {
@@ -86,7 +86,7 @@ namespace kgrep {
         private string ApplySingleCommand(string line, Command command) {
             _command = command;
             _pickup.CollectAllPickupsInLine(line, command);
-            line = ReplaceIt(command.SubjectString, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));
+            line = ReplaceIt(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));
             return line;
         }
 

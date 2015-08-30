@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace kgrep {
 
 
-    // Values are in Named and unnamed Captures are only in SubjectString.
+    // Values are in Named and unnamed Captures are only in SubjectRegex.
     // e.g. named capture syntax: (?<digit>[0-9]+)  yeilds pickup name ${digit} 
     //    unnamed capture syntax: ([0-9]+)    yeilds pickup name ${1}
     public class Pickup {
@@ -14,11 +14,11 @@ namespace kgrep {
 
         public void CollectAllPickupsInLine(string line, Command command) {
             if (command.IsCaptureInSubjectString) {
-                Match m = command.SubjectString.Match(line);
+                Match m = command.SubjectRegex.Match(line);
                 if ( ! m.Success) return;
 
-                foreach (int groupNumber in command.SubjectString.GetGroupNumbers()) {
-                    string name = command.SubjectString.GroupNameFromNumber(groupNumber);
+                foreach (int groupNumber in command.SubjectRegex.GetGroupNumbers()) {
+                    string name = command.SubjectRegex.GroupNameFromNumber(groupNumber);
                     if (PickupList.ContainsKey(name))
                         PickupList[name] = m.Groups[groupNumber].Value;
                     else
