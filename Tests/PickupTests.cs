@@ -164,7 +164,7 @@ namespace Tests {
         [Test]
         public void WhenVariousTokensGiven_ExpectAppropiateCommandTypes() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"a~b; a; ~b; d~a~b");
+            ParseCommandFile commands = new ParseCommandFile(@"a~b; a; /d/a~b");
             Assert.AreEqual(Command.CommandType.Normal, commands.CommandList[0].Style);
             Assert.AreEqual(Command.CommandType.Pickup, commands.CommandList[1].Style);
             Assert.AreEqual(Command.CommandType.Anchored, commands.CommandList[2].Style);
@@ -180,7 +180,7 @@ namespace Tests {
 
         [Test]
         [TestCase("a~b")]
-        [TestCase("~a~")]
+        [TestCase("//a~")]
         [TestCase("a~")]
         public void WhenValidFieldContent_ExpectValidCommand(string line) {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
@@ -192,11 +192,11 @@ namespace Tests {
         [TestCase("~~~")]
         [TestCase("~~~~")]
         [TestCase("~")]
-        [TestCase("a~ ~")]  // only anchor supplied
+        [TestCase("/a/ ~")]  // only anchor supplied
         [TestCase(@"a~b~c~d~e")]
         [TestCase("delim=:::::")]
         [TestCase("delim=:::")]
-        [TestCase("a~~#abc")]
+        [TestCase("/a/~#abc")]
         [TestCase("~a  ")]
         public void WhenInvalidFieldContent_ExpectInvalidCommand(string line) {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };

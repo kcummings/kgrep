@@ -133,7 +133,7 @@ namespace Tests {
         [Test]
         public void WhenAnchorMatchesFirstLineOnly_ExpectChanges() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("my~hi~bye; all~gone");
+            ParseCommandFile commands = new ParseCommandFile("/my/hi~bye; all~gone");
             string newline = engine.ApplyCommandsToInputFileList(commands, new List<string> { "Now is my hi world;go hi today" });
             Assert.AreEqual("Now is my bye world\ngo hi today\n", newline);
         }
@@ -150,7 +150,7 @@ namespace Tests {
         [Test]
         public void WhenReplacementHasAnchorThatMatchesManySameLine_ExpectMultipleChangesLine() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("my~hi~bye; all~gone");
+            ParseCommandFile commands = new ParseCommandFile("/my/hi~bye; all~gone");
             string newline = engine.ApplyCommandsToInputFileList(commands,
                                         new List<string> { "This is my hi world", "go hi today" });
             Assert.AreEqual("Tbyes is my bye world\ngo hi today\n", newline);
@@ -159,7 +159,7 @@ namespace Tests {
         [Test]
         public void WhenReplacementHasAnchorThatMatchesOnTwoLines_ExpectChanges() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("my~hi~bye; all~gone");
+            ParseCommandFile commands = new ParseCommandFile("/my/hi~bye; all~gone");
             string newline = engine.ApplyCommandsToInputFileList(commands,
                                         new List<string> { "my is my hi world", "go hi mytoday" });
             Assert.AreEqual("my is my bye world\ngo bye mytoday\n", newline);
@@ -168,7 +168,7 @@ namespace Tests {
         [Test]
         public void WhenReplacementHasAnchorThatMatches_ExpectChange() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("^Th~hi~bye; all~gone");
+            ParseCommandFile commands = new ParseCommandFile("/^Th/hi~bye; all~gone");
             string newline = engine.ApplyCommandsToInputFileList(commands,
                                         new List<string> { "mTh my hi world", "Thgo hi mytoday" });
             Assert.AreEqual("mTh my hi world\nThgo bye mytoday\n", newline);

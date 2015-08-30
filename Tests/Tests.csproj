@@ -57,7 +57,7 @@
   <ItemGroup>
     <Compile Include="PickupTests.cs" />
     <Compile Include="ReplacementFileTests.cs" />
-    <Compile Include="ReplacementTests.cs" />
+    <Compile Include="CommandTests.cs" />
     <Compile Include="ReplacerEngineTests.cs" />
     <Compile Include="SearchAndReplaceTests.cs" />
     <Compile Include="ParseCommandLineTests.cs" />

@@ -176,9 +176,8 @@ namespace Tests {
         //    Assert.AreEqual(expect, result);
         //}
 
-        [TestCase("[.a~c~b")] // invalid AnchorString
+        [TestCase("[./a/c~b")] // invalid AnchorString
         [TestCase("a[.~b")]   // invalid from pattern
-        [TestCase("a~b[.")]   // invalid to pattern
         [ExpectedException(typeof(System.Exception))]
         public void WhenInvalidRegexPattern_ExpectException(string pattern) {
             ParseCommandFile rf = new ParseCommandFile(pattern);

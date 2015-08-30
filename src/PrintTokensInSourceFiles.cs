@@ -26,7 +26,7 @@ namespace kgrep {
                         _lineNumber++;
                         logger.Trace("Scanning line:{0}", line);
                         foreach (Command command in rf.CommandList) {
-                            sw.Write(ScanForTokens(line, command.SubjectString, command.ScannerFS));
+                            sw.Write(ScanForTokens(line, command.SubjectString, rf.ScannerFS));
                         }
                     }
                     sr.Close();
