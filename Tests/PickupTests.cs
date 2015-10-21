@@ -84,7 +84,7 @@ namespace Tests {
         [Test]
         public void WhenPickupPresent_ExpectReplacedValue() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~c${name}");
+            ParseCommandFile commands = new ParseCommandFile(@"^(?<name>[a-z]+)~c${name}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "a" });
             Assert.AreEqual("ca\n", results);
         }
@@ -92,7 +92,7 @@ namespace Tests {
         [Test]
         public void WhenPickupRepeats_ExpectReplacedValues() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~c${name}${name}");
+            ParseCommandFile commands = new ParseCommandFile(@"^(?<name>[a-z]+)~c${name}${name}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "a" });
             Assert.AreEqual("caa\n", results);
         }
@@ -100,7 +100,7 @@ namespace Tests {
         [Test]
         public void WhenPickupSpansLines_ExpectReplacedValue() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~blue ${name};blue ~${name}");
+            ParseCommandFile commands = new ParseCommandFile(@"^(?<name>[a-z]+)~blue ${name};blue ~${name}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "word" });
             Assert.AreEqual("word word\n", results);
         }
@@ -108,7 +108,7 @@ namespace Tests {
         [Test]
         public void WhenPickupAndRegexGiven_ExpectBothReplaced() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(\w)(.);..(.)~$1${2}");
+            ParseCommandFile commands = new ParseCommandFile(@"^(\w)(.);..(.)~$1${2}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "abc" });
             Assert.AreEqual("cb\n", results);
         }
@@ -116,7 +116,7 @@ namespace Tests {
         [Test]
         public void WhenTwoPickupSpansLines_ExpectReplacedValue() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~blue ${name};(?<digit>[0-9]+) ~${name}; blue~ ${name}${digit}");
+            ParseCommandFile commands = new ParseCommandFile(@"^(?<name>[a-z]+)~blue ${name};(?<digit>[0-9]+) ~${name}; blue~ ${name}${digit}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> {  "ab 89 cd" });
             Assert.AreEqual("ab89 ab ab cd\n", results);
         }
@@ -124,23 +124,15 @@ namespace Tests {
         [Test]
         public void WhenTwoPickupSpansLinesWithMultipleReferences_ExpectReplacedValue() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^<chap=(?<tag>[a-z]+?)>~; end~chapter=${tag}");
+            ParseCommandFile commands = new ParseCommandFile(@"^<chap=(?<tag>[a-z]+?)>~; end~chapter=${tag}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "<chap=a><last=z> end" });
             Assert.AreEqual("<last=z> chapter=a\n", results);
         }
 
         [Test]
-        public void WhenTwoPickupSpansLinesFirst_ExpectFirstReplacedValue() {
-            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=first; ^(?<name>[a-z]+)~blue ${name};(?<digit>[0-9]+) ~${name}; blue~ ${name}${digit}");
-            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "ab 89 cd", "ab 89 cd" });
-            Assert.AreEqual("blue ab 89 cd\nblue ab 89 cd\n", results);
-        }
-
-        [Test]
         public void WhenMatchedNamedAndUnnamedPickups_ExpectReplacedValue() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<letter>[a-z]+).([0-9]);12~${1}${letter}");
+            ParseCommandFile commands = new ParseCommandFile(@"(?<letter>[a-z]+).([0-9]);12~${1}${letter}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "ab 12" });
             Assert.AreEqual("ab 1ab\n", results);
         }
@@ -148,7 +140,7 @@ namespace Tests {
         [Test]
         public void WhenDifferentNamedPickups_ExpectReplacedValue() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; (?<name>[a-z]+) (?<name2>[a-z]+);(?<digit>[0-9]+)~${name}");
+            ParseCommandFile commands = new ParseCommandFile(@"(?<name>[a-z]+) (?<name2>[a-z]+);(?<digit>[0-9]+)~${name}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "ab cd", "89ab" });
             Assert.AreEqual("ab cd\nabab\n", results);
         }
@@ -156,7 +148,7 @@ namespace Tests {
         [Test]
         public void WhenNamedPickupChanged_ExpectReplacedValue() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; ^(?<name>[a-z]+)~blue;(?<digit>[0-9]+)~${name}");
+            ParseCommandFile commands = new ParseCommandFile(@"^(?<name>[a-z]+)~blue;(?<digit>[0-9]+)~${name}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "ab cd", "89ab" });
             Assert.AreEqual("blue cd\nabab\n", results);
         }
@@ -225,7 +217,7 @@ namespace Tests {
         [Test]
         public void WhenGlobPickupIsTooShort_ExpectNoValue() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; <{opentag}>;abc~${opentag}");
+            ParseCommandFile commands = new ParseCommandFile(@"<{opentag}>;abc~${opentag}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "<>def", "abc here" });
             Assert.AreEqual("<>def\n${opentag} here\n", results);
         }
@@ -233,7 +225,7 @@ namespace Tests {
         [Test]
         public void WhenGlobPickupsSpanLines_ExpectReplacedValue() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; <{opentag}>;abc~${opentag}");
+            ParseCommandFile commands = new ParseCommandFile(@"<{opentag}>;abc~${opentag}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "<tag>def", "abc here" });
             Assert.AreEqual("<tag>def\ntag here\n", results);
         }
@@ -241,7 +233,7 @@ namespace Tests {
         [Test]
         public void WhenGlobPickupsSpanThreeLines_ExpectReplacedValue() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; <title>{title}</title>; <isbn>{isbn}$; report ~ ${isbn} ${title}");
+            ParseCommandFile commands = new ParseCommandFile(@"<title>{title}</title>; <isbn>{isbn}$; report ~ ${isbn} ${title}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "<isbn>97809", "<title>Answers</title>", "report" });
             Assert.AreEqual("<isbn>97809\n<title>Answers</title>\n97809 Answers\n", results);
         }
@@ -249,7 +241,7 @@ namespace Tests {
         [Test]
         public void WhenGlobPickupsWithPattern_ExpectReplacedValue() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"scope=all; <isbn>{isbn=[0-9]+}$; report ~ ${isbn}");
+            ParseCommandFile commands = new ParseCommandFile(@"<isbn>{isbn=[0-9]+}$; report ~ ${isbn}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "<isbn>97809", "report" });
             Assert.AreEqual("<isbn>97809\n97809\n", results);
         }

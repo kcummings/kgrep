@@ -6,8 +6,6 @@ using System.Text.RegularExpressions;
 namespace kgrep {
     public class PrintTokensInSourceFiles : IFileAction {
         public IHandleOutput sw = new WriteStdout();
-        private int _countOfMatchesInFile = 0;
-        private int _lineNumber = 0;
 
         public string ApplyCommandsToInputFileList(ParseCommandFile rf, List<string> inputFilenames) {
             try {
@@ -15,10 +13,7 @@ namespace kgrep {
 
                 foreach (string filename in inputFilenames) {
                     IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
-                    _lineNumber = 0;
-                    _countOfMatchesInFile = 0;
                     while ((line = sr.ReadLine()) != null) {
-                        _lineNumber++;
                         foreach (Command command in rf.CommandList) {
                             sw.Write(ScanForTokens(line, command.SubjectRegex, rf.ScannerFS));
                         }
@@ -49,7 +44,6 @@ namespace kgrep {
                 }
                 m = m.NextMatch();
             }
-            _countOfMatchesInFile += sb.Count;
             return String.Join(FS, sb.ToArray());
         }
     }

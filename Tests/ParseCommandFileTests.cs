@@ -45,17 +45,8 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenEmbeddedDelimAndScopeFirst_ExpectFirstOnlyReplaces() {
-            ParseCommandFile rf = new ParseCommandFile("scope=first;delim=,; a,b; b,c");
-            List<Command> reps = rf.CommandList;
-            Assert.IsTrue(reps.Count == 2);
-            Assert.AreEqual((new Regex("a".Trim(), RegexOptions.Compiled)).ToString(), reps[0].SubjectRegex.ToString());
-            Assert.AreEqual("b", reps[0].ReplacementString);
-        }
-
-        [Test]
-        public void WhenEmbeddedDelimAndScopeAll_ExpectAllReplaces() {
-            ParseCommandFile rf = new ParseCommandFile("scope=all;delim=,; a,b; b,c");
+        public void WhenEmbeddedDelim_ExpectAllReplaces() {
+            ParseCommandFile rf = new ParseCommandFile("delim=,; a,b; b,c");
             List<Command> reps = rf.CommandList;
             Assert.IsTrue(reps.Count == 2);
             Assert.AreEqual((new Regex("b".Trim(), RegexOptions.Compiled)).ToString(), reps[1].SubjectRegex.ToString());
@@ -70,44 +61,24 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenFirstDirectiveGiven_ExpectFirstReplaceMode() {
-            ParseCommandFile rf = new ParseCommandFile("scope=first; a~b; b");
-            List<Command> reps = rf.CommandList;
-            Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceFirst, rf.kgrepMode);
-        }
-
-        [Test]
         public void WhenAllDirectiveGiven_ExpectAllReplaceMode() {
-            ParseCommandFile rf = new ParseCommandFile("scope=all; a~b");
+            ParseCommandFile rf = new ParseCommandFile("a~b");
             List<Command> reps = rf.CommandList;
             Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceAll, rf.kgrepMode);
         }
 
         [Test]
         public void WhenOnlyScansGiven_ExpectScannerToOverrideAllMode() {
-            ParseCommandFile rf = new ParseCommandFile("scope=all; a; [0-9]+;scope=first");
+            ParseCommandFile rf = new ParseCommandFile("a; [0-9]+");
             List<Command> reps = rf.CommandList;
             Assert.AreEqual(ParseCommandFile.RunningAs.Scanner, rf.kgrepMode);
-        }
-
-        [Test]
-        public void WhenEndsWithFirst_ExpectFirstReplaceMode() {
-            ParseCommandFile rf = new ParseCommandFile("scope=all; a; [0-9]+; scope=first; a~b");
-            List<Command> reps = rf.CommandList;
-            Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceFirst, rf.kgrepMode);
         }
 
         [Test]
         public void WhenEndsWithAll_ExpectAllReplaceMode() {
-            ParseCommandFile rf = new ParseCommandFile("scope=first; a; [0-9]+; a~b; scope=all");
+            ParseCommandFile rf = new ParseCommandFile("a; [0-9]+; a~b");
             List<Command> reps = rf.CommandList;
             Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceAll, rf.kgrepMode);
-        }
-        [Test]
-        public void WhenScopeDirectiveWIthScanCommands_ExpectScannerMode() {
-            ParseCommandFile rf = new ParseCommandFile("scope=all;a;b;c");
-            List<Command> reps = rf.CommandList;
-            Assert.AreEqual(ParseCommandFile.RunningAs.Scanner, rf.kgrepMode);
         }
 
         [Test]
@@ -116,15 +87,7 @@ namespace Tests {
             List<Command> reps = rf.CommandList;
             Assert.AreEqual(ParseCommandFile.RunningAs.Scanner, rf.kgrepMode);
         }
-
-        [Test]
-        public void WhenBlanksAroundFirstDirective_ExpectIgnoreBlanks() {
-            ParseCommandFile rf = new ParseCommandFile("  scope = first; a~b; c");
-            List<Command> reps = rf.CommandList;
-            Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceFirst, rf.kgrepMode);
-        }
-
-        [Test]
+         [Test]
         public void WhenNoCommandsGiven_ExpectScannerMode() {
             ParseCommandFile rf = new ParseCommandFile(";;;");
             List<Command> reps = rf.CommandList;

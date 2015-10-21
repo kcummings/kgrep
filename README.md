@@ -95,8 +95,6 @@ The following controls can be embedded anywhere in the CommandFile. Control opti
 
 - **ScannerFS=?** Only used in Scanner mode. The scanned tokens are "glued" together with the value of this option. Default is "\n".
 
-- **scope=[first|all]** If set to **first**, the first time a Command is found on the line, no other Commands are applied to that line. If set to **all** , as many Commands as possible will be applied to a line.
-
 Caution: You can get unexpected results if you are not careful when using Control Options. For example, setting comment=~ still allows default delim=~ so the Command "comment=~; a~b" is interpreted as a Normal Command but becomes just "a" since "~b" is now a comment and the expected replacement doesn't take effect. No change occurs to the source inputs.
 
 

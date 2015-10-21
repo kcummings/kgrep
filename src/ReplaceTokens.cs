@@ -8,9 +8,6 @@ namespace kgrep {
 
     public class ReplaceTokens : IFileAction {
         public IHandleOutput sw = new WriteStdout();
-        private int _countOfMatchesInFile = 0;
-        private int _lineNumber = 0;
-        private Command _command;
         private readonly Pickup _pickup;
 
         public ReplaceTokens() {
@@ -20,7 +17,7 @@ namespace kgrep {
         public virtual string ApplyCommandsToInputFileList(ParseCommandFile rf, List<string> inputFilenames) {
             try {
                 foreach (string filename in inputFilenames) {
-                    ApplyAllCommandsToFile(rf, filename);
+                    ApplyCommandsToFile(rf, filename);
                 }
             } catch (Exception e) {
                 Console.WriteLine("{0}", e.Message);
@@ -28,7 +25,7 @@ namespace kgrep {
             return sw.Close();
         }
 
-        private void ApplyAllCommandsToFile(ParseCommandFile commandFile, string filename) {
+        private void ApplyCommandsToFile(ParseCommandFile commandFile, string filename) {
             IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
             string line;
             while ((line = sr.ReadLine()) != null) {
@@ -42,12 +39,7 @@ namespace kgrep {
             string line = argline;
             foreach (Command command in commandList) {
                 if ( ! isCandidateForReplacement(line, command)) break;
-                if (command.IsReplaceFirstMatchCommand) {
-                   line = ApplyCommandsFirstMatch(line, command);
-                   if (command.SubjectRegex.IsMatch(argline)) break;
-                }
-                else 
-                   line = ApplyCommandsAllMatches(line, command);
+                line = ApplyCommandsAllMatches(line, command);
             }
             return line;
         }
@@ -60,19 +52,8 @@ namespace kgrep {
             return line;
         }
 
-        public string ApplyCommandsFirstMatch(string line, Command command) {
-            if ( ! command.SubjectRegex.IsMatch(line))
-                return line;
-
-            if (command.Style == Command.CommandType.Normal || command.Style == Command.CommandType.Anchored) {
-                line = ApplySingleCommand(line, command);
-            }
-            _pickup.CollectAllPickupsInLine(line, command);
-            return line;
-        }
 
         private string ApplySingleCommand(string line, Command command) {
-            _command = command;
             _pickup.CollectAllPickupsInLine(line, command);
             line = ReplaceIt(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));
             return line;
@@ -81,7 +62,6 @@ namespace kgrep {
         private string ReplaceIt(Regex re, string source, string target) {
             int count = re.Matches(source).Count;
             if (count>0) {
-                _countOfMatchesInFile += count;
                 return re.Replace(source, target);
             }
             return source;

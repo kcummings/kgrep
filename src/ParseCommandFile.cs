@@ -8,8 +8,6 @@ namespace kgrep
     public class ParseCommandFile
     {
         public List<Command> CommandList = new List<Command>();
-        private bool _scopeAll = true;
-        public bool ScopeAll { get { return _scopeAll; } }
         private String _comment = "#";
         private String _delim = "~";
         private IHandleInput sr;
@@ -17,10 +15,8 @@ namespace kgrep
     
         // Kgrep is only in one state or mode.
         // The mode is determined by the types and sequence of commands. 
-        // If only scan tokens are present, it runs in scanner mode even if a scope directive is supplied.
         public enum RunningAs {
             Scanner,
-            ReplaceFirst,
             ReplaceAll
         }
 
@@ -59,14 +55,9 @@ namespace kgrep
                     _delim = GetOption(line, "delim");
                 else if (line.ToLower().StartsWith("scannerfs="))
                     ScannerFS = GetOption(line, "scannerfs");
-                else if (Regex.IsMatch(line,@"^\s*scope\s*=\s*first",RegexOptions.IgnoreCase))  
-                    kgrepMode = RunningAs.ReplaceFirst;
-                else if (Regex.IsMatch(line, @"^\s*scope\s*=\s*all", RegexOptions.IgnoreCase))  
-                    kgrepMode = RunningAs.ReplaceAll;
                 else {
                     Command command = new Command(line, _delim);
                     if (command.IsValid()) {
-                        command.IsReplaceFirstMatchCommand = kgrepMode == RunningAs.ReplaceFirst;
                         CommandList.Add(command);
                     }
                 }

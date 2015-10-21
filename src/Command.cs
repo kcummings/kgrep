@@ -12,7 +12,6 @@ namespace kgrep
         public String SubjectString =""; 
         public CommandType Style;
         public string ScannerFS = "\n";
-        public bool IsReplaceFirstMatchCommand = false;
         public bool IsCaptureInSubjectString = false;
         public bool IsPickupInReplacementString = false;   // pickup syntax: ${name}
         private static Regex allParensPattern = new Regex(@"(\(\?<.+?>.+?\)|\(.*?\))",RegexOptions.Compiled);
