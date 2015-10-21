@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using NLog;
 
 /*
 ##The MIT License (MIT)
@@ -33,13 +32,8 @@ namespace kgrep
 
     class Kgrep
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
         static void Main(string[] args) {
 
-            Stopwatch timer = new Stopwatch();
-            timer.Start();
-
-            logger.Info("<<<<< Starting kgrep >>>>>");
             ParseCommandLine commandLine = new ParseCommandLine();
             commandLine.Init(args);
             if (commandLine.InputSourceList.Count == 0)
@@ -48,9 +42,6 @@ namespace kgrep
             ParseCommandFile commands = new ParseCommandFile(commandLine.ReplacementFileName);
             IFileAction engine = (new FileActionFactory()).GetFileAction(commands.kgrepMode);
             engine.ApplyCommandsToInputFileList(commands, commandLine.InputSourceList); 
-
-            timer.Stop();
-            logger.Info("<<<<< Ending kgrep [{0}] >>>>>", timer.Elapsed);
         }
 
         private static void Usage(string message) {

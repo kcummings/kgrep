@@ -1,12 +1,10 @@
 using System;
 using System.Xml.Serialization;
 using System.Text.RegularExpressions;
-using NLog;
 
 namespace kgrep
 {
     public class Command {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         public String AnchorString = "";
         public String ReplacementString = "";
@@ -87,7 +85,6 @@ namespace kgrep
             string pat = pattern.Trim();
             if (pattern.StartsWith("\"") && pattern.EndsWith("\"")) {
                 string patternWithoutQuotes = pat.Substring(1, pat.Length - 2);
-                logger.Trace("Removed quotes ({0} --> {1})", pattern, patternWithoutQuotes);
                 return patternWithoutQuotes;
             }
             return pattern; // return the original string untouched
@@ -95,7 +92,6 @@ namespace kgrep
 
         public bool IsValid() {
             if (String.IsNullOrEmpty(SubjectString)) {
-                logger.Debug("Subjectstring cannot be empty - command ignored\nanchor:{0} replacementString:{1}", AnchorString, ReplacementString);
                 return false;
             }
             if (_parts.Length > 2)

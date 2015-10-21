@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using NLog;
 namespace kgrep 
 {
     public class ParseCommandLine  {
@@ -20,7 +19,6 @@ namespace kgrep
         }
         private List<string> _inputSourceList = new List<string>();
         public string STDIN = "stdin?";
-        private static Logger logger = LogManager.GetCurrentClassLogger();
         public IUtilities utilities;
 
         public ParseCommandLine() {
@@ -34,15 +32,12 @@ namespace kgrep
             if (args.Length == 1) {   // cat filename|kgrep matchpattern
                 ReplacementFileName = args[0];
                 _inputSourceList.Add(STDIN);
-                logger.Info("Reading stdin with command file {0}", ReplacementFileName);
             }
 
             // kgrep matchpattern filename1 .... filenameN
             ReplacementFileName = args[0];
-            logger.Info("Reading from source files with command file {0}", ReplacementFileName);
             for (int i = 1; i < args.Length; i = i + 1) {
                 foreach (string filename in utilities.ExpandFileNameWildCards(args[i])) {
-                    logger.Debug("   adding source file:{0}", filename);
                     _inputSourceList.Add(filename);                    
                 }
             } 

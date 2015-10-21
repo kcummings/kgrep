@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
-using NLog;
 
 namespace kgrep
 {
     public class ParseCommandFile
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
         public List<Command> CommandList = new List<Command>();
         private bool _scopeAll = true;
         public bool ScopeAll { get { return _scopeAll; } }
@@ -32,12 +30,10 @@ namespace kgrep
             if (filename == null) return;
             Stopwatch sw;
             sw = Stopwatch.StartNew();
-            logger.Debug("Start reading commandfile:{0}",filename);
             sr = (new ReadFileFactory()).GetSource(filename);
 
             CommandList = GetReplacementList();
             sw.Stop();
-            logger.Info("Parsed {0} commands in command file. [{1:d} ms]", CommandList.Count, sw.ElapsedMilliseconds);
         }
 
         public List<Command> GetReplacementList() {
@@ -45,7 +41,6 @@ namespace kgrep
             kgrepMode = RunningAs.ReplaceAll;
             String line;
             while ((line = sr.ReadLine()) != null) {
-                logger.Trace("   command source line:{0}",line);
                 line = line.Trim();
 
                 // Remove comment lines.

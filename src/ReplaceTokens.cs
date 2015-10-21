@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
-using NLog;
 
 namespace kgrep {
 
     public class ReplaceTokens : IFileAction {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
         public IHandleOutput sw = new WriteStdout();
         private int _countOfMatchesInFile = 0;
         private int _lineNumber = 0;
@@ -31,29 +29,19 @@ namespace kgrep {
         }
 
         private void ApplyAllCommandsToFile(ParseCommandFile commandFile, string filename) {
-            Stopwatch timer;
-            timer = Stopwatch.StartNew();
-
-            logger.Debug("Replace Matches - Processing input file:{0}", filename);
-            _countOfMatchesInFile = 0;
-            _lineNumber = 0;
             IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
             string line;
             while ((line = sr.ReadLine()) != null) {
-                _lineNumber++;
                 string alteredLine = ApplyCommandsToLine(line, commandFile.CommandList);
                 if (!String.IsNullOrEmpty(alteredLine)) sw.Write(alteredLine);
             }
             sr.Close();
-            logger.Info("File {0} found {1} matches on {2} input lines [{3:d} ms]", filename, _countOfMatchesInFile, _lineNumber, timer.ElapsedMilliseconds);
-            timer.Stop();
         }
 
         public string ApplyCommandsToLine(string argline, List<Command> commandList) {
             string line = argline;
             foreach (Command command in commandList) {
                 if ( ! isCandidateForReplacement(line, command)) break;
-
                 if (command.IsReplaceFirstMatchCommand) {
                    line = ApplyCommandsFirstMatch(line, command);
                    if (command.SubjectRegex.IsMatch(argline)) break;
@@ -93,7 +81,6 @@ namespace kgrep {
         private string ReplaceIt(Regex re, string source, string target) {
             int count = re.Matches(source).Count;
             if (count>0) {
-                logger.Debug("   At line {0} found {1} occurances of '{2}' in '{3}'", _lineNumber, count, re.ToString(), source);
                 _countOfMatchesInFile += count;
                 return re.Replace(source, target);
             }
@@ -106,7 +93,6 @@ namespace kgrep {
 
             if (Regex.IsMatch(line, command.AnchorString))
                 return true;
-            logger.Trace("   is not a Command candidate");
             return false;
         }
     }
