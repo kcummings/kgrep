@@ -7,7 +7,7 @@ Project Goals
 -------------
 
 * Refactor a working but untestable program into a testable program with unit tests, small methods, classes, etc. In other words, a sandbox to play, experiment and have a useful tool at the end of the day.
-* Developed using VS2012 & .NET 4.5, Nunit for testing, NLog for logging and NSubstitute for mocking. 
+* Developed using VS2012 & .NET 4.5, Nunit for testing and NSubstitute for mocking. 
 
 Binaries
 -----

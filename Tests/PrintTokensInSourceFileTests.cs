@@ -38,6 +38,14 @@ namespace Tests {
                 Assert.AreEqual("", results);
             }
 
+            [Test]
+            public void WhenAnchorMatchFound_ExpectOutput() {
+                PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
+                ParseCommandFile commands = new ParseCommandFile("/world/ [0-9]+");
+                string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "def", "89 hello world", "hello 09182 worlds" });
+                Assert.AreEqual("89\n09182\n", results);
+            }
+
             [ExpectedException(typeof(System.Exception))]
             public void WhenInvalidTokenGiven_ExpectException() {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
