@@ -15,7 +15,8 @@ namespace kgrep {
                     IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
                     while ((line = sr.ReadLine()) != null) {
                         foreach (Command command in rf.CommandList) {
-                            sw.Write(ScanForTokens(line, command.SubjectRegex, rf.ScannerFS));
+                            if (isCandidateForPrinting(line, command))
+                               sw.Write(ScanForTokens(line, command.SubjectRegex, rf.ScannerFS));
                         }
                     }
                     sr.Close();
@@ -45,6 +46,15 @@ namespace kgrep {
                 m = m.NextMatch();
             }
             return String.Join(FS, sb.ToArray());
+        }
+
+        private bool isCandidateForPrinting(string line, Command command) {
+            if (command.AnchorString.Length == 0)   // no anchor present
+                return true;
+
+            if (Regex.IsMatch(line, command.AnchorString))
+                return true;
+            return false;
         }
     }
 }

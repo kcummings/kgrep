@@ -46,6 +46,14 @@ namespace Tests {
                 Assert.AreEqual("89\n09182\n", results);
             }
 
+            [Test]
+            public void WhenRegexAnchorMatchFound_ExpectOutput() {
+                PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
+                ParseCommandFile commands = new ParseCommandFile("/([l]{3})/ [0-9]+");
+                string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "def", "55 hello ", "helllo 555 worlds"});
+                Assert.AreEqual("555\n", results);
+            }
+
             [ExpectedException(typeof(System.Exception))]
             public void WhenInvalidTokenGiven_ExpectException() {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };

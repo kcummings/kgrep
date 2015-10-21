@@ -52,7 +52,6 @@ namespace kgrep {
             return line;
         }
 
-
         private string ApplySingleCommand(string line, Command command) {
             _pickup.CollectAllPickupsInLine(line, command);
             line = ReplaceIt(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));
