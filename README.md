@@ -28,7 +28,12 @@ Usage
         ScanToken =  a regex string that when found in input will print one match per line
 		filenames are expanded using normal wild card notation
 
-![kgrep commands](support/kgrepcommands.jpg)
+Kgrep command syntax:
+-
+	Normal			subject ~ replacement
+	Anchored		/anchor/ subject
+	Anchored		/anchor/ subject ~ replacement
+	Pickup or Scan	subject
 
 Kgrep runs in two modes: A Scanner and Print OR a Search and Replace tool. 
 
