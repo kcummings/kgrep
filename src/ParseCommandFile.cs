@@ -79,7 +79,7 @@ namespace kgrep
 
         public bool IsScanner() {
             foreach (Command cmd in CommandList)
-                if (cmd.Style == Command.CommandType.Normal)
+                if (cmd.IsNormal)
                     return false;
             return true;
         }

@@ -157,9 +157,9 @@ namespace Tests {
         public void WhenVariousTokensGiven_ExpectAppropiateCommandTypes() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"a~b; a; /d/a~b");
-            Assert.AreEqual(Command.CommandType.Normal, commands.CommandList[0].Style);
-            Assert.AreEqual(Command.CommandType.Pickup, commands.CommandList[1].Style);
-            Assert.AreEqual(Command.CommandType.Anchored, commands.CommandList[2].Style);
+            Assert.IsTrue(commands.CommandList[0].IsNormal);
+            Assert.IsTrue(commands.CommandList[1].IsPickup);
+            Assert.IsTrue(commands.CommandList[2].IsAnchored);
             Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceAll, commands.kgrepMode);
         }
 

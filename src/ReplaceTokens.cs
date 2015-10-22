@@ -45,7 +45,7 @@ namespace kgrep {
         }
 
         public string ApplyCommandsAllMatches(string line, Command command) {
-            if (command.Style == Command.CommandType.Pickup)
+            if (command.IsPickup)
                 _pickup.CollectAllPickupsInLine(line, command);
             else
                 line = ApplySingleCommand(line, command);
@@ -67,7 +67,7 @@ namespace kgrep {
         }
 
         private bool isCandidateForReplacement(string line, Command command) {
-            if (command.AnchorString.Length == 0)   // no anchor present
+            if (!command.IsAnchored)   
                 return true;
 
             if (Regex.IsMatch(line, command.AnchorString))

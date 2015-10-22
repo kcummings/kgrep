@@ -49,7 +49,7 @@ namespace kgrep {
         }
 
         private bool isCandidateForPrinting(string line, Command command) {
-            if (command.AnchorString.Length == 0)   // no anchor present
+            if (!command.IsAnchored)   
                 return true;
 
             if (Regex.IsMatch(line, command.AnchorString))

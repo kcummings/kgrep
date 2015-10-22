@@ -10,8 +10,10 @@ namespace kgrep
         public String ReplacementString = "";
         public Regex SubjectRegex;
         public String SubjectString =""; 
-        public CommandType Style;
         public string ScannerFS = "\n";
+        public bool IsAnchored {get { return !String.IsNullOrEmpty(AnchorString); }}
+        public bool IsPickup {get { return _parts.Length == 1; }}
+        public bool IsNormal {get { return !IsAnchored && !IsPickup;}}
         public bool IsCaptureInSubjectString = false;
         public bool IsPickupInReplacementString = false;   // pickup syntax: ${name}
         private static Regex allParensPattern = new Regex(@"(\(\?<.+?>.+?\)|\(.*?\))",RegexOptions.Compiled);
@@ -19,12 +21,6 @@ namespace kgrep
         public static Regex PickupPattern = new Regex(@"\$\{(.+?)\}", RegexOptions.Compiled);
         private Pickup _pickup = new Pickup();
         private String[] _parts;
-
-        public enum CommandType {
-            Pickup,
-            Anchored,
-            Normal
-        }
 
         public Command(string line) {
             ParseAndValidateCommand(line, "~");
@@ -44,11 +40,11 @@ namespace kgrep
         //     Parse line and init parameters.
         public void ParseLine(string rawcommand, string delim) {
             try {
+                
                 AnchorString = Regex.Match(rawcommand, @"^\s*/(.*?)/").Groups[1].Value;
                 AnchorString = RemoveEnclosingQuotesIfPresent(AnchorString);
                 if (!String.IsNullOrEmpty(AnchorString)) {
                     rawcommand = Regex.Replace(rawcommand, @"^\s*/(.*?)/", "");
-                    Style = CommandType.Anchored;
                 }
 
                 _parts = rawcommand.Split(delim.ToCharArray(), 4);
@@ -58,8 +54,6 @@ namespace kgrep
                 if (_parts.Length == 2)
                     ReplacementString = RemoveEnclosingQuotesIfPresent(_parts[1].Trim());
                 SetType();
-                if (_parts.Length == 1)
-                    Style = CommandType.Pickup;
             } catch (Exception e) {
                 Console.WriteLine("Regex error Command, from '{0}'  to '{1}'  AnchorString '{2}'", SubjectString,
                                   ReplacementString, AnchorString);
@@ -70,11 +64,6 @@ namespace kgrep
         }
 
         private void SetType() {
-            if (!String.IsNullOrEmpty(AnchorString))
-                Style = CommandType.Anchored;
-            else 
-                Style = CommandType.Normal;
-
             IsCaptureInSubjectString = allParensPattern.Match(SubjectString).Success;
             IsPickupInReplacementString = PickupPattern.Match(ReplacementString).Success;
             return;
