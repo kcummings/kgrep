@@ -48,8 +48,8 @@ namespace kgrep
             string versionNumber = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             if (!string.IsNullOrEmpty(message)) Console.WriteLine(message);
             Console.WriteLine("kgrep (Kevin's grep) v{0}",versionNumber);
-            Console.WriteLine("Usage: kgrep matchpattern filename1 ... filenameN");
-            Console.WriteLine("       cat filename|kgrep matchpattern");
+            Console.WriteLine("Usage: kgrep [-l] matchpattern filename1 ... filenameN");
+            Console.WriteLine("       cat filename|kgrep [-l] matchpattern");
             Console.WriteLine(" matchpattern can be either a regex string to scan or replace based on a regex");
             Environment.Exit(1);
         }

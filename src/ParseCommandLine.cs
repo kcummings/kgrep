@@ -5,15 +5,15 @@ namespace kgrep
 {
     public class ParseCommandLine  {
 
-        // kgrep matchpattern filename1 ... filenameN     
-        // cat filename|kgrep matchpattern   
+        // kgrep [-l] replacementfile filename1 ... filenameN     
+        // cat filename|kgrep [-l] replacementfile   
 
         // Input is either stdin or files, not both.
         // If matchpattern is a file, it contains ReplacementPatterns.
         // If matchpattern contains a "~" it is treated as a ReplacementPattern, else a ScanToPrintPattern.
 
-       //  public string SearchPattern = null;
         public string ReplacementFileName = null;
+        public bool OutputOnlyMatching = true;
         public List<string> InputSourceList {
             get { return _inputSourceList; }
         }
@@ -24,20 +24,31 @@ namespace kgrep
         public ParseCommandLine() {
             utilities = new Utilities();
         }
-
         public void Init(string[] args) {
-           
-            if (args.Length == 0) return;
+            Init(new List<string>(args));
+        }
 
-            if (args.Length == 1) {   // cat filename|kgrep matchpattern
-                ReplacementFileName = args[0];
-                _inputSourceList.Add(STDIN);
+        public void Init(List<string> args) {
+           
+            if (args.Count == 0) return;
+
+            if (args[0] == "-l") {
+                OutputOnlyMatching = false;
+                args.RemoveAt(0);
             }
 
-            // kgrep matchpattern filename1 .... filenameN
+            if (args.Count == 1) {   // cat filename|kgrep [-l] replacementfile
+                ReplacementFileName = args[0];
+                _inputSourceList.Add(STDIN);
+                return;
+            }
+
+            // kgrep [-l] replacementfile filename1 .... filenameN
             ReplacementFileName = args[0];
-            for (int i = 1; i < args.Length; i = i + 1) {
-                foreach (string filename in utilities.ExpandFileNameWildCards(args[i])) {
+            args.RemoveAt(0);
+            
+            foreach (string arg in args) {
+                foreach (string filename in utilities.ExpandFileNameWildCards(arg)) {
                     _inputSourceList.Add(filename);                    
                 }
             } 
