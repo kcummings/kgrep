@@ -5,15 +5,15 @@ namespace kgrep
 {
     public class ParseCommandLine  {
 
-        // kgrep [-l] replacementfile filename1 ... filenameN     
-        // cat filename|kgrep [-l] replacementfile   
+        // kgrep [-v] replacementfile filename1 ... filenameN     
+        // cat filename|kgrep [-v] replacementfile   
 
         // Input is either stdin or files, not both.
         // If matchpattern is a file, it contains ReplacementPatterns.
         // If matchpattern contains a "~" it is treated as a ReplacementPattern, else a ScanToPrintPattern.
 
         public string ReplacementFileName = null;
-        public bool OutputOnlyMatching = true;
+        public bool OutputAllLines = true;
         public List<string> InputSourceList {
             get { return _inputSourceList; }
         }
@@ -32,18 +32,18 @@ namespace kgrep
            
             if (args.Count == 0) return;
 
-            if (args[0] == "-l") {
-                OutputOnlyMatching = false;
+            if (args[0] == "-v") {
+                OutputAllLines = false;
                 args.RemoveAt(0);
             }
 
-            if (args.Count == 1) {   // cat filename|kgrep [-l] replacementfile
+            if (args.Count == 1) {   // cat filename|kgrep [-v] replacementfile
                 ReplacementFileName = args[0];
                 _inputSourceList.Add(STDIN);
                 return;
             }
 
-            // kgrep [-l] replacementfile filename1 .... filenameN
+            // kgrep [-v] replacementfile filename1 .... filenameN
             ReplacementFileName = args[0];
             args.RemoveAt(0);
             
