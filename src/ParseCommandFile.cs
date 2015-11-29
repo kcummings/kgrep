@@ -11,7 +11,7 @@ namespace kgrep
         private String _comment = "#";
         private String _delim = "~";
         private IHandleInput sr;
-        public string OFS = "\n";    // Output Field Seperator, like AWK's
+        public string OFS = "";    // Output Field Seperator, like AWK's
         public bool OutputAllLines = true;
     
         // Kgrep is only in one state or mode.

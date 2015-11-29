@@ -45,7 +45,8 @@ namespace kgrep {
                 }
                 m = m.NextMatch();
             }
-            return String.Join(FS, sb.ToArray());
+            string joiner = (FS == "\\n") ? "\n" : FS;
+            return String.Join(joiner, sb.ToArray());
         }
 
         private bool isCandidateForPrinting(string line, Command command) {
