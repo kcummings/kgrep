@@ -66,6 +66,7 @@ namespace Tests {
             [TestCase("bc\n", "a(bc)", "abc")]
             [TestCase("bc\n89\n", "OFS='\\n';(..) ([0-9]+)", "abc 89")]
             [TestCase("ell\no\n", @"OFS='\n';h(...)(.)", "hello world")]
+            [TestCase("ell\to\td\n", @"OFS='\t';h(...)(.).*(d)", "hello world")]
             public void WhenGroupsGiven_ExpectSubsetOutput(string expected, string scantoken, string input) {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
                 ParseCommandFile commands = new ParseCommandFile(scantoken);

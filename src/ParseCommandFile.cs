@@ -51,8 +51,11 @@ namespace kgrep
                     _comment = GetOption(line, "comment");
                 else if (line.ToLower().StartsWith("delim="))
                     _delim = GetOption(line, "delim");
-                else if (line.ToLower().StartsWith("ofs="))
+                else if (line.ToLower().StartsWith("ofs=")) {
                     OFS = GetOption(line, "OFS");
+                    OFS = OFS.Replace("\\n", "\n"); // interpret \n on command line as newline
+                    OFS = OFS.Replace("\\t", "\t"); // interpret \t on command line as tab
+                }
                 else {
                     Command command = new Command(line, _delim);
                     if (command.IsValid()) {
