@@ -45,7 +45,7 @@ namespace kgrep {
                 }
                 m = m.NextMatch();
             }
-            string joiner = (FS == "\\n") ? "\n" : FS;
+            string joiner = FS.Replace("\\n", "\n");  // interpret \n on command line as newline
             return String.Join(joiner, sb.ToArray());
         }
 
