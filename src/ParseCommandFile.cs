@@ -11,7 +11,7 @@ namespace kgrep
         private String _comment = "#";
         private String _delim = "~";
         private IHandleInput sr;
-        public string ScannerFS = "\n";
+        public string OFS = "\n";    // Output Field Seperator, like AWK's
         public bool OutputAllLines = true;
     
         // Kgrep is only in one state or mode.
@@ -25,12 +25,9 @@ namespace kgrep
 
         public ParseCommandFile(String filename) {
             if (filename == null) return;
-            Stopwatch sw;
-            sw = Stopwatch.StartNew();
             sr = (new ReadFileFactory()).GetSource(filename);
 
             CommandList = GetReplacementList();
-            sw.Stop();
         }
 
         public List<Command> GetReplacementList() {
@@ -54,8 +51,8 @@ namespace kgrep
                     _comment = GetOption(line, "comment");
                 else if (line.ToLower().StartsWith("delim="))
                     _delim = GetOption(line, "delim");
-                else if (line.ToLower().StartsWith("scannerfs="))
-                    ScannerFS = GetOption(line, "scannerfs");
+                else if (line.ToLower().StartsWith("ofs="))
+                    OFS = GetOption(line, "OFS");
                 else {
                     Command command = new Command(line, _delim);
                     if (command.IsValid()) {

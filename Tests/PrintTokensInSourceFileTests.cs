@@ -93,9 +93,9 @@ namespace Tests {
                 Assert.AreEqual(expected, results);
             }
 
-            [TestCase("a b ca", "ScannerFS=\", \"; a", "a, a\n")]   // ", " delimited
-            [TestCase("a b ca", "ScannerFS=,; a", "a,a\n")]         // "," delimited
-            public void WhenScannerFSUsed_ExpectDelimitedOutput(string input, string pattern, string expected) {
+            [TestCase("a b ca", "OFS=\", \"; a", "a, a\n")]   // ", " delimited
+            [TestCase("a b ca", "OFS=,; a", "a,a\n")]         // "," delimited
+            public void WhenOFSUsed_ExpectDelimitedOutput(string input, string pattern, string expected) {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
                 ParseCommandFile commands = new ParseCommandFile(pattern);
                 string result = engine.ApplyCommandsToInputFileList(commands, new List<string> { input });
