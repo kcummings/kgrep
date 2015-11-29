@@ -12,6 +12,7 @@ namespace kgrep
         private String _delim = "~";
         private IHandleInput sr;
         public string ScannerFS = "\n";
+        public bool OutputAllLines = true;
     
         // Kgrep is only in one state or mode.
         // The mode is determined by the types and sequence of commands. 
