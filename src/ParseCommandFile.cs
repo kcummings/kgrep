@@ -71,6 +71,8 @@ namespace kgrep
         private string GetOption(string line, string type) {
             Match m = Regex.Match(line, type+"=\"(.+)\"", RegexOptions.IgnoreCase);  
             if (!m.Success)
+               m = Regex.Match(line, type+"='(.+)'", RegexOptions.IgnoreCase);  
+            if (!m.Success)
                 m = Regex.Match(line, type+"=(.+)", RegexOptions.IgnoreCase);
             return m.Groups[1].Value;
         }

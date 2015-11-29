@@ -94,6 +94,7 @@ namespace Tests {
             }
 
             [TestCase("a b ca", "OFS=\", \"; a", "a, a\n")]   // ", " delimited
+            [TestCase("a b ca", "OFS=', '; a", "a, a\n")]   // ", " delimited
             [TestCase("a b ca", "OFS=,; a", "a,a\n")]         // "," delimited
             public void WhenOFSUsed_ExpectDelimitedOutput(string input, string pattern, string expected) {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
