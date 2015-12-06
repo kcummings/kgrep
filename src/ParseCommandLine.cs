@@ -32,7 +32,7 @@ namespace kgrep
            
             if (args.Count == 0) return;
 
-            if (args[0] == "-v") {
+            if (args[0] == "-o") {
                 OutputAllLines = false;
                 args.RemoveAt(0);
             }

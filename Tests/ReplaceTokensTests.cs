@@ -218,5 +218,13 @@ namespace Tests {
             Command command = new Command("/today/ you ~ to");
             Assert.AreEqual("to and to today", engine.ApplyCommandsAllMatches("you and you today", command));
         }
+
+        [Test]
+        public void WhenSimpleMatch_OnlyPrintMatched() {
+            PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("OFS='';(you) ~ to");
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "you and you today" });
+            Assert.AreEqual("youyou\n", results);
+        }
     }
 }

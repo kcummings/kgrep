@@ -28,7 +28,7 @@ namespace Tests {
             util.ExpandFileNameWildCards("*.txt").Returns(new List<string>{"file1.txt", "file2.txt"});
 
             ParseCommandLine commandLine = new ParseCommandLine() {utilities = util};
-            commandLine.Init(new string[] { "-v", "a", "*.txt" });
+            commandLine.Init(new string[] { "-o", "a", "*.txt" });
             Assert.IsFalse(commandLine.OutputAllLines);
             Assert.AreEqual(new List<string>{"file1.txt","file2.txt"}, commandLine.InputSourceList);
         }
@@ -48,7 +48,7 @@ namespace Tests {
         [Test]
         // cat -l filename|kgrep commandFilename
         public void WhenOnlyMatchingOption_ExpectStdinAsInputSource() {
-            string[] args = new String[] { "-v", "hi~bye" };
+            string[] args = new String[] { "-o", "hi~bye" };
             ParseCommandLine cmd = new ParseCommandLine();
             cmd.Init(args);
             Assert.IsFalse(cmd.OutputAllLines);
