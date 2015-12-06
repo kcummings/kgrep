@@ -7,7 +7,7 @@ using kgrep;
 namespace Tests {
 
     [TestFixture]
-    public class ReplacementFileTests {
+    public class ParseCommandFileTests {
 
         [Test]
         public void WhenOneArgument_ExpectOneReplacement() {

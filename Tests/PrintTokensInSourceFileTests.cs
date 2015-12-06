@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace Tests {
  
         [TestFixture]
-        public class ScannerTests {
+        public class PrintTokensInSourceFileTests {
 
             [Test]
             public void WhenNoScanTokenGiven_ExpectNoChange() {

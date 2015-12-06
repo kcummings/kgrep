@@ -8,7 +8,7 @@ namespace Tests {
 
     // A higher level test
     [TestFixture]
-    public class SearchAndReplaceAcceptenceTests {
+    public class ReplaceTokensTests {
 
 
         // To simulate input from 3 files use: new List<string> { "a b c", "a b c", "earth" }
