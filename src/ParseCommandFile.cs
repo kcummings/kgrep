@@ -12,7 +12,8 @@ namespace kgrep
         private String _delim = "~";
         private IHandleInput sr;
         public string OFS = "";    // Output Field Seperator, like AWK's
-        public bool OutputAllLines = true;
+        public bool ReplaceOnEntireLine = true;
+        public int MaxReplacements = 9999;
     
         // Kgrep is only in one state or mode.
         // The mode is determined by the types and sequence of commands. 
@@ -55,8 +56,7 @@ namespace kgrep
                     OFS = GetOption(line, "OFS");
                     OFS = OFS.Replace("\\n", "\n"); // interpret \n on command line as newline
                     OFS = OFS.Replace("\\t", "\t"); // interpret \t on command line as tab
-                }
-                else {
+                } else {
                     Command command = new Command(line, _delim);
                     if (command.IsValid()) {
                         CommandList.Add(command);
@@ -72,7 +72,7 @@ namespace kgrep
         // Get the provided value for the given Control Option.
         // allow optional enclosing in quotes
         private string GetOption(string line, string type) {
-            Match m = Regex.Match(line, type+"=\"(.+)\"", RegexOptions.IgnoreCase);  
+            Match m = Regex.Match(line, type+"=\"(.*)\"", RegexOptions.IgnoreCase);  
             if (!m.Success)
                m = Regex.Match(line, type+"='(.*)'", RegexOptions.IgnoreCase);  
             if (!m.Success)

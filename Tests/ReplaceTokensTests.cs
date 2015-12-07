@@ -180,24 +180,6 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenMatchsOnMultipleLines_All_ExpectCummulativeChange() {
-            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            List<Command> reps = new List<Command>();
-            reps.Add(new Command("from~to"));
-            reps.Add(new Command("to~this"));
-            Assert.AreEqual("this me this you", engine.ApplyCommandsToLine("from me to you", reps));
-        }
-
-        [Test]
-        public void WhenMatchesOnMultipleLinesWithGroups_ExpectChainedReplaces() {
-            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            List<Command> reps = new List<Command>();
-            reps.Add(new Command("f(..)m~$1"));
-            reps.Add(new Command("to~this"));
-            Assert.AreEqual("ro me this you", engine.ApplyCommandsToLine("from me to you", reps));
-        }
-
-        [Test]
         public void WhenReplacmentSwapsGroups_All_ExpectChange() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             List<Command> reps = new List<Command>();
@@ -222,9 +204,72 @@ namespace Tests {
         [Test]
         public void WhenSimpleMatch_OnlyPrintMatched() {
             PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("OFS='';(you) ~ to");
+            ParseCommandFile commands = new ParseCommandFile("(you) ~ to");
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { " 9you today" });
+            Assert.AreEqual("you\n", results);
+        }
+
+        [Test]
+        public void WhenMultipleMatch_OnlyPrintMatched() {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("OFS='\t';(you) ~ to");
+            commands.ReplaceOnEntireLine = false;
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "you and you today" });
-            Assert.AreEqual("youyou\n", results);
+            Assert.AreEqual("to\tto\n", results);
+        }
+
+        [Test]
+        public void WhenMatchesSpanLines_OnlyPrintMatched() {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("OFS=' ';([0-9]+)~{$1};s~t");
+            commands.ReplaceOnEntireLine = false;
+            commands.MaxReplacements = 1;
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "This is the 10th testing", "following 345." });
+            Assert.AreEqual("{10}\n{345}\n", results);
+        }
+
+        [Test]
+        public void LimitMatchesToZero() {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("OFS=' ';a~b;b~c;c~d;d~e");
+            commands.MaxReplacements = 0;
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "abcde" });
+            Assert.AreEqual("abcde\n", results);
+        }
+
+        [Test]
+        public void LimitMatchesToOne() {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("OFS=' ';a~b;b~c:c~d;d~e");
+            commands.MaxReplacements = 1;
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "abcde" });
+            Assert.AreEqual("bbcde\n", results);
+        }
+
+        [Test]
+        public void LimitMatchesToThree() {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("OFS=' ';a~b;b~c;c~d;d~e");
+            commands.MaxReplacements = 3;
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "abckde" });
+            Assert.AreEqual("dddkde\n", results);
+        }
+
+        [Test]
+        public void LimitMatchesToDefault() {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("OFS=' ';a~b;b~c;c~d;d~e");
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "abcde" });
+            Assert.AreEqual("eeeee\n", results);
+        }
+
+        [Test]
+        public void LimitMatchesResetsWithEachFile() {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("OFS=' ';a~b;b~c;c~d;d~e");
+            commands.MaxReplacements = 1;  // this override value should be used for each file read. Don't use value from previous file scan.
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "abcde", "kcde" });
+            Assert.AreEqual("bbcde\nkdde\n", results);
         }
     }
 }

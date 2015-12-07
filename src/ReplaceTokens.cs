@@ -10,6 +10,8 @@ namespace kgrep {
         public IHandleOutput sw = new WriteStdout();
         private readonly Pickup _pickup;
         private bool verbose = true;
+        private int _maxReplacements;
+        private string OFS;
 
         public ReplaceTokens() {
             _pickup = new Pickup();
@@ -17,6 +19,7 @@ namespace kgrep {
 
         public virtual string ApplyCommandsToInputFileList(ParseCommandFile rf, List<string> inputFilenames) {
             try {
+                OFS = rf.OFS;
                 foreach (string filename in inputFilenames) {
                     ApplyCommandsToFile(rf, filename);
                 }
@@ -26,10 +29,10 @@ namespace kgrep {
             return sw.Close();
         }
 
-        private void ApplyCommandsToFile(ParseCommandFile commandFile, string filename) {
+        public void ApplyCommandsToFile(ParseCommandFile commandFile, string filename) {
             IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
-            verbose = commandFile.OutputAllLines;
-
+            verbose = commandFile.ReplaceOnEntireLine;
+            _maxReplacements = commandFile.MaxReplacements;
             string line;
             while ((line = sr.ReadLine()) != null) {
                 string alteredLine = ApplyCommandsToLine(line, commandFile.CommandList);
@@ -42,7 +45,10 @@ namespace kgrep {
             string line = argline;
             foreach (Command command in commandList) {
                 if ( ! isCandidateForReplacement(line, command)) break;
-                line = ApplyCommandsAllMatches(line, command);
+                if (command.SubjectRegex.IsMatch(line)) {  // only decrement _maxReplacements if matches, don't just count commands read
+                    if (_maxReplacements-- <= 0) break;
+                    line = ApplyCommandsAllMatches(line, command);
+                }
             }
             return line;
         }
@@ -60,7 +66,7 @@ namespace kgrep {
             if (verbose)
                 line = ReplaceFullLine(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));
             else {
-                line = ReplaceMatched(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString),command.OFS);
+                line = ReplaceMatched(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString),this.OFS);
             }
             return line;
         }
@@ -92,7 +98,7 @@ namespace kgrep {
         }
 
         private bool isCandidateForReplacement(string line, Command command) {
-            if (!command.IsAnchored)   
+            if (!command.IsAnchored)
                 return true;
 
             if (Regex.IsMatch(line, command.AnchorString))
