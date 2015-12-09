@@ -52,6 +52,10 @@ namespace kgrep
                     _comment = GetOption(line, "comment");
                 else if (line.ToLower().StartsWith("delim="))
                     _delim = GetOption(line, "delim");
+                else if (line.ToLower().StartsWith("mm="))
+                    MaxReplacements = int.Parse(GetOption(line,"mm"));
+                else if (line.ToLower().StartsWith("maxreplacements="))
+                    MaxReplacements = int.Parse(GetOption(line, "maxreplacements"));
                 else if (line.ToLower().StartsWith("ofs=")) {
                     OFS = GetOption(line, "OFS");
                     OFS = OFS.Replace("\\n", "\n"); // interpret \n on command line as newline
