@@ -273,10 +273,17 @@ namespace Tests {
         }
 
         [Test]
+        public void SetOFSViaCommand() {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@" OFS = ""\t"" ';a~b;b~c;c~d;d~e");
+            Assert.AreEqual("\t",commands.OFS);
+        }
+
+        [Test]
         public void SetLimitMatchViaCommand() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("MM=1 ;a~b;b~c;c~d;d~e");
-            Assert.AreEqual(1,commands.MaxReplacements);
+            ParseCommandFile commands = new ParseCommandFile(" MM = 1 ;a~b;b~c;c~d;d~e");
+            Assert.AreEqual(1,commands.MaxReplacements); 
             commands = new ParseCommandFile("MaxReplacements= 8 ;a~b;b~c;c~d;d~e");
             Assert.AreEqual(8,commands.MaxReplacements);
         }

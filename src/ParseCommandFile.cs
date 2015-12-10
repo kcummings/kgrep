@@ -48,15 +48,15 @@ namespace kgrep
                 if (i >= 0)
                     line = line.Remove(i);
 
-                if (line.ToLower().StartsWith("comment="))
+                if (line.ToLower().TrimStart().StartsWith("comment"))
                     _comment = GetOption(line, "comment");
-                else if (line.ToLower().StartsWith("delim="))
+                else if (line.ToLower().TrimStart().StartsWith("delim"))
                     _delim = GetOption(line, "delim");
-                else if (line.ToLower().StartsWith("mm="))
+                else if (line.ToLower().TrimStart().StartsWith("mm"))
                     MaxReplacements = int.Parse(GetOption(line,"mm"));
-                else if (line.ToLower().StartsWith("maxreplacements="))
+                else if (line.ToLower().TrimStart().StartsWith("maxreplacements"))
                     MaxReplacements = int.Parse(GetOption(line, "maxreplacements"));
-                else if (line.ToLower().StartsWith("ofs=")) {
+                else if (line.ToLower().TrimStart().StartsWith("ofs")) {
                     OFS = GetOption(line, "OFS");
                     OFS = OFS.Replace("\\n", "\n"); // interpret \n on command line as newline
                     OFS = OFS.Replace("\\t", "\t"); // interpret \t on command line as tab
@@ -76,11 +76,11 @@ namespace kgrep
         // Get the provided value for the given Control Option.
         // allow optional enclosing in quotes
         private string GetOption(string line, string type) {
-            Match m = Regex.Match(line, type+"=\"(.*)\"", RegexOptions.IgnoreCase);  
+            Match m = Regex.Match(line, type+@"\s*=\s*""(.*)""", RegexOptions.IgnoreCase);  
             if (!m.Success)
-               m = Regex.Match(line, type+"='(.*)'", RegexOptions.IgnoreCase);  
+               m = Regex.Match(line, type+@"\s*=\s*'(.*)'", RegexOptions.IgnoreCase);  
             if (!m.Success)
-                m = Regex.Match(line, type+"=(.*)", RegexOptions.IgnoreCase);
+                m = Regex.Match(line, type+@"\s*=\s*(.*)", RegexOptions.IgnoreCase);
             return m.Groups[1].Value;
         }
 
