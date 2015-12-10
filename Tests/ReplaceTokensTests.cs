@@ -203,10 +203,21 @@ namespace Tests {
 
         [Test]
         public void WhenSimpleMatch_OnlyPrintMatched() {
-            PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile("(you) ~ to");
+            commands.ReplaceOnEntireLine = false;
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { " 9you today" });
-            Assert.AreEqual("you\n", results);
+            Assert.AreEqual("to\n", results);
+        }
+
+        [Test]
+        [Ignore("Wait for ReplaceOn to be fully implemented")]
+        public void ReplacetoPlaceholders() {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("(.+) live .*? ([0-9+]+).~This is $2 and $1");
+            commands.ReplaceOnEntireLine = false;
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "I live today at 35 and beyond." });
+            Assert.AreEqual("This is 35 and I\n", results);
         }
 
         [Test]

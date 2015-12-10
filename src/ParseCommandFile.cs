@@ -15,6 +15,13 @@ namespace kgrep
         public bool ReplaceOnEntireLine = true;
         public int MaxReplacements = 9999;
     
+        // Output the: (1) input line with replaces (2) matched sections only with replaces (3) do not output line or matched, just use replace pattern as output line.    
+        public enum OutputUsing {
+            InputLine,
+            MatchedSection,
+            ReplacePattern
+        }
+
         // Kgrep is only in one state or mode.
         // The mode is determined by the types and sequence of commands. 
         public enum RunningAs {
@@ -23,6 +30,7 @@ namespace kgrep
         }
 
         public RunningAs kgrepMode;
+        private OutputUsing ReplaceOn = OutputUsing.InputLine;
 
         public ParseCommandFile(String filename) {
             if (filename == null) return;
@@ -61,7 +69,7 @@ namespace kgrep
                     OFS = OFS.Replace("\\n", "\n"); // interpret \n on command line as newline
                     OFS = OFS.Replace("\\t", "\t"); // interpret \t on command line as tab
                 } else {
-                    Command command = new Command(line, _delim);
+                    Command command = new Command(line, _delim) {ReplaceOn = this.ReplaceOn};
                     if (command.IsValid()) {
                         CommandList.Add(command);
                     }

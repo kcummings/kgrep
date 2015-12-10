@@ -74,6 +74,7 @@ namespace kgrep {
         private string ReplaceMatched(Regex re, string source, string target, string FS) {
              List<string> sb = new List<string>();
              Match m = re.Match(source);
+           //  return re.Replace(m.Value, target);
 
             // Only return submatches if found, otherwise return any matches.
             while (m.Success) {

@@ -9,7 +9,8 @@ namespace kgrep
         public String AnchorString = "";
         public String ReplacementString = "";
         public Regex SubjectRegex;
-        public String SubjectString =""; 
+        public String SubjectString ="";
+        public ParseCommandFile.OutputUsing ReplaceOn = ParseCommandFile.OutputUsing.InputLine;
         public bool IsAnchored {get { return !String.IsNullOrEmpty(AnchorString); }}
         public bool IsPickup {get { return _parts.Length == 1; }}
         public bool IsNormal {get { return !IsAnchored && !IsPickup;}}
