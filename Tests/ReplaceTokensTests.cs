@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using NSubstitute;
 using NUnit.Framework;
 using kgrep;
@@ -210,29 +211,31 @@ namespace Tests {
             Assert.AreEqual("to\n", results);
         }
 
-        [Test]
-        [Ignore("Wait for ReplaceOn to be fully implemented")]
-        public void ReplacetoPlaceholders() {
+        [TestCase("What are the abcs of 55?", "([a-c]{3}).+?([0-9]+)~$2 $1 better", "55 abc better\n")] 
+        [TestCase("The number is 65.","([0-9]+)~b","b\n")]
+        [TestCase("The number is 65.", "([0-9]+)~", "")]
+        public void WhenReplacing_ReplaceUsingMatchedValueAsSource(string line, string command, string expectedResults) {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("(.+) live .*? ([0-9+]+).~This is $2 and $1");
+            ParseCommandFile commands = new ParseCommandFile(command);
             commands.ReplaceOnEntireLine = false;
-            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "I live today at 35 and beyond." });
-            Assert.AreEqual("This is 35 and I\n", results);
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { line });
+            Assert.AreEqual(expectedResults, results);
         }
 
-        [Test]
-        public void WhenMultipleMatch_OnlyPrintMatched() {
+        [TestCase("you and you today", "(you) ~ to", "to and to today\n")]
+        [TestCase("you and you today", "you ~ to", "to and to today\n")]
+        public void WhenReplacing_ReplaceUsingOriginalLineAsSource(string line, string command, string expectedResults) {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("OFS='\t';(you) ~ to");
-            commands.ReplaceOnEntireLine = false;
-            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "you and you today" });
-            Assert.AreEqual("to\tto\n", results);
+            ParseCommandFile commands = new ParseCommandFile(command);
+            commands.ReplaceOnEntireLine = true; 
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { line });
+            Assert.AreEqual(expectedResults, results);
         }
 
         [Test]
         public void WhenMatchesSpanLines_OnlyPrintMatched() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("OFS=' ';([0-9]+)~{$1};s~t");
+            ParseCommandFile commands = new ParseCommandFile("([0-9]+)~{$1};s~t");
             commands.ReplaceOnEntireLine = false;
             commands.MaxReplacements = 1;
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "This is the 10th testing", "following 345." });
@@ -298,5 +301,18 @@ namespace Tests {
             commands = new ParseCommandFile("MaxReplacements= 8 ;a~b;b~c;c~d;d~e");
             Assert.AreEqual(8,commands.MaxReplacements);
         }
+
+        [Test]
+        public void test() {
+            string line = "What are the abcs of 55?";
+            Regex PatternRegex = new Regex("([a-c]{3}).+?([0-9]+)", RegexOptions.Compiled);
+            string fullline = PatternRegex.Replace(line, "$2 $1 better");
+
+            string templateline;
+            Match m = PatternRegex.Match(line);
+            if (m.Success)
+                templateline = PatternRegex.Replace(m.Value, "$2 $1 better");
+        }
+        
     }
 }
