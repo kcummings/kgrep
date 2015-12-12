@@ -1,32 +1,44 @@
 ##This is kgrep, as in Kevin's grep.
 
-A command line tool to search, replace, extract and/or print text based on regular expressions from stdin or input file(s). All output is written to stdout. Kgrep uses .NET regex syntax.
+A command line tool to search, replace, extract and/or print text from a text file based on regular expressions. All output is written to stdout. Kgrep uses .NET regex syntax.
 
 
 Project Goals
 -------------
 
-* Refactor a working but untestable program into a testable program with unit tests, small methods, classes, etc. In other words, a sandbox to play, experiment and have a useful tool at the end of the day.
+* Refactor a working but untestable program into a testable program with unit tests, small methods, classes, etc. In other words, a sandbox to play, experiment and have a useful tool at the end of the day... also learn GitHub.
 * Developed using VS2012 & .NET 4.5, Nunit for testing and NSubstitute for mocking. 
 
-Binaries
------
-To try kgrep, the binaries are in the *deploy* folder. You must also have .net 4.0 installed.
+##Quick Examples
+	kgrep "[0-9]+" MyBook.log
 
+will print all numbers in MyBook.log on separate lines.
+
+	kgrep "OFS='\t'; [0-9]+" MyBook.log
+outputs same as the first example but separated by tabs.
+
+	kgrep "/(invoice|payment)/ [a-zA-Z]+" MyBook.log
+will only look at lines that contain either the phrase "invoice" or "payment", then print words on separate lines. 
+This filter is a regular expression.
+
+	kgrep "today~tomorrow" MyBook.log
+
+will read MyBook.txt and replace all occurrences of "today" with "tomorrow" and write them to stdout. MyBook.txt is not changed.
+
+	echo "$12.85 today's invoice total"|kgrep "/invoice/ ([0-9\.]+)->$1 is over budget."
+will print "12.85 is over budget."
 
 Usage
 -----
 
-    kgrep matchpattern filename...filenameN
+    kgrep command filename...filenameN
     cat filename(s) | kgrep matchpattern
     
-    where matchpattern = Replacement | ScanToken
+    where command = Replacement | ScanToken
         Replacement = ReplacementFilename | ReplacementCommand
-           ReplacementCommand = a string with syntax "anchor~before~after" where "anchor~" is optional. 
+           ReplacementCommand = a string with syntax "/anchor/ before~after" where "/anchor/" is optional. 
            ReplacementFilename is a file containing a ReplacementCommand per line.
-
         ScanToken =  a regex string that when found in input will print one match per line
-		filenames are expanded using normal wild card notation
 
 Kgrep command syntax:
 -
@@ -35,12 +47,12 @@ Kgrep command syntax:
 	Anchored		/anchor/ subject ~ replacement
 	Pickup or Scan	subject
 
-Kgrep runs in two modes: A Scanner and Print OR a Search and Replace tool. 
+Kgrep runs in two modes: A Scan and Print OR a Search and Replace. 
 
-####Scan Mode
+####Scan and Print
 It runs as a scanner if the command file (or replacements given on the command line) only contain *Scan* commands, i.e. type 3 in the chart above. All matched commands are printed to stdout. Example: *kgrep "[0-9]+" test.txt* will print all numbers found in test.txt on a separate line.
 
-####Search and Replacement Mode
+####Search and Replacement
 It runs in search mode if the file contains commands other than just *Scan* commands. it will search and replace *Subject* with *Replacement* and print the results to stdout. Unlike grep, all named and unnamed captures are remembered during the run and can be applied to any field in a command (except *Anchor*). Such expressions are called Pickups. Syntax for a named capture is normal regex *(?&lt;name&gt;[a-z]+)* OR the special {name} syntax where *name* is the pickup's name that holds the matched value. {name} matches anything where it has been placed. The value of this matched expression can be retrieved using ${name} syntax. If no Commands match an input line, the input line will print to stdout unchanged.
 
 ---
@@ -66,7 +78,7 @@ Example:
 If in search mode, any matches are treated as Pickups for later reference. *Subject* can contain Pickups. See Pickup explanation below.
 
 ## CommandFile
-Commands can be consolidated into a *CommandFile*. 
+Commands can be placed into a *CommandFile*. 
 
 Commands can be stacked as one string and supplied on the command line or stored in a file and given as the first argument on the command line. Commands are stacked using the ";" stacking character, e.g. "dog~cat; h(..)~cold" contains two Normal Commands. The stacking character cannot be overridden. 
 
@@ -98,7 +110,7 @@ The following controls can be embedded anywhere in the CommandFile. Control opti
 
 - **comment=?** This value designates the beginning of a comment. Default is "#".
 
-- **ScannerFS=?** Only used in Scanner mode. The scanned tokens are "glued" together with the value of this option. Default is "\n".
+- **OFS=?** Only used in Scanner mode. The scanned tokens are "glued" together with the value of this option. Default is "". This can be a string of characters.
 
 Caution: You can get unexpected results if you are not careful when using Control Options. For example, setting comment=~ still allows default delim=~ so the Command "comment=~; a~b" is interpreted as a Normal Command but becomes just "a" since "~b" is now a comment and the expected replacement doesn't take effect. No change occurs to the source inputs.
 

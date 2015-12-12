@@ -9,7 +9,6 @@ namespace kgrep {
     public class ReplaceTokens : IFileAction {
         public IHandleOutput sw = new WriteStdout();
         private readonly Pickup _pickup;
-        private bool verbose = true;
         private int _maxReplacements;
         private string OFS;
 
@@ -31,7 +30,6 @@ namespace kgrep {
 
         public void ApplyCommandsToFile(ParseCommandFile commandFile, string filename) {
             IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
-            verbose = commandFile.ReplaceOnEntireLine;
             _maxReplacements = commandFile.MaxReplacements;
             string line;
             while ((line = sr.ReadLine()) != null) {
@@ -63,10 +61,10 @@ namespace kgrep {
 
         private string ApplySingleCommand(string line, Command command) {
             _pickup.CollectAllPickupsInLine(line, command);
-            if (verbose)
-                line = ReplaceFullLine(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));
+            if (command.IsUsingTargetTemplate)
+                line = ReplaceMatched(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));            
             else {
-                line = ReplaceMatched(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));
+                line = ReplaceFullLine(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));
             }
             return line;
         }

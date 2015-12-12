@@ -10,12 +10,12 @@ namespace kgrep
         public String ReplacementString = "";
         public Regex SubjectRegex;
         public String SubjectString ="";
-        public ParseCommandFile.OutputUsing ReplaceOn = ParseCommandFile.OutputUsing.InputLine;
         public bool IsAnchored {get { return !String.IsNullOrEmpty(AnchorString); }}
         public bool IsPickup {get { return _parts.Length == 1; }}
         public bool IsNormal {get { return !IsAnchored && !IsPickup;}}
         public bool IsCaptureInSubjectString = false;
         public bool IsPickupInReplacementString = false;   // pickup syntax: ${name}
+        public bool IsUsingTargetTemplate = false;     // subject -> target rather than subject ~ target
         private static Regex allParensPattern = new Regex(@"(\(\?<.+?>.+?\)|\(.*?\))",RegexOptions.Compiled);
         private static Regex nonCapturingPattern = new Regex(@"\(\?(?:[^<=]|<=|<!).*?\)", RegexOptions.Compiled);
         public static Regex PickupPattern = new Regex(@"\$\{(.+?)\}", RegexOptions.Compiled);
@@ -36,6 +36,7 @@ namespace kgrep
 
         //  Sample: "/word/ a~b"
         //          "/AnchorString/ SubjectRegex ~ ReplacementString
+        //          "/AnchorString/ SubjectRegex -> ReplacementString
         //     Only SubjectRegex is required.
         //     Parse line and init parameters.
         public void ParseLine(string rawcommand, string delim) {
@@ -47,7 +48,11 @@ namespace kgrep
                     rawcommand = Regex.Replace(rawcommand, @"^\s*/(.*?)/", "");
                 }
 
-                _parts = rawcommand.Split(delim.ToCharArray(), 4);
+                _parts = rawcommand.Split(new string[] {"->"}, StringSplitOptions.None);  // use "template" as target. Not a simple replace
+                if (_parts.Length == 2) 
+                    IsUsingTargetTemplate = true;
+                else // "->" not found
+                     _parts = rawcommand.Split(delim.ToCharArray(), 4);
                 SubjectString = RemoveEnclosingQuotesIfPresent(_parts[0].Trim());
                 SubjectString = _pickup.ReplaceShorthandPatternWithFormalRegex(SubjectString);
                 SubjectRegex = new Regex(SubjectString, RegexOptions.Compiled);

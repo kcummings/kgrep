@@ -205,19 +205,19 @@ namespace Tests {
         [Test]
         public void WhenSimpleMatch_OnlyPrintMatched() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("(you) ~ to");
-            commands.ReplaceOnEntireLine = false;
+            ParseCommandFile commands = new ParseCommandFile("(you) -> to");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { " 9you today" });
             Assert.AreEqual("to\n", results);
         }
 
-        [TestCase("What are the abcs of 55?", "([a-c]{3}).+?([0-9]+)~$2 $1 better", "55 abc better\n")] 
-        [TestCase("The number is 65.","([0-9]+)~b","b\n")]
-        [TestCase("The number is 65.", "([0-9]+)~", "")]
+        [TestCase("What are the abcs of 55?", "([a-c]{3}).+?([0-9]+)->$2 $1 better", "55 abc better\n")] 
+        [TestCase("The number is 65.","([0-9]+)->b","b\n")]
+        [TestCase("The number is 65.", "([0-9]+)->", "")]
+        [TestCase("The 12th object.", ".*?([0-9]+)->$1 maids a drinking.", "12 maids a drinking.\n")]
+        [TestCase("The 12th object.", ".*?->new", "new\n")]
         public void WhenReplacing_ReplaceUsingMatchedValueAsSource(string line, string command, string expectedResults) {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(command);
-            commands.ReplaceOnEntireLine = false;
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { line });
             Assert.AreEqual(expectedResults, results);
         }
@@ -227,7 +227,6 @@ namespace Tests {
         public void WhenReplacing_ReplaceUsingOriginalLineAsSource(string line, string command, string expectedResults) {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(command);
-            commands.ReplaceOnEntireLine = true; 
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { line });
             Assert.AreEqual(expectedResults, results);
         }
@@ -235,8 +234,7 @@ namespace Tests {
         [Test]
         public void WhenMatchesSpanLines_OnlyPrintMatched() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("([0-9]+)~{$1};s~t");
-            commands.ReplaceOnEntireLine = false;
+            ParseCommandFile commands = new ParseCommandFile("([0-9]+)->{$1};s~t");
             commands.MaxReplacements = 1;
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "This is the 10th testing", "following 345." });
             Assert.AreEqual("{10}\n{345}\n", results);

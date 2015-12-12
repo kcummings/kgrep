@@ -8,6 +8,24 @@ namespace Tests {
     public class CommandTests {
 
         [Test]
+        public void WhenUsingTemplateTarget_ExpectSplitOnTemplate() {
+            Command command = new Command("/ hello/ a->b");
+            Assert.AreEqual("a", command.SubjectString);
+        }
+
+        [Test]
+        public void WhenUsingTildaInSubjectAndTemplateTarget_ExpectSplitOnTemplate() {
+            Command command = new Command("/ hello/ a~ c->b");
+            Assert.AreEqual("a~ c", command.SubjectString);
+        }
+
+        [Test]
+        public void WhenUsingTildaInTargetAndTemplateTarget_ExpectSplitOnTemplate() {
+            Command command = new Command("/ hello/ (..) c-> b~dog");
+            Assert.AreEqual("b~dog", command.ReplacementString);
+        }
+
+        [Test]
         public void WhenAnchorInTopattern_ExpectAnchor() {
             Command command = new Command("/ hello/ a~b");
             Assert.AreEqual(" hello", command.AnchorString);
