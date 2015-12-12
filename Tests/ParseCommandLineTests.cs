@@ -16,7 +16,6 @@ namespace Tests {
 
             ParseCommandLine commandLine = new ParseCommandLine() {utilities = util};
             commandLine.Init(new String[] { token, repfile });
-            Assert.IsTrue(commandLine.OutputAllLines);
             Assert.AreEqual(expected, commandLine.ReplacementFileName);
             Assert.AreEqual(1, commandLine.InputSourceList.Count);
         }
@@ -26,10 +25,8 @@ namespace Tests {
         public void WhenTwoArguments_ExpectReplacementFileAndSourceFile() {
             IUtilities util = Substitute.For<IUtilities>();
             util.ExpandFileNameWildCards("*.txt").Returns(new List<string>{"file1.txt", "file2.txt"});
-
             ParseCommandLine commandLine = new ParseCommandLine() {utilities = util};
-            commandLine.Init(new string[] { "-o", "a", "*.txt" });
-            Assert.IsFalse(commandLine.OutputAllLines);
+            commandLine.Init(new string[] { "a", "*.txt" });
             Assert.AreEqual(new List<string>{"file1.txt","file2.txt"}, commandLine.InputSourceList);
         }
 
@@ -39,19 +36,6 @@ namespace Tests {
             string[] args = new String[] { "hi~bye" };
             ParseCommandLine cmd = new ParseCommandLine();
             cmd.Init(args);
-            Assert.IsTrue(cmd.OutputAllLines);
-            Assert.AreEqual("hi~bye", cmd.ReplacementFileName);
-            Assert.AreEqual(1, cmd.InputSourceList.Count);
-            Assert.AreEqual(cmd.STDIN, cmd.InputSourceList[0]);
-        }
-
-        [Test]
-        // cat -l filename|kgrep commandFilename
-        public void WhenOnlyMatchingOption_ExpectStdinAsInputSource() {
-            string[] args = new String[] { "-o", "hi~bye" };
-            ParseCommandLine cmd = new ParseCommandLine();
-            cmd.Init(args);
-            Assert.IsFalse(cmd.OutputAllLines);
             Assert.AreEqual("hi~bye", cmd.ReplacementFileName);
             Assert.AreEqual(1, cmd.InputSourceList.Count);
             Assert.AreEqual(cmd.STDIN, cmd.InputSourceList[0]);
@@ -62,7 +46,6 @@ namespace Tests {
             string[] args = new String[] { "" };
             ParseCommandLine cmd = new ParseCommandLine();
             cmd.Init(args);
-            Assert.IsTrue(cmd.OutputAllLines);
             Assert.AreEqual("", cmd.ReplacementFileName);
             Assert.AreEqual(1, cmd.InputSourceList.Count);  // empty string
             Assert.AreEqual(cmd.STDIN, cmd.InputSourceList[0]);
