@@ -45,7 +45,11 @@ Kgrep command syntax:
 	Normal			subject ~ replacement
 	Anchored		/anchor/ subject
 	Anchored		/anchor/ subject ~ replacement
-	Pickup or Scan	subject
+	Pickup Only		/pickup/   
+
+The matched captured text in a Subject is treated as a Pickup and is also printed to stdout.
+
+A Pickup Only has anchored text syntax but is treated as an implicit Pickup. Since there is no associated Subject there is nothing to print.
 
 Kgrep runs in two modes: A Scan and Print OR a Search and Replace. 
 

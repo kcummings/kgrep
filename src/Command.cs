@@ -12,6 +12,7 @@ namespace kgrep
         public String SubjectString ="";
         public bool IsAnchored {get { return !String.IsNullOrEmpty(AnchorString); }}
         public bool IsPickup {get { return _parts.Length == 1; }}
+        public bool IsPickupOnly = false;
         public bool IsNormal {get { return !IsAnchored && !IsPickup;}}
         public bool IsCaptureInSubjectString = false;
         public bool IsPickupInReplacementString = false;   // pickup syntax: ${name}
@@ -54,6 +55,14 @@ namespace kgrep
                 else // "->" not found
                      _parts = rawcommand.Split(delim.ToCharArray(), 4);
                 SubjectString = RemoveEnclosingQuotesIfPresent(_parts[0].Trim());
+
+                // if command is "/abc/" pattern without a subject or replace, treat it as a pickup and don't print it.
+                if (!String.IsNullOrEmpty(AnchorString) && String.IsNullOrEmpty(SubjectString)) {
+                    IsPickupOnly = true;
+                    SubjectString = AnchorString;
+                    AnchorString = "";
+                }
+                
                 SubjectString = _pickup.ReplaceShorthandPatternWithFormalRegex(SubjectString);
                 SubjectRegex = new Regex(SubjectString, RegexOptions.Compiled);
                 if (_parts.Length == 2)

@@ -52,6 +52,9 @@ namespace kgrep {
             if (!command.IsAnchored)   
                 return true;
 
+            if (command.IsPickupOnly)
+                return false;
+
             if (Regex.IsMatch(line, command.AnchorString))
                 return true;
             return false;

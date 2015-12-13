@@ -184,11 +184,9 @@ namespace Tests {
         [TestCase("~~~")]
         [TestCase("~~~~")]
         [TestCase("~")]
-        [TestCase("/a/ ~")]  // only anchor supplied
         [TestCase(@"a~b~c~d~e")]
         [TestCase("delim=:::::")]
         [TestCase("delim=:::")]
-        [TestCase("/a/~#abc")]
         [TestCase("~a  ")]
         public void WhenInvalidFieldContent_ExpectInvalidCommand(string line) {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
@@ -257,11 +255,35 @@ namespace Tests {
         [TestCase("ab{test=[a-c]+}", "ab(?<test>[a-c]+)")]
         [TestCase("ab{test=[0-9+} d", "ab(?<test>[0-9+) d")]
         [TestCase("ab{test a", "ab{test a")]
-        [Test]
         public void ExpandPickupWithAnExplicitPattern(string line, string expectedResults) {
             Pickup sh = new Pickup();
             string results = sh.ReplaceShorthandPatternWithFormalRegex(line);
             Assert.AreEqual(expectedResults, results);
+        }
+
+        [Test]
+        public void TemplateWithPickup() {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("(?<date>[0-9]+);(.)->Date is ${date}");
+            commands.MaxReplacements = 3;
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "Today is the 5th.", "The 6th is tomorrow." });
+            Assert.AreEqual("Date is 5\nDate is 6\n", results);
+        }
+        [Test]
+        public void TemplateWithPickupOnlyNoPrinting() {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("/Today (?<date>..)/;(.)->Date ${date}");
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "Today is the 5th.", "The 6th is tomorrow." });
+            Assert.AreEqual("Date is\nDate is\n", results);
+        }
+
+        [Test]
+        public void AnchoredPicked_PickupAndHoldNoPrinting() {
+            ParseCommandFile commands = new ParseCommandFile(@"/abc/;(a)bcd~b$1");
+            Assert.IsTrue(commands.CommandList[0].IsPickupOnly);
+            Assert.AreEqual("abc",commands.CommandList[0].SubjectString);
+            Assert.IsEmpty(commands.CommandList[0].AnchorString);
+            Assert.IsTrue(commands.CommandList[0].IsPickup);
         }
     }
 }
