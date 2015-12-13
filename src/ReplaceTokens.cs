@@ -10,7 +10,6 @@ namespace kgrep {
         public IHandleOutput sw = new WriteStdout();
         private readonly Pickup _pickup;
         private int _maxReplacements;
-        private string OFS;
 
         public ReplaceTokens() {
             _pickup = new Pickup();

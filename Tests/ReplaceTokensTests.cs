@@ -243,7 +243,7 @@ namespace Tests {
         [Test]
         public void LimitMatchesToZero() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("OFS=' ';a~b;b~c;c~d;d~e");
+            ParseCommandFile commands = new ParseCommandFile("a~b;b~c;c~d;d~e");
             commands.MaxReplacements = 0;
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "abcde" });
             Assert.AreEqual("abcde\n", results);
@@ -252,7 +252,7 @@ namespace Tests {
         [Test]
         public void LimitMatchesToOne() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("OFS=' ';a~b;b~c:c~d;d~e");
+            ParseCommandFile commands = new ParseCommandFile("a~b;b~c:c~d;d~e");
             commands.MaxReplacements = 1;
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "abcde" });
             Assert.AreEqual("bbcde\n", results);
@@ -261,7 +261,7 @@ namespace Tests {
         [Test]
         public void LimitMatchesToThree() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("OFS=' ';a~b;b~c;c~d;d~e");
+            ParseCommandFile commands = new ParseCommandFile("a~b;b~c;c~d;d~e");
             commands.MaxReplacements = 3;
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "abckde" });
             Assert.AreEqual("dddkde\n", results);
@@ -270,7 +270,7 @@ namespace Tests {
         [Test]
         public void LimitMatchesToDefault() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("OFS=' ';a~b;b~c;c~d;d~e");
+            ParseCommandFile commands = new ParseCommandFile("a~b;b~c;c~d;d~e");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "abcde" });
             Assert.AreEqual("eeeee\n", results);
         }
@@ -278,7 +278,7 @@ namespace Tests {
         [Test]
         public void LimitMatchesResetsWithEachFile() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile("OFS=' ';a~b;b~c;c~d;d~e");
+            ParseCommandFile commands = new ParseCommandFile("a~b;b~c;c~d;d~e");
             commands.MaxReplacements = 1;  // this override value should be used for each file read. Don't use value from previous file scan.
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "abcde", "kcde" });
             Assert.AreEqual("bbcde\nkdde\n", results);
