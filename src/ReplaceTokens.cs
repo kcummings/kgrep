@@ -18,7 +18,6 @@ namespace kgrep {
 
         public virtual string ApplyCommandsToInputFileList(ParseCommandFile rf, List<string> inputFilenames) {
             try {
-                OFS = rf.OFS;
                 foreach (string filename in inputFilenames) {
                     ApplyCommandsToFile(rf, filename);
                 }

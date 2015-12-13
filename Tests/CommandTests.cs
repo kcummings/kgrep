@@ -91,6 +91,14 @@ namespace Tests {
             Assert.AreEqual(" with blanks ", command.ReplacementString);
         }
 
+        [Test]
+        public void WhenOFSused_LetItBecomeDefaultUntilChanged() {
+            PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("(.);OFS=' ';(.);(.); OFS='+';(.)");
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "de" });
+            Assert.AreEqual("d\ne\nd e\nd e\nd+e\n", results);
+        }
+
     }
 
 }

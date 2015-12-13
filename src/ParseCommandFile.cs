@@ -11,7 +11,7 @@ namespace kgrep
         private String _comment = "#";
         private String _delim = "~";
         private IHandleInput sr;
-        public string OFS = "";    // Output Field Seperator use by scanner only, like AWK's
+        private string OFS = "\n";    
         public int MaxReplacements = 9999;
     
         // Kgrep is only in one state or mode.
@@ -60,7 +60,7 @@ namespace kgrep
                     OFS = OFS.Replace("\\n", "\n"); // interpret \n on command line as newline
                     OFS = OFS.Replace("\\t", "\t"); // interpret \t on command line as tab
                 } else {
-                    Command command = new Command(line, _delim);
+                    Command command = new Command(line, _delim) {OFS = OFS};
                     if (command.IsValid()) {
                         CommandList.Add(command);
                     }

@@ -13,7 +13,7 @@ namespace Tests {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles { sw = new WriteToString() };
                 ParseCommandFile commands = new ParseCommandFile("bye");
                 string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "today bye bye birdie" });
-                Assert.AreEqual("byebye\n", results);
+                Assert.AreEqual("bye\nbye\n", results);
             }
 
             [Test]
@@ -75,7 +75,7 @@ namespace Tests {
             }
 
             [TestCase("b\n", "b", "abc")]
-            [TestCase("byebye\n", "bye", "today bye bye birdie")]
+            [TestCase("byebye\n", "OFS='';bye", "today bye bye birdie")]
             [TestCase("birdie\n", "bye bye (.*?)$", "today bye bye birdie")]
             public void WhenNonRegexTokenGiven_ExpectSimpleOutput(string expected, string scantoken, string input) {
                 PrintTokensInSourceFiles engine = new PrintTokensInSourceFiles() { sw = new WriteToString() };

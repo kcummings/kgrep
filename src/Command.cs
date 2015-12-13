@@ -22,6 +22,7 @@ namespace kgrep
         public static Regex PickupPattern = new Regex(@"\$\{(.+?)\}", RegexOptions.Compiled);
         private Pickup _pickup = new Pickup();
         private String[] _parts;
+        public string OFS;  // Output Field Seperator use by scanner only, like AWK's
 
         public Command(string line) {
             ParseAndValidateCommand(line, "~");

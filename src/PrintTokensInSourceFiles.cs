@@ -16,7 +16,7 @@ namespace kgrep {
                     while ((line = sr.ReadLine()) != null) {
                         foreach (Command command in rf.CommandList) {
                             if (isCandidateForPrinting(line, command))
-                               sw.Write(ScanForTokens(line, command.SubjectRegex, rf.OFS));
+                               sw.Write(ScanForTokens(line, command.SubjectRegex, command.OFS));
                         }
                     }
                     sr.Close();
