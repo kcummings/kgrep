@@ -24,6 +24,17 @@ namespace kgrep
         private String[] _parts;
         public string OFS;  // Output Field Seperator use by scanner only, like AWK's
 
+        public enum CommandType {
+            isReplace,
+            isTemplate,
+            isAnchoredReplace,
+            isAnchoredTemplate,
+            isPickupOnly,
+            isFindAndPrint
+        }
+
+        public CommandType CommandIs = CommandType.isReplace;
+
         public Command(string line) {
             ParseAndValidateCommand(line, "~");
         }
@@ -69,13 +80,30 @@ namespace kgrep
                 if (_parts.Length == 2)
                     ReplacementString = RemoveEnclosingQuotesIfPresent(_parts[1].Trim());
                 SetType();
+                CommandIs = GetCommandType();
             } catch (Exception e) {
                 Console.WriteLine("Regex error Command, from '{0}'  to '{1}'  AnchorString '{2}'", SubjectString,
                                   ReplacementString, AnchorString);
                 throw new Exception(e.Message);
             }
-
             return;
+        }
+
+        private CommandType GetCommandType() {
+            bool isAnchored = !String.IsNullOrEmpty(AnchorString);
+            bool isNormal = _parts.Length == 2;
+
+            if (IsPickupOnly)
+                return CommandType.isPickupOnly;
+            if (isAnchored && IsUsingTargetTemplate)
+                return CommandType.isAnchoredTemplate;
+            if (IsUsingTargetTemplate)
+                return CommandType.isTemplate;  
+            if (isAnchored && isNormal)
+                return CommandType.isAnchoredReplace;
+            if (isNormal)
+                return CommandType.isReplace;
+            return CommandType.isFindAndPrint;
         }
 
         private void SetType() {

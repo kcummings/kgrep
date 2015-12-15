@@ -99,6 +99,20 @@ namespace Tests {
             Assert.AreEqual("d\ne\nd e\nd e\nd+e\n", results);
         }
 
+        [TestCase ("/abc/ from  ~ to", Command.CommandType.isAnchoredReplace)]
+        [TestCase("from  ~ to", Command.CommandType.isReplace)]
+        [TestCase("/abc/ from ~", Command.CommandType.isAnchoredReplace)]
+        [TestCase("from  ~", Command.CommandType.isReplace)]
+        [TestCase("/abc/ from  -> to", Command.CommandType.isAnchoredTemplate)]
+        [TestCase("from  -> to", Command.CommandType.isTemplate)]
+        [TestCase("/abc/ from  ->", Command.CommandType.isAnchoredTemplate)]
+        [TestCase("from  ->", Command.CommandType.isTemplate)]
+        [TestCase("/abc/ ", Command.CommandType.isPickupOnly)]
+        [TestCase("from to", Command.CommandType.isFindAndPrint)]
+        public void TestCommandTypes(string line, Command.CommandType type) {
+            Command command = new Command(line);
+            Assert.AreEqual(type, command.CommandIs);
+        }
     }
 
 }

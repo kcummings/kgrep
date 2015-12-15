@@ -59,11 +59,13 @@ namespace kgrep {
 
         private string ApplySingleCommand(string line, Command command) {
             _pickup.CollectAllPickupsInLine(line, command);
-            if (command.IsUsingTargetTemplate)
+            if (command.CommandIs == Command.CommandType.isAnchoredTemplate || command.CommandIs == Command.CommandType.isTemplate)
                 line = ReplaceMatched(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));            
-            else {
-                line = ReplaceFullLine(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));
+            else if (command.CommandIs == Command.CommandType.isFindAndPrint) {
+                ScanForTokens(line, command.SubjectRegex, command.OFS);
             }
+            else 
+                line = ReplaceFullLine(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));
             return line;
         }
 
@@ -82,12 +84,35 @@ namespace kgrep {
         }
 
         private bool isCandidateForReplacement(string line, Command command) {
-            if (!command.IsAnchored)
+            if (command.CommandIs != Command.CommandType.isAnchoredReplace && command.CommandIs != Command.CommandType.isAnchoredReplace)
+                return true;
+            if (command.CommandIs == Command.CommandType.isPickupOnly)
                 return true;
 
             if (Regex.IsMatch(line, command.AnchorString))
                 return true;
             return false;
+        }
+
+        public string ScanForTokens(string line, Regex pattern, string FS) {
+            List<string> sb = new List<string>();
+            Match m = pattern.Match(line);
+
+            // Only return submatches if found, otherwise return any matches.
+            while (m.Success) {
+                int[] gnums = pattern.GetGroupNumbers();
+                if (gnums.Length > 1) {
+                    for (int i = 1; i < gnums.Length; i++) {
+                        string token = m.Groups[gnums[i]].ToString();
+                        sb.Add(token);
+                    }
+                } else {
+                    // Only include the substring that was matched.
+                    sb.Add(m.Value);
+                }
+                m = m.NextMatch();
+            }
+            return String.Join(FS, sb.ToArray());
         }
     }
 }
