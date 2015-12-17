@@ -177,7 +177,7 @@ namespace Tests {
         public void WhenSimpleRegex_ExpectSimpleResults(string expected, string line, string input) {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             Command command = new Command(line);
-            Assert.AreEqual(expected, engine.ApplyCommandsAllMatches(input, command));
+            Assert.AreEqual(expected, engine.ApplySingleCommand(input, command));
         }
 
         [Test]
@@ -185,21 +185,21 @@ namespace Tests {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             List<Command> reps = new List<Command>();
             Command command = new Command(@"(\w+)\s(\w+)~$2 $1");
-            Assert.AreEqual("me from you to", engine.ApplyCommandsAllMatches("from me to you", command));
+            Assert.AreEqual("me from you to", engine.ApplySingleCommand("from me to you", command));
         }
 
         [Test]
         public void WhenAnchorMatchesButPatternDoesNot_All_ExpectNoChange() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             Command command = new Command("/today/ Joe~to");
-            Assert.AreEqual("you and you today", engine.ApplyCommandsAllMatches("you and you today", command));
+            Assert.AreEqual("you and you today", engine.ApplySingleCommand("you and you today", command));
         }
 
         [Test]
         public void WhenAnchorAndPatternMatches_All_ExpectChange() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             Command command = new Command("/today/ you ~ to");
-            Assert.AreEqual("to and to today", engine.ApplyCommandsAllMatches("you and you today", command));
+            Assert.AreEqual("to and to today", engine.ApplySingleCommand("you and you today", command));
         }
 
         [Test]

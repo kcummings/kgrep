@@ -43,21 +43,13 @@ namespace kgrep {
                 if ( ! isCandidateForReplacement(line, command)) break;
                 if (command.SubjectRegex.IsMatch(line)) {  // only decrement _maxReplacements if matches, don't just count commands read
                     if (_maxReplacements-- <= 0) break;
-                    line = ApplyCommandsAllMatches(line, command);
+                    line = ApplySingleCommand(line, command);
                 }
             }
             return line;
         }
 
-        public string ApplyCommandsAllMatches(string line, Command command) {
-            if (command.IsPickup)
-                _pickup.CollectAllPickupsInLine(line, command);
-            else
-                line = ApplySingleCommand(line, command);
-            return line;
-        }
-
-        private string ApplySingleCommand(string line, Command command) {
+        public string ApplySingleCommand(string line, Command command) {
             _pickup.CollectAllPickupsInLine(line, command);
             if (command.CommandIs == Command.CommandType.isAnchoredTemplate || command.CommandIs == Command.CommandType.isTemplate)
                 line = ReplaceMatched(command.SubjectRegex, line, _pickup.ReplacePickupsWithStoredValue(command.ReplacementString));            
