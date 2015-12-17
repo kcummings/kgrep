@@ -49,15 +49,7 @@ namespace kgrep {
         }
 
         private bool isCandidateForPrinting(string line, Command command) {
-            if (!command.IsAnchored)   
-                return true;
-
-            if (command.IsPickupOnly)
-                return false;
-
-            if (Regex.IsMatch(line, command.AnchorString))
-                return true;
-            return false;
+            return Regex.IsMatch(line, command.AnchorString);
         }
     }
 }

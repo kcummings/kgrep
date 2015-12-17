@@ -75,10 +75,7 @@ namespace kgrep {
         private bool isCandidateForReplacement(string line, Command command) {
             if (command.CommandIs != Command.CommandType.isAnchoredReplace && command.CommandIs != Command.CommandType.isAnchoredReplace)
                 return true;
-
-            if (Regex.IsMatch(line, command.AnchorString))
-                return true;
-            return false;
+            return Regex.IsMatch(line, command.AnchorString);
         }
     }
 }
