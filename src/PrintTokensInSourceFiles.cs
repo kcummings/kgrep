@@ -9,23 +9,27 @@ namespace kgrep {
 
         public string ApplyCommandsToInputFileList(ParseCommandFile rf, List<string> inputFilenames) {
             try {
-                string line;
-
                 foreach (string filename in inputFilenames) {
-                    IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
-                    while ((line = sr.ReadLine()) != null) {
-                        foreach (Command command in rf.CommandList) {
-                            if (isCandidateForPrinting(line, command))
-                               sw.Write(ScanForTokens(line, command.SubjectRegex, command.OFS));
-                        }
-                    }
-                    sr.Close();
+                    ApplyCommandsToFile(rf, filename);
                 }
             } catch (Exception e) {
                 Console.WriteLine("{0}", e.Message);
             }
             return sw.Close();
         }
+
+        private void ApplyCommandsToFile(ParseCommandFile rf, string filename) {
+            IHandleInput sr = (new ReadFileFactory()).GetSource((filename));
+            string line;
+            while ((line = sr.ReadLine()) != null) {
+                foreach (Command command in rf.CommandList) {
+                    if (isCandidateForPrinting(line, command))
+                        sw.Write(ScanForTokens(line, command.SubjectRegex, command.OFS));
+                }
+            }
+            sr.Close();
+        }
+
 
         public string ScanForTokens(string line, Regex pattern, string FS) {
             List<string> sb = new List<string>();
