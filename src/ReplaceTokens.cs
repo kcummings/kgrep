@@ -15,7 +15,7 @@ namespace kgrep {
             _pickup = new Pickup();
         }
 
-        public virtual string ApplyCommandsToInputFileList(ParseCommandFile rf, List<string> inputFilenames) {
+        public string ApplyCommandsToInputFileList(ParseCommandFile rf, List<string> inputFilenames) {
             try {
                 foreach (string filename in inputFilenames) {
                     ApplyCommandsToFile(rf, filename);
