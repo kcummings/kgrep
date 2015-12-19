@@ -84,7 +84,7 @@ namespace kgrep
 
         public bool IsScanner() {
             foreach (Command cmd in CommandList)
-                if (cmd.IsNormal)
+                if (cmd.CommandIs != Command.CommandType.isFindAndPrint)
                     return false;
             return true;
         }

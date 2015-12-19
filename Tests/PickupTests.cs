@@ -154,16 +154,6 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenVariousTokensGiven_ExpectAppropiateCommandTypes() {
-            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
-            ParseCommandFile commands = new ParseCommandFile(@"a~b; a; /d/a~b");
-            Assert.IsTrue(commands.CommandList[0].IsNormal);
-            Assert.IsTrue(commands.CommandList[1].IsPickup);
-            Assert.IsTrue(commands.CommandList[2].IsAnchored);
-            Assert.AreEqual(ParseCommandFile.RunningAs.ReplaceAll, commands.kgrepMode);
-        }
-
-        [Test]
         public void WhenOnlyScanTokensGiven_ExpectScannerMode() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"b; a; c");
@@ -283,15 +273,6 @@ namespace Tests {
             ParseCommandFile commands = new ParseCommandFile("/Today (?<date>..)/;(.)->Date ${date}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "Today is the 5th.", "The 6th is tomorrow." });
             Assert.AreEqual("Date is\nDate is\n", results);
-        }
-
-        [Test]
-        public void AnchoredPicked_PickupAndHoldNoPrinting() {
-            ParseCommandFile commands = new ParseCommandFile(@"/abc/;(a)bcd~b$1");
-            Assert.IsTrue(commands.CommandList[0].IsPickupOnly);
-            Assert.AreEqual("abc",commands.CommandList[0].SubjectString);
-            Assert.IsEmpty(commands.CommandList[0].AnchorString);
-            Assert.IsTrue(commands.CommandList[0].IsPickup);
         }
     }
 }

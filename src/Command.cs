@@ -10,10 +10,7 @@ namespace kgrep
         public String ReplacementString = "";
         public Regex SubjectRegex;
         public String SubjectString ="";
-        public bool IsAnchored {get { return !String.IsNullOrEmpty(AnchorString); }}
-        public bool IsPickup {get { return _parts.Length == 1; }}
         public bool IsPickupOnly = false;
-        public bool IsNormal {get { return !IsAnchored && !IsPickup;}}
         public bool IsCaptureInSubjectString = false;
         public bool IsPickupInReplacementString = false;   // pickup syntax: ${name}
         public bool IsUsingTargetTemplate = false;     // subject -> target rather than subject ~ target
@@ -101,10 +98,10 @@ namespace kgrep
             bool isAnchored = !String.IsNullOrEmpty(AnchorString);
             bool isNormal = _parts.Length == 2;
 
-            if (IsPickupOnly)
-                return CommandType.isPickupOnly;
             if (isAnchored && IsUsingTargetTemplate)
                 return CommandType.isAnchoredTemplate;
+            if (IsPickupOnly)
+                return CommandType.isPickupOnly;
             if (IsUsingTargetTemplate)
                 return CommandType.isTemplate;  
             if (isAnchored && isNormal)
