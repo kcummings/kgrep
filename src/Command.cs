@@ -74,13 +74,21 @@ namespace kgrep
                     SubjectString = AnchorString;
                     AnchorString = "";
                 }
+
+                CommandIs = GetCommandType();
+
+                // Since subject is requires but "->abc" is a valid command, add a substitue subject for template without a subject.
+                if (CommandIs == CommandType.isTemplate && String.IsNullOrEmpty(SubjectString))
+                    SubjectString = ".";               
                 
                 SubjectString = _pickup.ReplaceShorthandPatternWithFormalRegex(SubjectString);
                 SubjectRegex = new Regex(SubjectString, RegexOptions.Compiled);
                 if (_parts.Length == 2)
                     ReplacementString = RemoveEnclosingQuotesIfPresent(_parts[1].Trim());
                 SetType();
-                CommandIs = GetCommandType();
+
+
+
             } catch (Exception e) {
                 Console.WriteLine("Regex error Command, from '{0}'  to '{1}'  AnchorString '{2}'", SubjectString,
                                   ReplacementString, AnchorString);

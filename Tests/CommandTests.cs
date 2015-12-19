@@ -107,6 +107,7 @@ namespace Tests {
         [TestCase("from  -> to", Command.CommandType.isTemplate)]
         [TestCase("/abc/ from  ->", Command.CommandType.isAnchoredTemplate)]
         [TestCase("from  ->", Command.CommandType.isTemplate)]
+        [TestCase("->to", Command.CommandType.isTemplate)]
         [TestCase("/abc/ ", Command.CommandType.isPickupOnly)]
         [TestCase("from to", Command.CommandType.isFindAndPrint)]
         public void TestCommandTypes(string line, Command.CommandType type) {

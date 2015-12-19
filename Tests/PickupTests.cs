@@ -217,7 +217,7 @@ namespace Tests {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"<{opentag}>;abc~${opentag}");
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "<>def", "abc here" });
-            Assert.AreEqual("<>def\n${opentag} here\n", results);
+            Assert.AreEqual("<>def\n here\n", results);
         }
 
         [Test]
@@ -237,6 +237,14 @@ namespace Tests {
         }
 
         [Test]
+        public void WhenGlobPickupAtEndOfLine_ExpectReplacedValue() {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(@"{num=[0-9]+}{title};->${title}");
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "900  the end"});
+            Assert.AreEqual("  the end\n", results);
+        }
+
+        [Test]
         public void WhenGlobPickupsWithPattern_ExpectReplacedValue() {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(@"<isbn>{isbn=[0-9]+}$; report ~ ${isbn}");
@@ -248,7 +256,7 @@ namespace Tests {
         public void ExpandPickupWithOutAnExplicitPattern() {
             Pickup sh = new Pickup();
             string results = sh.ReplaceShorthandPatternWithFormalRegex("ab{test} d");
-            Assert.AreEqual("ab(?<test>.+?) d",results);
+            Assert.AreEqual("ab(?<test>.*?) d",results);
         }
 
         [TestCase("ab{test=[0-9]+} d", "ab(?<test>[0-9]+) d")]

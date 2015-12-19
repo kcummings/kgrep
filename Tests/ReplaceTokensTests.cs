@@ -215,6 +215,8 @@ namespace Tests {
         [TestCase("The number is 65.", "([0-9]+)->", "")]
         [TestCase("The 12th object.", ".*?([0-9]+)->$1 maids a drinking.", "12 maids a drinking.\n")]
         [TestCase("The 12th object.", ".*?->new", "new\n")]
+        [TestCase("The 12th object.", "->new", "new\n")]
+        [TestCase("The 12th object.", @"\s{num}th;->${num}", "12\n")]
         public void WhenReplacing_ReplaceUsingMatchedValueAsSource(string line, string command, string expectedResults) {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(command);

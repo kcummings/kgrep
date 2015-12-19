@@ -46,15 +46,17 @@ namespace kgrep {
         // pickup syntax: {shorthandName=pattern} where shorthandName must begin with a letter
         public string ReplaceShorthandPatternWithFormalRegex(string field) {
             Regex shorthandPattern = new Regex(@"\{([a-zA-Z]\w+?)(=.*?)?\}");
+            string anchorEnd = "";
 
             MatchCollection mc = shorthandPattern.Matches(field);
             foreach (Match m in mc) {
                 string shorthandName = m.Groups[1].Value;
                 string pattern = m.Groups[2].Value;
                 if (string.IsNullOrEmpty(pattern)) {
-                    pattern = ".+?";
+                    if (field.EndsWith("{" + shorthandName + "}")) anchorEnd = "$";
+                    pattern = ".*?";
                     field = field.Replace("{" + shorthandName + "}",
-                                          String.Format(@"(?<{0}>{1})", shorthandName, pattern));
+                                          String.Format(@"(?<{0}>{1}){2}", shorthandName, pattern, anchorEnd));
                 }
                 else {
                     pattern = pattern.Substring(1); // ignore the '=' delimiter
