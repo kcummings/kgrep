@@ -212,7 +212,7 @@ namespace Tests {
 
         [TestCase("What are the abcs of 55?", "([a-c]{3}).+?([0-9]+)->$2 $1 better", "55 abc better\n")] 
         [TestCase("The number is 65.","([0-9]+)->b","b\n")]
-        [TestCase("The number is 65.", "([0-9]+)->", "")]
+        [TestCase("The number is 65.", "([0-9]+)->", "The number is 65.\n")]  // output will be ignored since commandy type is not supported
         [TestCase("The 12th object.", ".*?([0-9]+)->$1 maids a drinking.", "12 maids a drinking.\n")]
         [TestCase("The 12th object.", ".*?->new", "new\n")]
         [TestCase("The 12th object.", "->new", "new\n")]
@@ -240,6 +240,14 @@ namespace Tests {
             commands.MaxReplacements = 1;
             string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "This is the 10th testing", "following 345." });
             Assert.AreEqual("{10}\n{345}\n", results);
+        }
+
+        [Test]
+        public void WhenAnchoredTemplateWithoutASubject() {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile("cat~dog; /dog/->lion;s~t");
+            string results = engine.ApplyCommandsToInputFileList(commands, new List<string> { "The dog is brown.", "The cat is yellow.","The fish is golden." });
+            Assert.AreEqual("lion\nlion\nThe fish is golden.\n", results);
         }
 
         [Test]
@@ -306,6 +314,14 @@ namespace Tests {
             if (m.Success)
                 templateline = PatternRegex.Replace(m.Value, "$2 $1 better");
         }
-        
+       
+        [TestCase("/a/~", 0)]
+        [TestCase("a~b;/a/~", 1)]
+        [TestCase("/a/~;b->c", 1)]
+        public void TestNonSupportedCommandTypesAreIgnored(string line, int validCommands) {
+            ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
+            ParseCommandFile commands = new ParseCommandFile(line);
+            Assert.AreEqual(validCommands, commands.CommandList.Count);
+        }
     }
 }

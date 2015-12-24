@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Text.RegularExpressions;
 
@@ -10,6 +11,7 @@ namespace kgrep
         public String ReplacementString = "";
         public Regex SubjectRegex;
         public String SubjectString ="";
+        private string delimiter;
         public bool IsPickupOnly = false;
         public bool IsCaptureInSubjectString = false;
         public bool IsPickupInReplacementString = false;   // pickup syntax: ${name}
@@ -18,7 +20,6 @@ namespace kgrep
         private static Regex nonCapturingPattern = new Regex(@"\(\?(?:[^<=]|<=|<!).*?\)", RegexOptions.Compiled);
         public static Regex PickupPattern = new Regex(@"\$\{(.+?)\}", RegexOptions.Compiled);
         private Pickup _pickup = new Pickup();
-        private String[] _parts;
         public string OFS;  // Output Field Seperator use by scanner only, like AWK's
 
         public enum CommandType {
@@ -27,7 +28,9 @@ namespace kgrep
             isAnchoredReplace,
             isAnchoredTemplate,
             isPickupOnly,
-            isFindAndPrint
+            isAnchoredScan,
+            isScan,
+            isNotSupported
         }
 
         public CommandType CommandIs = CommandType.isReplace;
@@ -49,42 +52,42 @@ namespace kgrep
         //          "/AnchorString/ SubjectRegex -> ReplacementString
         //     Only SubjectRegex is required.
         //     Parse line and init parameters.
-        public void ParseLine(string rawcommand, string delim) {
+        public void ParseLine(string line, string delim) {
             try {
-                
-                AnchorString = Regex.Match(rawcommand, @"^\s*/(.*?)/").Groups[1].Value;
-                AnchorString = RemoveEnclosingQuotesIfPresent(AnchorString);
-                if (!String.IsNullOrEmpty(AnchorString)) {
-                    rawcommand = Regex.Replace(rawcommand, @"^\s*/(.*?)/", "");
-                }
 
-                _parts = rawcommand.Split(new string[] {"->"}, StringSplitOptions.None);  // use "template" as target. Not a simple replace
-                if (_parts.Length == 2) 
+                string pat = String.Format("(?:/(?<anchor>.*?)/)?(?:(?<subject>.*?)?(?<delim>->|{0})(?<target>.*)|(?<subject>.*))", delim);
+                Regex commandTypeRegex = new Regex(pat);
+                MatchCollection mc = commandTypeRegex.Matches(line);
+                if (mc.Count == 0) {
+                    throw new Exception(String.Format("Invalid Command syntax for '{0}'", line));
+                }
+                Match m = mc[0];
+                AnchorString = RemoveEnclosingQuotesIfPresent(m.Groups["anchor"].Value);
+                SubjectString = m.Groups["subject"].Value.Trim();
+                delimiter = m.Groups["delim"].Value;
+                ReplacementString = m.Groups["target"].Value.Trim();
+                CommandIs = GetCommandType(AnchorString, SubjectString, delimiter, ReplacementString);
+
+                if (delimiter == "->")
                     IsUsingTargetTemplate = true;
-                else // "->" not found
-                     _parts = rawcommand.Split(delim.ToCharArray(), 4);
-                SubjectString = RemoveEnclosingQuotesIfPresent(_parts[0].Trim());
+
+                SubjectString = RemoveEnclosingQuotesIfPresent(SubjectString.Trim());
 
                 // if command is "/abc/" pattern without a subject or replace, treat it as a pickup and don't print it.
-                if (!String.IsNullOrEmpty(AnchorString) && String.IsNullOrEmpty(SubjectString)) {
-                    IsPickupOnly = true;
+                if (CommandIs == CommandType.isPickupOnly) {
                     SubjectString = AnchorString;
                     AnchorString = "";
                 }
 
-                CommandIs = GetCommandType();
-
                 // Since subject is requires but "->abc" is a valid command, add a substitue subject for template without a subject.
-                if (CommandIs == CommandType.isTemplate && String.IsNullOrEmpty(SubjectString))
+                if ((CommandIs == CommandType.isTemplate || CommandIs == CommandType.isAnchoredTemplate) && String.IsNullOrEmpty(SubjectString))
                     SubjectString = ".";               
                 
                 SubjectString = _pickup.ReplaceShorthandPatternWithFormalRegex(SubjectString);
                 SubjectRegex = new Regex(SubjectString, RegexOptions.Compiled);
-                if (_parts.Length == 2)
-                    ReplacementString = RemoveEnclosingQuotesIfPresent(_parts[1].Trim());
-                SetType();
-
-
+                ReplacementString = RemoveEnclosingQuotesIfPresent(ReplacementString.Trim());
+                IsCaptureInSubjectString = allParensPattern.Match(SubjectString).Success;
+                IsPickupInReplacementString = PickupPattern.Match(ReplacementString).Success;
 
             } catch (Exception e) {
                 Console.WriteLine("Regex error Command, from '{0}'  to '{1}'  AnchorString '{2}'", SubjectString,
@@ -94,27 +97,43 @@ namespace kgrep
             return;
         }
 
-        private CommandType GetCommandType() {
-            bool isAnchored = !String.IsNullOrEmpty(AnchorString);
-            bool isNormal = _parts.Length == 2;
+        private CommandType GetCommandType(string anchor, string subject, string delim, string target) {
+            bool hasAnchor = !String.IsNullOrEmpty(anchor);
+            bool hasSubject = !String.IsNullOrEmpty(subject);
+            bool hasTarget = !String.IsNullOrEmpty(target);
+            bool hasDelimter = !String.IsNullOrEmpty(delim);
 
-            if (isAnchored && IsUsingTargetTemplate)
-                return CommandType.isAnchoredTemplate;
-            if (IsPickupOnly)
-                return CommandType.isPickupOnly;
-            if (IsUsingTargetTemplate)
-                return CommandType.isTemplate;  
-            if (isAnchored && isNormal)
-                return CommandType.isAnchoredReplace;
-            if (isNormal)
-                return CommandType.isReplace;
-            return CommandType.isFindAndPrint;
-        }
+            // Determine the type of command.
+            // For a Truth Table explaining possibilities, see docs/CommandTypeTruthTable.xlsx
+            int state = 0;
+            if (hasAnchor) state += 1;
+            if (hasSubject) state += 2;
+            if (hasDelimter) state += 4;
+            if (hasTarget) state += 8;
+            
+            // Scan only related commands.
+            if (String.IsNullOrEmpty(delim)) {
+                if (state==3) return CommandType.isAnchoredScan;
+                if (state==1) return CommandType.isPickupOnly;
+                if (state==2) return CommandType.isScan;
+                return CommandType.isNotSupported;
+            }
 
-        private void SetType() {
-            IsCaptureInSubjectString = allParensPattern.Match(SubjectString).Success;
-            IsPickupInReplacementString = PickupPattern.Match(ReplacementString).Success;
-            return;
+            // Template related search and replace commands.
+            if (delim == "->") {
+                if (state == 15) return CommandType.isAnchoredTemplate;
+                if (state == 13) return CommandType.isAnchoredTemplate;
+                if (state==14) return CommandType.isTemplate;
+                if (state == 12) return CommandType.isTemplate;
+                return CommandType.isNotSupported;
+            }
+
+            // Search and repalce commands.
+            if (state==15) return CommandType.isAnchoredReplace;
+            if (state == 7) return CommandType.isAnchoredReplace;
+            if (state == 14) return CommandType.isReplace;
+            if (state == 6) return CommandType.isReplace;
+            return CommandType.isNotSupported;
         }
 
         private string RemoveEnclosingQuotesIfPresent(string pattern) {
@@ -127,12 +146,7 @@ namespace kgrep
         }
 
         public bool IsValid() {
-            if (String.IsNullOrEmpty(SubjectString)) {
-                return false;
-            }
-            if (_parts.Length > 2)
-                return false;
-            return true;
+            return CommandIs != CommandType.isNotSupported;
         }
     }
 }

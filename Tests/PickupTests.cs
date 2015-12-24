@@ -171,17 +171,17 @@ namespace Tests {
         }
 
         [Test]
-        [TestCase("~~~")]
-        [TestCase("~~~~")]
-        [TestCase("~")]
-        [TestCase(@"a~b~c~d~e")]
-        [TestCase("delim=:::::")]
-        [TestCase("delim=:::")]
-        [TestCase("~a  ")]
-        public void WhenInvalidFieldContent_ExpectInvalidCommand(string line) {
+        [TestCase("~~~",0)]
+        [TestCase("~~~~",0)]
+        [TestCase("~",0)]
+        [TestCase(@"a~b~c~d~e",1)]  // this parses to source="a" & replace="b~c~d~e". It's legal but may not be what we want. Something to think about.
+        [TestCase("delim=:::::",0)]
+        [TestCase("delim=:::",0)]
+        [TestCase("~a  ",0)]
+        public void WhenInvalidFieldContent_ExpectInvalidCommand(string line, int count) {
             ReplaceTokens engine = new ReplaceTokens() { sw = new WriteToString() };
             ParseCommandFile commands = new ParseCommandFile(line);
-            Assert.AreEqual(0, commands.CommandList.Count);
+            Assert.AreEqual(count, commands.CommandList.Count);
         }
 
         [Test]

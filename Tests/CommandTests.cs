@@ -14,9 +14,9 @@ namespace Tests {
         }
 
         [Test]
-        public void WhenUsingTildaInSubjectAndTemplateTarget_ExpectSplitOnTemplate() {
+        public void WhenUsingTildaInSubjectAndTemplateTarget_ExpectSplitOnTilda() {
             Command command = new Command("/ hello/ a~ c->b");
-            Assert.AreEqual("a~ c", command.SubjectString);
+            Assert.AreEqual("a", command.SubjectString);
         }
 
         [Test]
@@ -99,20 +99,28 @@ namespace Tests {
             Assert.AreEqual("d\ne\nd e\nd e\nd+e\n", results);
         }
 
-        [TestCase ("/abc/ from  ~ to", Command.CommandType.isAnchoredReplace)]
-        [TestCase("from  ~ to", Command.CommandType.isReplace)]
-        [TestCase("/abc/ from ~", Command.CommandType.isAnchoredReplace)]
-        [TestCase("from  ~", Command.CommandType.isReplace)]
-        [TestCase("/abc/ from  -> to", Command.CommandType.isAnchoredTemplate)]
-        [TestCase("from  -> to", Command.CommandType.isTemplate)]
-        [TestCase("/abc/ from  ->", Command.CommandType.isAnchoredTemplate)]
-        [TestCase("from  ->", Command.CommandType.isTemplate)]
-        [TestCase("->to", Command.CommandType.isTemplate)]
-        [TestCase("/abc/ ", Command.CommandType.isPickupOnly)]
-        [TestCase("from to", Command.CommandType.isFindAndPrint)]
-        public void TestCommandTypes(string line, Command.CommandType type) {
+        [TestCase ("/abc/ from  ~ to", Command.CommandType.isAnchoredReplace,"abc","from","~","to")]
+        [TestCase("from  ~ to", Command.CommandType.isReplace,"","from","~","to")]
+        [TestCase("/abc/ from ~", Command.CommandType.isAnchoredReplace,"abc","from","~","")]
+        [TestCase("from  ~", Command.CommandType.isReplace,"","from","~","")]
+        [TestCase("/abc/ from  -> to", Command.CommandType.isAnchoredTemplate,"abc","from","->","to")]
+        [TestCase("/abc/-> to", Command.CommandType.isAnchoredTemplate,"abc",".","->","to")]
+        [TestCase("from  -> to", Command.CommandType.isTemplate,"","from","->","to")]
+        [TestCase("/abc/ from  ->", Command.CommandType.isNotSupported,"abc","from","->","")]
+        [TestCase("from  ->", Command.CommandType.isNotSupported,"","from","->","")]
+        [TestCase("->to", Command.CommandType.isTemplate,"",".","->","to")]
+        [TestCase("/abc/ ", Command.CommandType.isPickupOnly,"","abc","","")]
+        [TestCase("from to", Command.CommandType.isScan,"","from to","","")]
+        [TestCase("->", Command.CommandType.isNotSupported, "", "", "->", "")]
+        [TestCase("s->", Command.CommandType.isNotSupported, "", "s", "->", "")]
+        [TestCase("/a/~t", Command.CommandType.isNotSupported, "a", "", "~", "t")]
+        [TestCase("/a/~", Command.CommandType.isNotSupported, "a", "", "", "")]
+
+        public void TestCommandTypes(string line, Command.CommandType type, string anchor, string subject, string delim, string target) {
             Command command = new Command(line);
             Assert.AreEqual(type, command.CommandIs);
+            Assert.AreEqual(anchor, command.AnchorString);
+            Assert.AreEqual(subject,command.SubjectString);
         }
     }
 

@@ -123,7 +123,7 @@ Caution: You can get unexpected results if you are not careful when using Contro
 
 Pickups add a lot of flexibility to kgrep.
 
-Use ${name} syntax *where name is 1..9 to reference an unnamed capture or the name given to a named capture*, to retrieve the last value of a given capture whether the capture was from the current line or a prior line. Example: The string "hello (?&lt;word&gt;[a-z]+)" contains a pickup named "word". {pickup} is a alternate and simpler syntax.
+Use ${name} syntax *where name is 1..9 to reference an unnamed capture or the name given to a named capture*, to retrieve the last value of a given capture whether the capture was from the current line or a prior line. Example: The string "hello (?&lt;word&gt;[a-z]+)" contains a pickup named "word". {pickup} is a alternate and simpler syntax. Also {pickup=[0-9]+} to conditionally pickup a value based on a regex.
 
 Pickup values are kept for the duration of the run and can only be used in *ReplacementStrings*.  A named pickup's value is the value of the last capture. 
 

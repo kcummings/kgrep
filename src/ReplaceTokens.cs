@@ -73,8 +73,8 @@ namespace kgrep {
         }
 
         private bool isCandidateForReplacement(string line, Command command) {
-            if (command.CommandIs != Command.CommandType.isAnchoredReplace && command.CommandIs != Command.CommandType.isAnchoredReplace)
-                return true;
+            //if (command.CommandIs != Command.CommandType.isAnchoredReplace && command.CommandIs != Command.CommandType.isAnchoredReplace)
+            //    return true;
             return Regex.IsMatch(line, command.AnchorString);
         }
     }
