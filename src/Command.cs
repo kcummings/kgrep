@@ -15,7 +15,6 @@ namespace kgrep
         public bool IsPickupOnly = false;
         public bool IsCaptureInSubjectString = false;
         public bool IsPickupInReplacementString = false;   // pickup syntax: ${name}
-        public bool IsUsingTargetTemplate = false;     // subject -> target rather than subject ~ target
         private static Regex allParensPattern = new Regex(@"(\(\?<.+?>.+?\)|\(.*?\))",RegexOptions.Compiled);
         private static Regex nonCapturingPattern = new Regex(@"\(\?(?:[^<=]|<=|<!).*?\)", RegexOptions.Compiled);
         public static Regex PickupPattern = new Regex(@"\$\{(.+?)\}", RegexOptions.Compiled);
@@ -67,9 +66,6 @@ namespace kgrep
                 delimiter = m.Groups["delim"].Value;
                 ReplacementString = m.Groups["target"].Value.Trim();
                 CommandIs = GetCommandType(AnchorString, SubjectString, delimiter, ReplacementString);
-
-                if (delimiter == "->")
-                    IsUsingTargetTemplate = true;
 
                 SubjectString = RemoveEnclosingQuotesIfPresent(SubjectString.Trim());
 
