@@ -7,6 +7,8 @@ namespace kgrep
 {
     public class Command {
 
+        private static Regex CommandPattern = null;
+        private static string lastDelim = null;
         public String AnchorString = "";
         public String ReplacementString = "";
         public Regex SubjectRegex;
@@ -54,8 +56,7 @@ namespace kgrep
         public void ParseLine(string line, string delim) {
             try {
 
-                string pat = String.Format("(?:/(?<anchor>.*?)/)?(?:(?<subject>.*?)?(?<delim>->|{0})(?<target>.*)|(?<subject>.*))", delim);
-                Regex commandTypeRegex = new Regex(pat);
+                Regex commandTypeRegex = GetCommandRegexPattern(delim);
                 MatchCollection mc = commandTypeRegex.Matches(line);
                 if (mc.Count == 0) {
                     throw new Exception(String.Format("Invalid Command syntax for '{0}'", line));
@@ -91,6 +92,15 @@ namespace kgrep
                 throw new Exception(e.Message);
             }
             return;
+        }
+
+        // This is an optimization to use a compiled Regex expression but to rebuild when delim changes.
+        private Regex GetCommandRegexPattern(string delim) {
+            if (CommandPattern == null || delim != lastDelim) {
+                lastDelim = delim;
+                CommandPattern = new Regex(String.Format("(?:/(?<anchor>.*?)/)?(?:(?<subject>.*?)?(?<delim>->|{0})(?<target>.*)|(?<subject>.*))", delim),RegexOptions.Compiled);
+            }
+            return CommandPattern;
         }
 
         private CommandType GetCommandType(string anchor, string subject, string delim, string target) {
